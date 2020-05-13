@@ -1,2 +1,2 @@
-# brownian
-Brownian Dynamics Engine with Reactions
+# bydrogels
+Simulation tools for use with ReaDDy
