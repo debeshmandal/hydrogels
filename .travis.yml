@@ -16,10 +16,11 @@ install:
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
+  - conda config --add channels conda-forge
 
   # Replace dep1 dep2 ... with your dependencies
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION --file requirements.txt
   - conda activate test-environment
-  - while read requirement; do conda install --yes $requirement || pip install $requirement; done < requirements.txt
-  
+  - conda install -c readdy readdy
+
 script: pytest
