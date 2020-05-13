@@ -28,4 +28,5 @@ script:
   - conda activate test-environment
   - conda install -c readdy readdy
   - python --version
+  - conda list readdy
   - pytest
