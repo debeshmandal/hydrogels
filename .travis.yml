@@ -27,4 +27,4 @@ install:
   - conda list readdy  
 
 script: 
-  - pytest -p no:warnings
+  - pytest
