@@ -21,6 +21,7 @@ install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION --file requirements.txt
   - conda activate test-environment
+  - conda install pandas numpy scipy matplotlib
   - conda install -c readdy readdy
 
 script: pytest
