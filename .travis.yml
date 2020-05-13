@@ -21,12 +21,10 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - conda activate test-environment
   - conda install pandas numpy scipy matplotlib pytest
-  
-
-script: 
   - conda activate test-environment
   - conda config --add channels conda-forge
   - conda install -c readdy readdy
-  - python --version
-  - conda list readdy
-  - pytest
+  - conda list readdy  
+
+script: 
+  - pytest -p no:warnings
