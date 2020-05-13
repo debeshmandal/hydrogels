@@ -8,6 +8,9 @@ import numpy as np
 import pandas as pd
 import readdy
 
+from readdy._internal.readdybinding.api import TopologyRecord
+from readdy._internal.readdybinding.common.util import TrajectoryParticle
+
 class Topology():
     """
     Wrapper for a readdy topology
@@ -65,6 +68,6 @@ class ReaddyTopology(Topology):
     """
     def __init__(
         self, 
-        topology : readdy._internal.readdybinding.api.TopologyRecord, 
-        particles : list):
+        topology : TopologyRecord, 
+        particles : typing.List[TrajectoryParticle]):
         pass
