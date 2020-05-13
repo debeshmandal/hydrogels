@@ -24,4 +24,7 @@ install:
   - conda install pandas numpy scipy matplotlib
   - conda install -c readdy readdy
 
-script: pytest
+script: 
+  - conda activate test-environment
+  - python --version
+  - pytest
