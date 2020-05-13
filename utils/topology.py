@@ -4,6 +4,8 @@ Objects for handling commonly used high-level readdy topologies
 """
 import readdy
 import numpy as np
+import pandas as pd
+import typing
 
 class Topology():
     """
