@@ -2,19 +2,24 @@
 """
 Objects for handling commonly used high-level readdy topologies
 """
-import readdy
+import typing
+
 import numpy as np
 import pandas as pd
-import typing
+import readdy
 
 class Topology():
     """
     Wrapper for a readdy topology
     """
-    def __init__(self, top_type : str):
+    def __init__(self, top_type : str, sequence = [], positions = []):
         self.top_type = top_type
-        self.sequence = []
-        self.positions = np.array([[]])
+        self.sequence = sequence
+        self.positions = np.array(positions)
+
+    @property
+    def is_valid(self) -> bool:
+        return len(self.sequence) == len(self.positions)
 
     def import_dataframe(self, dataframe : pd.DataFrame):
         """
@@ -30,10 +35,19 @@ class Topology():
         """
         DataFrame form of sequence and positions
         """
-        pass
+        data = {
+            'sequence' : self.sequence,
+            'x' : self.positions[:, 0],
+            'y' : self.positions[:, 1],
+            'z' : self.positions[:, 2]
+        }
+        output = pd.DataFrame(data)
 
     def export_xyz(self, fout : str):
-        pass
+        """
+        Export to xyz file, readable by OVITO
+        """
+        self.dataframe.to_csv(fout, index=False, header=False, float_format="%g", sep='\t')
 
     def add_to_sim(self, simulation : readdy.Simulation):
         """
@@ -44,3 +58,13 @@ class Topology():
             self.sequence,
             self.positions
         )
+
+class ReaddyTopology(Topology):
+    """
+    Class to handle readdy.Topology objects
+    """
+    def __init__(
+        self, 
+        topology : readdy._internal.readdybinding.api.TopologyRecord, 
+        particles : list):
+        pass
