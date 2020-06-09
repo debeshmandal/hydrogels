@@ -29,7 +29,15 @@ class PDMS(AbstractGel):
     def __init__(self):
         pass
 
-    def add_initiators(self):
+    def add_initiators(self, n_initiators):
+        """
+        An initiator is a readdy.TopologyRecord in the form of a
+        branched polymer with n_arms = 4.
+        """
+
+        # molecule = .polymers.BranchedPolymer
+        # use self.add_polymer method to add molecule to system aka self
+
         return
     
 class Diacrylate(AbstractGel):

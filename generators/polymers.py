@@ -6,6 +6,8 @@ of monomers.
 import numpy as np 
 from ..utils.topology import Topology
 
+import starpolymers
+
 class AbstractPolymer(Topology):
     """
     Wrapper for topology with basic Polymer operations
