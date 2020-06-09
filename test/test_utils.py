@@ -4,10 +4,10 @@ pytest script for testing utils folder
 """
 import typing
 
-from ..utils import *
-from ..utils import simulation
-from ..utils import system
-from ..utils import topology
+from hydrogels.utils import *
+from hydrogels.utils import simulation
+from hydrogels.utils import system
+from hydrogels.utils import topology
 
 def test_topology() -> bool:
     top = topology.Topology('polymer')

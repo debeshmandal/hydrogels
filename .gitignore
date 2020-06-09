@@ -1,5 +1,10 @@
-**.pyc
-**/.pytest_cache
-**/__pycache__
-**/.ipynb_checkpoints
-**/.ipynb
+*.pyc
+.vscode
+.cache
+__pycache__
+test/configs/*/test_config.dat
+.pytest_cache
+**.bak
+build/
+**.ipynb
+**.egg-info/
