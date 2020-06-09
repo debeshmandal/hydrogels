@@ -25,7 +25,7 @@ install:
   - conda config --add channels conda-forge
   - conda install -c readdy readdy
   - conda list readdy  
+  - pip install . -vv
 
 script: 
   - pytest
-  - cd theory && pytest
