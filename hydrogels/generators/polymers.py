@@ -39,6 +39,8 @@ class LinearPolymer(AbstractPolymer):
         return []
     
     def generate_positions(self):
+        positions = \
+            starpolymers.molecules.LinearPolyelectrolyte().atoms[['x', 'y', 'z']].values
         return []
 
     

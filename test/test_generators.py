@@ -2,4 +2,11 @@
 """
 Pytest script for testing the generators folder
 """
-import readdy
+
+def test_polymers():
+    import hydrogels.generators.polymers as polymers
+    # create linear polymer and print positions
+    return
+
+if __name__ == "__main__":
+    test_polymers()
