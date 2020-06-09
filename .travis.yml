@@ -1,5 +1,7 @@
 language: python
-python: "3.7"
+python: 
+  - 3.7
+  - 3.8
 install:
   - sudo apt-get update
   # We do this conditionally because it saves us some downloading if the
@@ -24,7 +26,8 @@ install:
   - conda activate test-environment
   - conda config --add channels conda-forge
   - conda install -c readdy readdy
-  - conda list readdy  
+  - conda list readdy 
+  - pip install starpolymers 
 
 script: 
   - pytest
