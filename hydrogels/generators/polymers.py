@@ -24,24 +24,32 @@ class LinearPolymer(AbstractPolymer):
         self, 
         top_type : str, 
         n : int, 
-        start : np.ndarray, 
-        delta : np.ndarray,
-        parameters = {'type' : 'homo'}
+        start : np.ndarray = np.array([[0., 0., 0.]])
     ):
 
         super().__init__(
             top_type,
-            sequence = self.generate_sequence(),
-            positions = self.generate_positions()
+            sequence = self.generate_sequence(n),
+            positions = self.generate_positions(n, start)
         )
 
-    def generate_sequence(self):
-        return []
+    def generate_sequence(self, n):
+        return ['test'] * n
     
-    def generate_positions(self):
+    def generate_positions(self, length, start):
+        # use starpolymers to generate positions
         positions = \
-            starpolymers.molecules.LinearPolyelectrolyte().atoms[['x', 'y', 'z']].values
-        return []
+            starpolymers.molecules.LinearPolyelectrolyte(
+                {
+                    'lam' : length, 
+                    'charge' : { 'max' : 0 }
+                }
+            )._atoms
+        positions = positions[['x', 'y', 'z']].values
+        positions[:, 0] += start[:, 0]
+        positions[:, 1] += start[:, 1]
+        positions[:, 2] += start[:, 2]
+        return positions
 
     
 

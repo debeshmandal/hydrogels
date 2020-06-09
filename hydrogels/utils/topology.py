@@ -15,10 +15,10 @@ class Topology():
     """
     Wrapper for a readdy topology
     """
-    def __init__(self, top_type : str, sequence = [], positions = []):
+    def __init__(self, top_type : str, **kwargs):
         self.top_type = top_type
-        self.sequence = sequence
-        self.positions = np.array(positions)
+        self.sequence = kwargs.get('sequence', [])
+        self.positions = kwargs.get('positions', np.array([]))
 
     @property
     def is_valid(self) -> bool:
@@ -45,6 +45,7 @@ class Topology():
             'z' : self.positions[:, 2]
         }
         output = pd.DataFrame(data)
+        return output
 
     def export_xyz(self, fout : str):
         """
