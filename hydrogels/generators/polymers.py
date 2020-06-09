@@ -51,6 +51,42 @@ class LinearPolymer(AbstractPolymer):
         positions[:, 2] += start[:, 2]
         return positions
 
+class CrosslinkingPolymer(AbstractPolymer):
+    """
+    Linear Polymers are generated as a chain of atoms.
+    """
+    def __init__(
+        self, 
+        top_type : str, 
+        kap : int,
+        lam : int,
+        start : np.ndarray = np.array([[0., 0., 0.]])
+    ):
+
+        super().__init__(
+            top_type,
+            sequence = self.generate_sequence(kap, lam),
+            positions = self.generate_positions(kap, lam, start)
+        )
+
+    def generate_sequence(self, kap, lam):
+        return ['test'] * (kap * lam + 1)
+    
+    def generate_positions(self, kap, lam, start):
+        # use starpolymers to generate positions
+        positions = \
+            starpolymers.molecules.StarPolyelectrolyte(
+                {
+                    'kap' : kap,
+                    'lam' : lam, 
+                    'charge' : { 'max' : 0 }
+                }
+            )._atoms
+        positions = positions[['x', 'y', 'z']].values
+        positions[:, 0] += start[:, 0]
+        positions[:, 1] += start[:, 1]
+        positions[:, 2] += start[:, 2]
+        return positions
     
 
     
