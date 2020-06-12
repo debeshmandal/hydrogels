@@ -14,7 +14,23 @@ class AbstractPolymer(Topology):
     that can be shared amongst many polymers.
     """
     def __init__(self, top_type : str, **kwargs):
+        self.start = kwargs.get('start', np.array([[0., 0., 0.]]))
         super().__init__(top_type, **kwargs)
+
+    @property
+    def positions(self):
+        # use starpolymers to generate positions
+        _positions = self.molecule._atoms
+        _positions = _positions[['x', 'y', 'z']].values
+        _positions[:, 0] += self.start[:, 0]
+        _positions[:, 1] += self.start[:, 1]
+        _positions[:, 2] += self.start[:, 2]
+        return _positions
+
+    @property
+    def edges(self):
+        return 
+
 
 class LinearPolymer(AbstractPolymer):
     """
@@ -23,33 +39,39 @@ class LinearPolymer(AbstractPolymer):
     def __init__(
         self, 
         top_type : str, 
-        n : int, 
-        start : np.ndarray = np.array([[0., 0., 0.]])
+        n : int,
+        **kwargs
     ):
-
+        self.n = n
+        #self.start = kwargs.get('start', np.array([0., 0., 0.]))
         super().__init__(
             top_type,
-            sequence = self.generate_sequence(n),
-            positions = self.generate_positions(n, start)
+            sequence = self.generate_sequence(kwargs=kwargs),
         )
 
-    def generate_sequence(self, n):
-        return ['test'] * n
-    
-    def generate_positions(self, length, start):
-        # use starpolymers to generate positions
-        positions = \
-            starpolymers.molecules.LinearPolyelectrolyte(
+    def generate_sequence(self, **kwargs):
+        sequence = kwargs.get('sequence', None)
+        head = kwargs.get('head_name', 'head')
+        core = kwargs.get('core_name', 'core')
+        if sequence == None:
+            return [head] + [core] * (self.n-2) + [head]
+        else:
+            return sequence
+
+    @property
+    def molecule(self):
+        mol = starpolymers.molecules.LinearPolyelectrolyte(
                 {
-                    'lam' : length, 
+                    'lam' : self.n,
                     'charge' : { 'max' : 0 }
                 }
-            )._atoms
-        positions = positions[['x', 'y', 'z']].values
-        positions[:, 0] += start[:, 0]
-        positions[:, 1] += start[:, 1]
-        positions[:, 2] += start[:, 2]
-        return positions
+            )
+        return mol
+
+    @property
+    def edges(self) -> tuple:
+        bonds = self.molecule._bonds
+        return ()
 
 class CrosslinkingPolymer(AbstractPolymer):
     """
@@ -60,33 +82,35 @@ class CrosslinkingPolymer(AbstractPolymer):
         top_type : str, 
         kap : int,
         lam : int,
-        start : np.ndarray = np.array([[0., 0., 0.]])
+        **kwargs
     ):
-
+        self.kap = kap
+        self.lam = lam
+        
         super().__init__(
             top_type,
-            sequence = self.generate_sequence(kap, lam),
-            positions = self.generate_positions(kap, lam, start)
+            sequence = self.generate_sequence(kwargs=kwargs),
         )
 
-    def generate_sequence(self, kap, lam):
-        return ['test'] * (kap * lam + 1)
-    
-    def generate_positions(self, kap, lam, start):
-        # use starpolymers to generate positions
-        positions = \
-            starpolymers.molecules.StarPolyelectrolyte(
+    def generate_sequence(self, **kwargs):
+        sequence = kwargs.get('sequence', None)
+        head = kwargs.get('head_name', 'head')
+        core = kwargs.get('core_name', 'core')
+        if sequence == None:
+            return ([head] + (self.lam-1) * [core]) * self.kap + [core]
+        else:
+            return sequence
+
+    @property
+    def molecule(self):
+        mol = starpolymers.molecules.StarPolyelectrolyte(
                 {
-                    'kap' : kap,
-                    'lam' : lam, 
+                    'kap' : self.kap,
+                    'lam' : self.lam, 
                     'charge' : { 'max' : 0 }
                 }
-            )._atoms
-        positions = positions[['x', 'y', 'z']].values
-        positions[:, 0] += start[:, 0]
-        positions[:, 1] += start[:, 1]
-        positions[:, 2] += start[:, 2]
-        return positions
+            )
+        return mol
     
 
     

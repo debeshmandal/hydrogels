@@ -17,8 +17,16 @@ class Topology():
     """
     def __init__(self, top_type : str, **kwargs):
         self.top_type = top_type
-        self.sequence = kwargs.get('sequence', [])
-        self.positions = kwargs.get('positions', np.array([]))
+        self._sequence = kwargs.get('sequence', [])
+        self._positions = kwargs.get('positions', np.array([]))
+
+    @property
+    def positions(self):
+        return self._positions
+
+    @property
+    def sequence(self):
+        return self._sequence
 
     @property
     def is_valid(self) -> bool:
