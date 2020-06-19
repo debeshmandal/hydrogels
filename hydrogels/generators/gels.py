@@ -15,10 +15,23 @@ class AbstractGel(System):
     def __init__(self):
         pass
 
-    def add_polymers(self, polymer_list):
+    def add_polymers(self, atom_shift=0):
+        # access self._topologies 
+
+        # for each polymer, 
+        
+        # add positions and sequence to the system
+
+        # add edges but remember to do + atom_shift and after this update the atom_shift
+
         return
 
     def add_reactions(self):
+
+        return
+
+    def add_potentials(self):
+
         return
 
 class PDMS(AbstractGel):

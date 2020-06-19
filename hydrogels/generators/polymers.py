@@ -18,7 +18,7 @@ class AbstractPolymer(Topology):
         super().__init__(top_type, **kwargs)
 
     @property
-    def positions(self):
+    def positions(self) -> np.ndarray:
         # use starpolymers to generate positions
         _positions = self.molecule._atoms
         _positions = _positions[['x', 'y', 'z']].values
@@ -28,8 +28,9 @@ class AbstractPolymer(Topology):
         return _positions
 
     @property
-    def edges(self):
-        return 
+    def edges(self) -> tuple:
+        _edges = self.molecule._bonds[['atom_1', 'atom_2']].values
+        return _edges
 
 
 class LinearPolymer(AbstractPolymer):
@@ -67,11 +68,6 @@ class LinearPolymer(AbstractPolymer):
                 }
             )
         return mol
-
-    @property
-    def edges(self) -> tuple:
-        bonds = self.molecule._bonds
-        return ()
 
 class CrosslinkingPolymer(AbstractPolymer):
     """
