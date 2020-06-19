@@ -4,6 +4,9 @@ from typing import List
 import functools
 
 class Equation():
+    """
+    An Equation is a wrapper for a generic functions used in integration
+    """
     def __init__(self, function, parameters : List[str] = [], output_variable : str = None, string : str = ''):
         self._function = function
 
@@ -34,7 +37,14 @@ class Equation():
     def string(self):
         return self._string
 
+    def __repr__(self):
+        return self.string
+
 class History():
+    """
+    An instance of History contains data from a Simulation instance and records it
+    along with metadata for analysis afterwards.
+    """
     def __init__(self, sim_obj, **kwargs):
         self._simulation = sim_obj
         self.data = {}
@@ -43,7 +53,9 @@ class History():
 
     def initialise(self):
         # read variables and setup data dictionary
-        self.data = self._simulation.variables
+        self.data = {}
+        for key, value in self._simulation.variables.items():
+            self.data[key] = [value]
 
     def update(self):
         for key, value in self._simulation.variables.items():
@@ -53,7 +65,7 @@ class History():
     @property
     def dataframe(self) -> pd.DataFrame:
         df = pd.DataFrame(self.data)
-        times = [i * self.meta['constants']['dt'] for i in self._simulation.timestep]
+        times = [i * self.meta['constants']['dt'] for i in range(self._simulation.timestep + 1)]
         df['t'] = times
         return df
     
@@ -66,6 +78,10 @@ class History():
         return data
 
 class Simulation():
+    """
+    A simulation integrates over a given timestep to solve Equations in order as a function
+    of time.
+    """
     def __init__(self, dt, constants={}, variables={}, equations : List[Equation] = [], **kwargs):
 
         self._constants = constants
@@ -73,18 +89,24 @@ class Simulation():
         self._variables = variables
         self._equations = equations
 
+        self.timestep = 0
+
         self.history = History(self, **kwargs)
 
     def integrate(self):
         for equation in self.equations:
-            self._variables[equation.output] = equation(self._variables)
-
-        self._history.update()
+            self._variables[equation.output] = equation(self.inputs)
+        self.timestep += 1
+        self.history.update()
         return
 
     def add_equation(self, equation : Equation):
         self._equations.append(equation)
         self.history.initialise()
+
+    @property
+    def inputs(self):
+        return {**self.constants, **self.variables}
 
     @property
     def constants(self):
@@ -99,7 +121,7 @@ class Simulation():
         return self._equations
 
     def run(self, n_timesteps):
-        for timestep in n_timesteps:
+        for i in range(n_timesteps):
             self.integrate()
         return
 
@@ -129,7 +151,7 @@ if __name__ == '__main__':
         print(f'\tfrom func: M={M}, R={R}, dt={dt}')
         if R == 0:
             return 0.0
-        return R - (M * R ** -2) * dt
+        return R - (1./(M  * R ** 2)) * dt
 
     equation = Equation(func, string=func.__doc__)
     result = equation({
@@ -142,8 +164,25 @@ if __name__ == '__main__':
     print(f'\tString from equation: {equation.string}')
 
     print('Setting up simulation:')
+    simu = Simulation(
+        0.1, 
+        variables= {
+            'M' : 5,
+            'R' : 10
+        },
+        equations = [equation]
+    )
+    print(f'\tsimu.variables: {simu.variables}')
+    print(f'\tsimu.constants: {simu.constants}')
+    print(f'\tsimu.inputs: {simu.inputs}')
+    print(f'\tsimu.equations: {simu.equations}')
+    print(f'\tsimu.history.meta: {simu.history.meta}')
+    print(f'\tsimu.history.dataframe:\n{simu.history.dataframe}')
     print('Doing a single step:')
+    simu.integrate()
+    print(f'\tsimu.history.dataframe:\n{simu.history.dataframe}')
     print('Doing multiple steps:')
-    print('Recording History:')
+    simu.run(100)
+    print(f'\tsimu.history.dataframe:\n{simu.history.dataframe}')
 
 
