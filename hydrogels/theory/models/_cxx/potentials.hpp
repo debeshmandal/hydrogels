@@ -4,4 +4,5 @@
 #include <cmath>
 double lennardJones (double sig, double eps, double r);
 double harmonic (double k, double r);
+double yukawa (double kappa, double cutoff, double r);
 #endif
