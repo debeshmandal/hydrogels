@@ -2,6 +2,6 @@
 #define POTENTIALS_HPP
 #include <bits/stdc++.h>
 #include <cmath>
-double addNumbers(double a, double b);
-double vectorNorm (std::vector<double> vect);
+double lennardJones (double sig, double eps, double r);
+double harmonic (double k, double r);
 #endif
