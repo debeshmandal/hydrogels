@@ -1,1 +1,1 @@
-from .engine import Simulation
+from .engine import Simulation, Equation, History

@@ -184,5 +184,22 @@ if __name__ == '__main__':
     print('Doing multiple steps:')
     simu.run(100)
     print(f'\tsimu.history.dataframe:\n{simu.history.dataframe}')
+    print(f'Simulation with 2 equations:')
+    def func_2(R : float = 1) -> 'M':
+        """M=R/2"""
+        return R/2
+
+    equation_2 = Equation(func_2, string=func_2.__doc__)
+
+    simu = simu = Simulation(
+        0.1, 
+        variables= {
+            'M' : 5,
+            'R' : 10
+        },
+        equations = [equation, equation_2]
+    )
+    simu.run(100)
+    print(f'\tsimu.history.dataframe:\n{simu.history.dataframe}')
 
 
