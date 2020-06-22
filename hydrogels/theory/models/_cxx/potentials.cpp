@@ -23,9 +23,9 @@ double zero (double r) {
 namespace py = pybind11;
 
 PYBIND11_MODULE(potentials, m) {
-    m.def("lennard_jones", &lennardJones, R"pbdoc(LJ)pbdoc");
-    m.def("harmonic", &harmonic, R"pbdoc(HARM)pbdoc");
-    m.def("zero", &zero, "ra"); //R"pbdoc(ZERO)pbdoc", 
+    m.def("lennard_jones", &lennardJones, R"pbdoc(LJ)pbdoc", py::arg("sig"), py::arg("eps"), py::arg("rc"), py::arg("r") );
+    m.def("harmonic", &harmonic, R"pbdoc(HARM)pbdoc", py::arg("k"), py::arg("r"));
+    m.def("zero", &zero, "ZERO", R"pbdoc(ZERO)pbdoc", py::arg("r"));
 
     #ifdef VERSION_INFO
         m.attr("__version__") = VERSION_INFO;

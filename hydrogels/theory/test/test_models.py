@@ -3,6 +3,7 @@ import hydrogels.theory.models as models
 def test_cxx():
     from hydrogels.theory.models import potentials
     assert potentials.zero(1) == 0
+    potentials.lennard_jones(1,1,2,1)
     return
 
 def test_utils():
