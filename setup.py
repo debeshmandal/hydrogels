@@ -1,14 +1,15 @@
 from distutils.core import setup, Extension
 from distutils import sysconfig
+import os
 
 with open("README.md", "r") as f:
     long_description = f.read()
 
-cpp_args = ['-std=c++11', '-stdlib=libc++', '-mmacosx-version-min=10.7']
+cpp_args = ['-std=c++11']#, '-stdlib=libc++']#, '-mmacosx-version-min=10.7']
 
-sfc_module = Extension(
+potentials = Extension(
     'potentials', sources = ['./hydrogels/theory/models/_cxx/potentials.cpp'],
-    include_dirs=['pybind11/include', './hydrogels/theory/models/_cxx/'],
+    include_dirs=[f'{os.environ["CONDA_PREFIX"]}/include/pybind11/include', './hydrogels/theory/models/_cxx/'],
     language='c++',
     extra_compile_args = cpp_args,
     )
@@ -28,4 +29,5 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.5",
+    ext_modules=[potentials]
 )

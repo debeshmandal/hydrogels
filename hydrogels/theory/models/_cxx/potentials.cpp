@@ -1,6 +1,4 @@
-#include <pybind11/pybind11.h>
-
-namespace py = pybind11;
+#include "./potentials.hpp"
 
 double lennardJones (double sig, double eps, double rc, double r) {
     double result;
@@ -22,14 +20,16 @@ double zero (double r) {
     return 0.0;
 }
 
+namespace py = pybind11;
+
 PYBIND11_MODULE(potentials, m) {
-    m.def("lennard_jones", &lennardJones, R"pbdoc()pbdoc");
-    m.def("harmonic", &lennardJones, R"pbdoc()pbdoc");
-    m.def("zero", &lennardJones, R"pbdoc()pbdoc");
+    m.def("lennard_jones", &lennardJones, R"pbdoc(LJ)pbdoc");
+    m.def("harmonic", &harmonic, R"pbdoc(HARM)pbdoc");
+    m.def("zero", &zero, "ra"); //R"pbdoc(ZERO)pbdoc", 
 
     #ifdef VERSION_INFO
-        m.attr("__version__") = VERSION_INFO
+        m.attr("__version__") = VERSION_INFO;
     #else
-        m.attr("__version__") = "dev"
+        m.attr("__version__") = "dev";
     #endif
 }

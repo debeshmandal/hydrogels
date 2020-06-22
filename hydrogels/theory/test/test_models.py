@@ -1,5 +1,10 @@
 import hydrogels.theory.models as models
 
+def test_cxx():
+    from hydrogels.theory.models import potentials
+    assert potentials.zero(1) == 0
+    return
+
 def test_utils():
     return
 
