@@ -4,6 +4,7 @@ def test_cxx():
     from hydrogels.theory.models import potentials
     assert potentials.zero(1) == 0
     potentials.lennard_jones(1,1,2,1)
+    potentials.macro_power2D(1,1,0.1,3,5)
     return
 
 def test_utils():
