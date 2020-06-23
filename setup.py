@@ -1,5 +1,6 @@
 from distutils.core import setup, Extension
 from distutils import sysconfig
+import setuptools
 import os
 
 with open("README.md", "r") as f:
