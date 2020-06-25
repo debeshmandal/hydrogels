@@ -1,5 +1,6 @@
 from ..integrator import Simulation, Equation
 import potentials
+import functions
 
 class ConstantDensity(Simulation):
     def __init__(self, dt, potential_equation, **kwargs):
@@ -7,16 +8,13 @@ class ConstantDensity(Simulation):
         super().__init__(
             dt, 
             constants = {
-                'sig' : sig,
-                'eps' : eps,
-                'rc' : rc, 
                 'beta' : kwargs.get('beta', 1.0),
                 'c0' : kwargs.get('c0', 1.0),
                 'KV' : kwargs.get('KV', 1.0),
                 'nV' : kwargs.get('nV', 1.0)
-            }
+            },
             variables = {
-                'N' : N,
+                'N' : kwargs.get('N'),
                 'R' : None,
                 'V' : None,
                 'k' : None
@@ -26,25 +24,31 @@ class ConstantDensity(Simulation):
 
     @property
     def potential(self):
+        if not isinstance(self._potential_equation, Equation):
+            raise TypeError(
+                f'An object ({self._potential_equation.__name__}) with' 
+                 'type {type(self._potential_equation)} was passed as the '
+                 'potential equation but it must be an Equation instance'                
+                )
         return self._potential_equation
-    
+
     @property
     def equations(self) -> list:
         def radius(N: int = 0, nV: float = 1.0) -> 'R':
             """Radius from number of particles and density"""
-            return functions.R_from_N(N, nV)
+            return functions.radius_from_number(N, nV)
 
         def rate(V: float = 0.0, beta: float = 1.0, KV: float = 1.0, c0: float = 1.0) -> 'k':
             """rate from potential, concentratin and rate of encounter"""
-            return functions.rate_from_boltzmann(KV, c0, beta, V)
+            return functions.rate_from_potential_energy(KV, c0, beta, V)
 
         def number(N: int = 0, k: float = 1.0, dt: float = 1.0) -> 'N':
             """New number from old number and rate"""
-            return functions.N_update_from_rate(N, k, dt)
+            return functions.update_number_from_rate(N, k, dt)
 
         return [
             Equation(radius, string=radius.__doc__),
-            self.potential
+            self.potential,
             Equation(rate, string=rate.__doc__),
-            Equation(number, string=number.__doc__),
+            Equation(number, string=number.__doc__)
         ]
