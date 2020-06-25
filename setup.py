@@ -15,9 +15,16 @@ potentials = Extension(
     extra_compile_args = cpp_args,
     )
 
+functions = Extension(
+    'functions', sources = ['./hydrogels/theory/models/_cxx/functions.cpp'],
+    include_dirs=[f'{os.environ["CONDA_PREFIX"]}/include/pybind11/include', './hydrogels/theory/models/_cxx/'],
+    language='c++',
+    extra_compile_args = cpp_args,
+    )
+
 setup(
     name="hydrogels",
-    version="0.0.2",
+    version="0.0.3",
     author="Debesh Mandal",
     description="Package for creating and analysing hydrogels in ReaDDy",
     long_description=long_description,
@@ -30,5 +37,5 @@ setup(
         "Operating System :: POSIX",
     ],
     python_requires=">=3.5",
-    ext_modules=[potentials]
+    ext_modules=[potentials, functions]
 )

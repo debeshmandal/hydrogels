@@ -1,10 +1,12 @@
 import hydrogels.theory.models as models
 
 def test_cxx():
-    from hydrogels.theory.models import potentials
+    from hydrogels.theory.models import potentials, functions
     assert potentials.zero(1) == 0
     potentials.lennard_jones(1,1,2,1)
     potentials.macro_power2D(1,1,0.1,3,5)
+    functions.radius_from_number(1.0, 1.0)
+    assert functions.boltzmann(1.0, 0.0) == 1.0
     return
 
 def test_utils():
