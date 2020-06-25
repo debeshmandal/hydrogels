@@ -8,14 +8,17 @@ class ConstantDensity(Simulation):
         super().__init__(
             dt, 
             constants = {
-                'beta' : kwargs.get('beta', 1.0),
-                'c0' : kwargs.get('c0', 1.0),
-                'KV' : kwargs.get('KV', 1.0),
-                'nV' : kwargs.get('nV', 1.0)
+                **{
+                    'beta' : kwargs.get('beta', 1.0),
+                    'c0' : kwargs.get('c0', 1.0),
+                    'KV' : kwargs.get('KV', 1.0),
+                    'nV' : kwargs.get('nV', 1.0)
+                }, 
+                **kwargs.get('constants', {})
             },
             variables = {
-                'N' : kwargs.get('N'),
-                'R' : None,
+                'N' : kwargs.get('N', None),
+                'R' : kwargs.get('R', None),
                 'V' : None,
                 'k' : None
             },
