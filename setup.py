@@ -1,11 +1,30 @@
+from distutils.core import setup, Extension
+from distutils import sysconfig
 import setuptools
+import os
 
 with open("README.md", "r") as f:
     long_description = f.read()
 
-setuptools.setup(
+cpp_args = ['-std=c++11']#, '-stdlib=libc++']#, '-mmacosx-version-min=10.7']
+
+potentials = Extension(
+    'potentials', sources = ['./hydrogels/theory/models/_cxx/potentials.cpp'],
+    include_dirs=[f'{os.environ["CONDA_PREFIX"]}/include/pybind11/include', './hydrogels/theory/models/_cxx/'],
+    language='c++',
+    extra_compile_args = cpp_args,
+    )
+
+functions = Extension(
+    'functions', sources = ['./hydrogels/theory/models/_cxx/functions.cpp'],
+    include_dirs=[f'{os.environ["CONDA_PREFIX"]}/include/pybind11/include', './hydrogels/theory/models/_cxx/'],
+    language='c++',
+    extra_compile_args = cpp_args,
+    )
+
+setup(
     name="hydrogels",
-    version="0.0.1",
+    version="0.0.3",
     author="Debesh Mandal",
     description="Package for creating and analysing hydrogels in ReaDDy",
     long_description=long_description,
@@ -15,7 +34,8 @@ setuptools.setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "Operating System :: POSIX",
     ],
     python_requires=">=3.5",
+    ext_modules=[potentials, functions]
 )

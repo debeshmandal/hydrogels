@@ -22,7 +22,7 @@ install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - conda activate test-environment
-  - conda install pandas numpy scipy matplotlib pytest
+  - conda install pandas numpy scipy matplotlib pytest pybind11 gxx_linux-64
   - conda activate test-environment
   - conda config --add channels conda-forge
   - conda install -c readdy readdy
