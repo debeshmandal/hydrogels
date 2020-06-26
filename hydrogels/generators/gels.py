@@ -107,3 +107,89 @@ class Diacrylate(AbstractGel):
     """
     def __init__(self):
         pass
+
+class LennardJonesGel(AbstractGel):
+    """
+    A Lennard-Jones Gel is a gel with a given volume, number and 
+    hence number density that is composed of lennard-jones particles
+    where the k-nearest neighbours are bonded.
+    """
+    def __init__(
+            self, 
+            N : int = None, 
+            V : float = None, 
+            nV : float = None,
+            R : float = None,
+            k : int = 4
+        ):
+        self.deduce_geometry(N, V, nV, R)
+
+    def deduce_geometry(self, N, V, nV, R):
+
+        # Check that only one of R and V are provided and create
+        # boolean to store this information
+        if R != None and V != None:
+            raise ValueError('Only provide one of either R and V')
+        geom_checker = False if nV == None and R == None else True
+
+        # At least two of the list must be True
+        checker_list = [N, nV, geom_checker]
+        if checker_list.count(None) > 1:
+            raise ValueError('Check which arguments have been passed')
+
+        # We only need the radius and the N, the rest of the value
+        # are stored as properties
+        self.radius = R if R != None else self._get_radius(N, V, nV)
+        self.N = N if N != None else self._get_N(nV)
+
+    def _get_radius(self, N : int, V : float, nV : float) -> float:
+        if V == None:
+            try:
+                V = N / nV
+            except TypeError as e:
+                raise e('N and nV must be provided if either R or V are not.')
+        radius = np.cbrt(0.75 * (1./np.pi) * V)
+        return radius
+
+    def _get_N(self, nV : float) -> int:
+        if nV == None:
+            raise ValueError('nV must be provided if N is not')
+        N = int(nV * self.volume)
+        return N
+
+    @property
+    def concentration(self) -> float:
+        return self.N / self.volume
+
+    @property
+    def volume(self) -> float:
+        return 4./3. * np.pi * self.radius ** 3
+
+    def generate_positions(self) -> np.ndarray:
+        """
+        Generate positions within a sphere
+        """
+        V = []
+        costheta = []
+        phi = []
+        for i in range(self.N):
+            V.append(random.uniform(0., self.volume))
+            costheta.append(random.uniform(-1., 1.))
+            phi.append(random.uniform(0., 2*np.pi))
+        R = np.cbrt(np.array(V))
+        theta = np.arccos(costheta)
+        array = np.ones((N, 3))
+        array[:, 0] = R * np.sin(theta) * np.cos(phi)
+        array[:, 1] = R * np.sin(theta) * np.sin(phi)
+        array[:, 2] = R * np.cos(theta)
+        return array
+
+
+    def generate_edges(self) -> tuple:
+        return
+
+    # to set up simulation:
+    # add LJ potential for six potentials types - enzyme, bonded, unbonded combos
+    # add reaction that when an enzyme encounters a gel particle, it changes from bonded to unbonded
+    # and its epsilon is set to zero and sigma set so that it is purely repulsive
+
