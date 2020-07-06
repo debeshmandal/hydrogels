@@ -184,7 +184,6 @@ class LennardJonesGel(AbstractGel):
         array[:, 2] = R * np.cos(theta)
         return array
 
-
     def generate_edges(self) -> tuple:
         return
 
