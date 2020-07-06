@@ -11,54 +11,74 @@ import readdy
 
 from readdy.api.reaction_diffusion_system import ReactionDiffusionSystem
 
-import hydrogels
+from .topology import Topology
 
 class System(ReactionDiffusionSystem):
     """
     Wrapper for a ReaDDy system
     """
     def __init__(self, box):
-        super(box)
+        super().__init__(box)
         self._topologies = []
         self._reactions = []
         self._potentials = []
 
     @property
-    def potentials(self):
+    def potential_list(self):
         return self._potentials
         
     @property
-    def topologies(self):
+    def topology_list(self):
         return self._topologies
 
     @property
-    def reactions(self):
+    def reaction_list(self):
         return self._reactions
 
-    def add_atoms(self):
+    def insert_particles(self):
         return
 
-    def add_topology(self, topology : hydrogels.Topology):
-        if True:
-            raise NotImplementedError
+    def insert_topology(self, topology : Topology, **kwargs):
+        """
+        Takes an instance of hydrogels.Topology and adds the following
+        features to the system:
+            - topology type e.g. polymer
+            - topology species e.g. head, D=5; core, D=5;
+
+        It does not add:
+            - potentials
+            - reactions
+
+        Either diffusion_constant : float or diffusion_dictionary : dict
+        must be provided as keyword arguments
+        """
 
         # check if topology type exists
         # if not then add
-        self.topologies.add_type(topology.top_type)
+        try:
+            self.topologies.add_type(topology.top_type)
+        except ValueError:
+            pass
 
         # do the same for the topology species
-        self.add_topology_species('core', diffusion_constant=1.0)
-        self.add_topology_species('head', diffusion_constant=1.0)
+        for name, D in topology.species(**kwargs).items():
+            try:
+                self.add_topology_species(name, diffusion_constant=D)
+            except ValueError:
+                pass
+                
 
-        # add to simulation
-        topology.add_to_sim(self.simulation)
-        return
+        # store in system - be aware that storing this information
+        # may cause unnecessary memory usage
+        self._topologies.append(topology)
 
     def initialise_simulation(self, fout='_out.h5'):
-        simulation = self.simulation
+        simulation = self.simulation()
         simulation.output_file = fout
         if os.path.exists(simulation.output_file):
             os.remove(simulation.output_file)
+        for top in self.topology_list:
+            top.add_to_sim(simulation)
         return simulation
 
     

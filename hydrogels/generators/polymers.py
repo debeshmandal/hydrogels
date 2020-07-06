@@ -29,7 +29,7 @@ class AbstractPolymer(Topology):
 
     @property
     def edges(self) -> tuple:
-        _edges = self.molecule._bonds[['atom_1', 'atom_2']].values
+        _edges = self.molecule._bonds[['atom_1', 'atom_2']].values - 1
         return _edges
 
 
