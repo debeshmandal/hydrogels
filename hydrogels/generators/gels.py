@@ -3,10 +3,14 @@
 Gels systems containing of polymers. This package lives above polymers.py in the
 molecule hierarchy.
 """
+import random
+
 import numpy as np
+from scipy.spatial.distance import pdist, squareform
+
 from ..utils.system import System
 from .polymers import LinearPolymer, CrosslinkingPolymer
-import random
+
 
 class AbstractGel(System):
     """
@@ -209,8 +213,23 @@ class LennardJonesGel(AbstractGel):
         array[:, 2] = R * np.cos(theta)
         return array
 
-    def generate_edges(self) -> tuple:
-        return ([0, 1], [1, 2])
+    def generate_edges(self, positions, n=4) -> np.ndarray:
+        idxs = np.argsort(squareform(pdist(positions)))[:, 1:]
+        cxns = np.zeros((len(idxs), len(idxs)), dtype=int)
+        for i, row in enumerate(idxs):
+            for j, idx in enumerate(row):
+                if cxns[i, :].sum() >= n: break
+                if cxns[:, idx].sum() >= n: 
+                    continue
+                elif cxns[i, idx] != 1 and cxns[idx, i] != 1:
+                    cxns[i, idx] += 1
+                    cxns[idx, i] += 1
+        result = []
+        for i in range(cxns.shape[0]):
+            for j in range(i):
+                if cxns[i][j]:
+                    result.append([i, j])
+        return result
 
     def initialise_simulation(self, **kwargs):
         simulation = super().initialise_simulation(**kwargs)
@@ -221,7 +240,7 @@ class LennardJonesGel(AbstractGel):
             positions
         )
         self._topologies.append('Manual Topology LJ')
-        for atoms in self.generate_edges():
+        for atoms in self.generate_edges(positions):
             topology.get_graph().add_edge(atoms[0], atoms[1])
         return simulation
 
