@@ -30,7 +30,7 @@ double macroLJ (double sig, double eps, double nV, double n, double rE, double r
     numerator = pow((2.0 * r + rE), denominator) - pow(rE, denominator);
     result = result - (numerator / denominator);
     
-    numerator = 2 * M_PI * nV * pow(sig, n);
+    numerator = 2 * M_PI * nV * pow(sig, n) * eps;
     denominator = 2-n;
     result = result * (numerator / denominator);
     
