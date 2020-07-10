@@ -21,8 +21,9 @@ class AbstractGel(System):
         super().__init__(*args, **kwargs)
 
     def add_enzyme(
-                self, 
+                self,
                 positions, 
+                simulation_obj,
                 species='enzyme', 
                 reaction: str = None, 
                 rate : float = None,
@@ -30,8 +31,8 @@ class AbstractGel(System):
             ):
         for name in self._species:
             self.potentials.add_lennard_jones(species, name, **kwargs)
-        if species not in self._species: self._species.append(name)
-        self.add_particles(species, positions)
+        if species not in self._species: self._species.append(species)
+        simulation_obj.add_particles(species, positions)
         if reaction:
             self.reactions.add(reaction, rate=rate)
 
