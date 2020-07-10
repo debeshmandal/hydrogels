@@ -22,6 +22,7 @@ class System(ReactionDiffusionSystem):
         self._topologies = []
         self._reactions = []
         self._potentials = []
+        self._species = []
 
     @property
     def potential_list(self):
@@ -34,6 +35,10 @@ class System(ReactionDiffusionSystem):
     @property
     def reaction_list(self):
         return self._reactions
+
+    @property
+    def species_list(self):
+        return self._species
 
     def insert_particles(self):
         return
@@ -64,6 +69,7 @@ class System(ReactionDiffusionSystem):
         for name, D in topology.species(**kwargs).items():
             try:
                 self.add_topology_species(name, diffusion_constant=D)
+                if name not in self._species: self._species.append(name)
             except ValueError:
                 pass
                 

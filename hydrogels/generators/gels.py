@@ -5,34 +5,31 @@ molecule hierarchy.
 """
 import numpy as np
 from ..utils.system import System
-from polymers import LinearPolymer, CrosslinkingPolymer
+from .polymers import LinearPolymer, CrosslinkingPolymer
+import random
 
 class AbstractGel(System):
     """
     Initiators are systems of polymers and cross-linking agents that can be
     used to run simulations to form complete gels
     """
-    def __init__(self):
-        pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def add_polymers(self, atom_shift=0):
-        # access self._topologies 
-
-        # for each polymer, 
-        
-        # add positions and sequence to the system
-
-        # add edges but remember to do + atom_shift and after this update the atom_shift
-
-        return
-
-    def add_reactions(self):
-
-        return
-
-    def add_potentials(self):
-
-        return
+    def add_enzyme(
+                self, 
+                positions, 
+                species='enzyme', 
+                reaction: str = None, 
+                rate : float = None,
+                **kwargs
+            ):
+        for name in self._species:
+            self.potentials.add_lennard_jones(species, name, **kwargs)
+        if species not in self._species: self._species.append(name)
+        self.add_particles(species, positions)
+        if reaction:
+            self.reactions.add(reaction, rate=rate)
 
 class PDMS(AbstractGel):
     """
@@ -116,15 +113,43 @@ class LennardJonesGel(AbstractGel):
     """
     def __init__(
             self, 
+            box : np.array,
             N : int = None, 
             V : float = None, 
             nV : float = None,
             R : float = None,
-            k : int = 4
+            k : int = 4,
+            top_type : str = 'lj-gel',
+            monomer : str = 'monomer',
+            **kwargs
         ):
-        self.deduce_geometry(N, V, nV, R)
+        self.top_type = top_type
+        self.monomer = monomer
 
-    def deduce_geometry(self, N, V, nV, R):
+        self.initialise_geometry(N, V, nV, R)
+        super().__init__(box)
+
+        self.add_topology_species(monomer, kwargs['diffusion_constant'])
+        self.topologies.add_type(top_type)
+        self.topologies.configure_harmonic_bond(
+                monomer, 
+                monomer, 
+                force_constant = kwargs['bond_strength'],
+                length = kwargs['bond_length']
+            )
+
+        self.potentials.add_lennard_jones(
+                monomer, 
+                monomer,
+                m=12,
+                n=6,
+                shift=True,
+                epsilon = kwargs['lj_eps'],
+                sigma = kwargs['lj_sig'],
+                cutoff = kwargs['lj_cutoff']
+            )
+
+    def initialise_geometry(self, N, V, nV, R):
 
         # Check that only one of R and V are provided and create
         # boolean to store this information
@@ -178,14 +203,27 @@ class LennardJonesGel(AbstractGel):
             phi.append(random.uniform(0., 2*np.pi))
         R = np.cbrt(np.array(V))
         theta = np.arccos(costheta)
-        array = np.ones((N, 3))
+        array = np.ones((self.N, 3))
         array[:, 0] = R * np.sin(theta) * np.cos(phi)
         array[:, 1] = R * np.sin(theta) * np.sin(phi)
         array[:, 2] = R * np.cos(theta)
         return array
 
     def generate_edges(self) -> tuple:
-        return
+        return ([0, 1], [1, 2])
+
+    def initialise_simulation(self, **kwargs):
+        simulation = super().initialise_simulation(**kwargs)
+        positions = self.generate_positions()
+        topology = simulation.add_topology(
+            self.top_type,
+            len(positions) * [self.monomer],
+            positions
+        )
+        self._topologies.append('Manual Topology LJ')
+        for atoms in self.generate_edges():
+            topology.get_graph().add_edge(atoms[0], atoms[1])
+        return simulation
 
     # to set up simulation:
     # add LJ potential for six potentials types - enzyme, bonded, unbonded combos
