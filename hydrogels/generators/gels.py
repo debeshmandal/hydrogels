@@ -19,22 +19,29 @@ class AbstractGel(System):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._particles = {}
 
     def add_enzyme(
-                self,
-                positions, 
-                simulation_obj,
-                species='enzyme', 
-                reaction: str = None, 
-                rate : float = None,
-                **kwargs
-            ):
-        for name in self._species:
-            self.potentials.add_lennard_jones(species, name, **kwargs)
-        if species not in self._species: self._species.append(species)
-        simulation_obj.add_particles(species, positions)
-        if reaction:
-            self.reactions.add(reaction, rate=rate)
+            self,
+            positions,
+            species='enzyme', 
+            reaction: str = None, 
+            rate : float = None,
+            diffusion_constant : float = 1.0,
+            **kwargs
+        ):
+            if species not in self._species: 
+                self.add_species(species, diffusion_constant)
+                self._species.append(species)
+
+            for name in self._species:
+                self.potentials.add_lennard_jones(species, name, **kwargs)
+            
+            if reaction:
+                self.reactions.add(reaction, rate=rate)
+                
+            self._particles[species] = positions
+        
 
 class PDMS(AbstractGel):
     """
@@ -243,6 +250,9 @@ class LennardJonesGel(AbstractGel):
         self._topologies.append('Manual Topology LJ')
         for atoms in self.generate_edges(positions):
             topology.get_graph().add_edge(atoms[0], atoms[1])
+
+        for species, positions in self._particles.items():
+            simulation.add_particles(species, positions)
         return simulation
 
     # to set up simulation:

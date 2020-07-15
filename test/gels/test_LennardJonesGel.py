@@ -15,7 +15,7 @@ def test_LennardJonesGel_generation():
         diffusion_constant=1.0
     )
     
+    gel.add_enzyme(np.array([[20., 20., 20.]]), epsilon=1.0, sigma=1.0)
     simu = gel.initialise_simulation()
-    gel.add_enzyme(np.array([[40., 40., 40.]]), simu)
     simu.run(10, 0.1)
     return
