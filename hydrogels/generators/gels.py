@@ -25,8 +25,10 @@ class AbstractGel(System):
             self,
             positions,
             species='enzyme', 
-            reaction: str = None, 
+            reaction: str = None,
+            spatial_reaction : str = None,
             rate : float = None,
+            radius : float = None,
             diffusion_constant : float = 1.0,
             **kwargs
         ):
@@ -38,7 +40,10 @@ class AbstractGel(System):
                 self.potentials.add_lennard_jones(species, name, **kwargs)
             
             if reaction:
-                self.reactions.add(reaction, rate=rate)
+                self.reactions.add(reaction, rate=rate, radius=radius)
+            
+            if spatial_reaction:
+                self.topologies.add_spatial_reaction(spatial_reaction)
                 
             self._particles[species] = positions
         
@@ -133,15 +138,18 @@ class LennardJonesGel(AbstractGel):
             k : int = 4,
             top_type : str = 'lj-gel',
             monomer : str = 'monomer',
+            unbonded : str = 'unbonded',
             **kwargs
         ):
         self.top_type = top_type
         self.monomer = monomer
+        self.unbonded = unbonded
 
         self.initialise_geometry(N, V, nV, R)
         super().__init__(box)
 
         self.add_topology_species(monomer, kwargs['diffusion_constant'])
+        self.add_topology_species(unbonded, kwargs['diffusion_constant'])
         self.topologies.add_type(top_type)
         self.topologies.configure_harmonic_bond(
                 monomer, 

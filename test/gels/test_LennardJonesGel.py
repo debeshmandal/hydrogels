@@ -14,8 +14,15 @@ def test_LennardJonesGel_generation():
         lj_cutoff = 10.0,
         diffusion_constant=1.0
     )
-    
-    gel.add_enzyme(np.array([[20., 20., 20.]]), epsilon=1.0, sigma=1.0)
+    spatial_reaction = f'reaction: {gel.top_type}({gel.monomer})+(enzyme) -> {gel.top_type}({gel.unbonded})+(enzyme)'
+    gel.add_enzyme(
+        np.array([[20., 20., 20.]]), 
+        epsilon=1.0, 
+        sigma=1.0,
+        spatial_reaction=spatial_reaction,
+        rate=5.0,
+        radius=2.0
+    )
     simu = gel.initialise_simulation()
     simu.run(10, 0.1)
     return
