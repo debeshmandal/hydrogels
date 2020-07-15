@@ -43,7 +43,7 @@ class AbstractGel(System):
                 self.reactions.add(reaction, rate=rate, radius=radius)
             
             if spatial_reaction:
-                self.topologies.add_spatial_reaction(spatial_reaction)
+                self.topologies.add_spatial_reaction(spatial_reaction, rate=rate, radius=radius)
                 
             self._particles[species] = positions
         
