@@ -32,7 +32,13 @@ double rateFromPotentialEnergy (double K_V, double c_0, double U, double beta) {
 }
 
 double updateNumberFromRate (double N, double k, double dt) {
+    if (N <= 0.0) {
+        return 0.0;
+    }
     double result = N - k * dt;
+    if (result <= 0.0) {
+        return 0.0;
+    }
     return result;
 }
 

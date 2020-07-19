@@ -20,12 +20,20 @@ double zero (double r) {
     return 0.0;
 }
 
-double macroPower2D (double sig, double eps, double rho, double n, double r) {
-    double result;
-    double numerator = 2 * M_PI * eps * rho * sig * sig * sig;
-    double denominator = n * n - 5 * n + 6;
-    double power = pow(sig / r, n - 3);
-    result = (numerator * power) / denominator;
+double macroLJ (double sig, double eps, double nV, double n, double rE, double r) {
+
+    double numerator = pow((2.0*r - (r+rE) * (r+rE)), (2.0-n/2.0)) - pow((-2.0 * rE * rE - 3 * rE * r),(2.0-n/2.0));
+    double denominator = (r+rE) * (n-4.0);
+    double result = numerator / denominator;
+
+    denominator = 3.0 - n;
+    numerator = pow((2.0 * r + rE), denominator) - pow(rE, denominator);
+    result = result - (numerator / denominator);
+    
+    numerator = 2 * M_PI * nV * pow(sig, n) * eps;
+    denominator = 2-n;
+    result = result * (numerator / denominator);
+    
     return result;
 }
 
@@ -39,7 +47,7 @@ PYBIND11_MODULE(potentials, m) {
     m.def("lennard_jones", &lennardJones, R"pbdoc(LJ)pbdoc", py::arg("sig"), py::arg("eps"), py::arg("rc"), py::arg("r") );
     m.def("harmonic", &harmonic, R"pbdoc(HARM)pbdoc", py::arg("k"), py::arg("r"));
     m.def("zero", &zero, R"pbdoc(ZERO)pbdoc", py::arg("r"));
-    m.def("macro_power2D", &macroPower2D, R"pbdoc(2D Power Law Sphere)pbdoc", py::arg("sig"), py::arg("eps"), py::arg("rho"), py::arg("n"), py::arg("r"));
+    m.def("macro_LJ", &macroLJ, R"pbdoc(3D Macroscopic Lennard-Jones Nanoparticle)pbdoc", py::arg("sig"), py::arg("eps"), py::arg("nV"), py::arg("n"), py::arg("rE"), py::arg("r"));
 
     #ifdef VERSION_INFO
         m.attr("__version__") = VERSION_INFO;
