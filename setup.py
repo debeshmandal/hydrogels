@@ -24,7 +24,7 @@ functions = Extension(
 
 setup(
     name="hydrogels",
-    version="0.0.3",
+    version="0.0.4",
     author="Debesh Mandal",
     description="Package for creating and analysing hydrogels in ReaDDy",
     long_description=long_description,

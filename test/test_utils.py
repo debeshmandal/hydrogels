@@ -12,4 +12,3 @@ from hydrogels.utils import topology
 def test_topology() -> bool:
     top = topology.Topology('polymer')
     assert top.is_valid
-    return True
