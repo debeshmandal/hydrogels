@@ -1,6 +1,6 @@
+import setuptools
 from distutils.core import setup, Extension
 from distutils import sysconfig
-import setuptools
 import os
 
 with open("README.md", "r") as f:
@@ -22,9 +22,9 @@ functions = Extension(
     extra_compile_args = cpp_args,
     )
 
-setup(
+setuptools.setup(
     name="hydrogels",
-    version="0.0.3",
+    version="0.3.0",
     author="Debesh Mandal",
     description="Package for creating and analysing hydrogels in ReaDDy",
     long_description=long_description,
