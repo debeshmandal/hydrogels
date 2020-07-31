@@ -34,6 +34,6 @@ conda info -a
 # See if test-environment already available
 # As necessary, apply python module recipies
 echo "create test-environment";
-conda env create -n test-environment -f ./tests/environment.${CONDA_PYTHON}.yml;
+conda env create -n test-environment -f ./ci/environment.yml;
 conda activate test-environment
 conda list

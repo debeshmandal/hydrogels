@@ -1,0 +1,14 @@
+name: debesh
+
+channels:
+  - defaults
+  - conda-forge
+  - readdy
+
+dependencies:
+  - numpy
+  - scipy
+  - pandas
+  - pybind11
+  - matplotlib
+  - readdy
