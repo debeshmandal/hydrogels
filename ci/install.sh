@@ -38,11 +38,11 @@ conda env create -n test-environment -f ./ci/environment.yml;
 conda activate test-environment
 conda install pytest
 if  [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-    conda install libpython m2w64-toolchain -c msys2
+  conda install libpython m2w64-toolchain -c msys2;
 elif [[ "$TRAVIS_OS_NAME" == "osx"]]; then
-    conda install clang_osx-64
+  conda install clang_osx-64;
 else
-    conda install gxx_linux-64
+  conda install gxx_linux-64
 fi;
 conda list
 pip install . -vvv
