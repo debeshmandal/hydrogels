@@ -3,10 +3,14 @@ language: shell
 env:
   - CONDA_PYTHON = 3.8
 
-os:
-  - linux
-  - windows
-  - osx
+jobs:
+  include:
+    - services: docker
+    - os: osx
+      language: shell
+    - os: windows
+      language: shell
+    
 
 before_install:
   - source ./ci/setup.sh
@@ -16,3 +20,5 @@ install:
 
 script:
   - conda --version && python --version && pip --version
+  - pytest
+  - python -m cibuildwheel --output-dir wheelhouse
