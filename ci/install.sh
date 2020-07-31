@@ -38,5 +38,5 @@ conda env create -n test-environment -f ./ci/environment.yml;
 conda activate test-environment
 conda install pytest
 conda list
-python -m pip install .
-python -m pip install cibuildwheel
+pip install . -vvv
+pip install cibuildwheel
