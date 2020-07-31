@@ -6,6 +6,7 @@ channels:
   - readdy
 
 dependencies:
+  - pip
   - numpy
   - scipy
   - pandas
