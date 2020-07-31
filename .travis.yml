@@ -21,4 +21,13 @@ install:
 script:
   - conda --version && python --version && pip --version
   - pytest
-  - python -m cibuildwheel --output-dir wheelhouse
+  #- python -m cibuildwheel --output-dir wheelhouse
+
+deploy:
+  provider: pypi
+  username: "__token__"
+  password: pypi-AgEIcHlwaS5vcmcCJDU3ZGQ2NjkzLTkwYWEtNGE0ZS04YjhjLTM5YTRhZTlkOTczMAACJXsicGVybWlzc2lvbnMiOiAidXNlciIsICJ2ZXJzaW9uIjogMX0AAAYg-ii4WlUxf9M9TfES9abFIulhzKpU1kgeCpTKB32D238
+  distributions: sdist bdist_wheel
+  skip_existing: true
+  on:
+    tags: true

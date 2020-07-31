@@ -1,6 +1,7 @@
 import pytest 
 import numpy as np
 
+@pytest.mark.skip
 def test_LennardJonesGel_generation():
     from hydrogels.generators.gels import LennardJonesGel
     gel = LennardJonesGel(

@@ -8,16 +8,26 @@ with open("README.md", "r") as f:
 
 cpp_args = ['-std=c++11']#, '-stdlib=libc++']#, '-mmacosx-version-min=10.7']
 
+class get_pybind_include(object):
+    """Helper class to determine the pybind11 include path
+    The purpose of this class is to postpone importing pybind11
+    until it is actually installed, so that the ``get_include()``
+    method can be invoked. """
+
+    def __str__(self):
+        import pybind11
+        return pybind11.get_include()
+
 potentials = Extension(
     'potentials', sources = ['./hydrogels/theory/models/_cxx/potentials.cpp'],
-    include_dirs=[f'{os.environ["CONDA_PREFIX"]}/include/pybind11/include', './hydrogels/theory/models/_cxx/'],
+    include_dirs=[get_pybind_include(), './hydrogels/theory/models/_cxx/'],
     language='c++',
     extra_compile_args = cpp_args,
     )
 
 functions = Extension(
     'functions', sources = ['./hydrogels/theory/models/_cxx/functions.cpp'],
-    include_dirs=[f'{os.environ["CONDA_PREFIX"]}/include/pybind11/include', './hydrogels/theory/models/_cxx/'],
+    include_dirs=[get_pybind_include(), './hydrogels/theory/models/_cxx/'],
     language='c++',
     extra_compile_args = cpp_args,
     )
