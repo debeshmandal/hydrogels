@@ -144,9 +144,9 @@ class LennardJonesGel(AbstractGel):
         self.top_type = top_type
         self.monomer = monomer
         self.unbonded = unbonded
-
         self.initialise_geometry(N, V, nV, R)
         super().__init__(box)
+        self._species += [self.monomer, self.unbonded]
 
         self.add_topology_species(monomer, kwargs['diffusion_constant'])
         self.add_topology_species(unbonded, kwargs['diffusion_constant'])
