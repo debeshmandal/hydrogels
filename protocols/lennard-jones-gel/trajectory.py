@@ -4,6 +4,12 @@ from subprocess import check_output, Popen
 from shutil import rmtree
 from pathlib import Path
 import os
+import matplotlib.pyplot as plt
+import numpy as np
+
+def count(array):
+    result = np.histogram(array, range(0, 5))[0]
+    return result
 
 h5_fname = '_out.h5'
 trajectory = readdy.Trajectory(h5_fname)
@@ -25,6 +31,11 @@ except FileNotFoundError:
 
 Path.mkdir(Path('./traj'))
 
+particles = trajectory.read_observable_particles()
+timesteps = particles[0]
+particle_types = particles[1]
+n_particles = pd.DataFrame()
+
 for i in range(n_frames - 1):
     data = pd.read_csv(
         xyz_fname, 
@@ -44,4 +55,20 @@ for i in range(n_frames - 1):
     with open(f'./traj/traj.xyz.{i}', 'w') as f:
         f.write(f'{n_active_atoms}\n\n')
         data.to_csv(f, index=False, header=False, float_format="%g", sep='\t')
+    n_particles = pd.concat([n_particles, pd.DataFrame(count(particle_types[i])).T])
 
+n_particles = n_particles.reset_index(drop=True)
+fig, ax = plt.subplots()
+particle_names = [
+    'gel',
+    'unbonded',
+    'released',
+    'enzyme',
+]
+for i in range(4):
+    ax.plot(n_particles[i], label=particle_names[i])
+ax.set_xlabel('Timestep')
+ax.set_ylabel('Number of Particles')
+ax.legend(frameon=False)
+fig.savefig('particles.pdf')
+plt.show()
