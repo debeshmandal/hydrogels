@@ -6,11 +6,9 @@ def test_LennardJonesGel_generation():
     gel = LennardJonesGel(
         np.array([50., 50., 50.]),
         N = 100,
-        R = 10,
+        R = 5,
         bond_strength = 10.0,
-        bond_length = 1.5,
         lj_eps = 1.0,
-        lj_sig = 1.0,
         lj_cutoff = 10.0,
         diffusion_constant=1.0
     )
@@ -26,3 +24,6 @@ def test_LennardJonesGel_generation():
     simu = gel.initialise_simulation()
     simu.run(10, 0.1)
     return
+
+if __name__=='__main__':
+    test_LennardJonesGel_generation()
