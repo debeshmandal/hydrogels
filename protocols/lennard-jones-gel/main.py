@@ -27,7 +27,7 @@ def generate_positions(radius_min, radius_max, N, origin):
 def generate_enzyme(**kwargs):
     N = kwargs.get('enzyme_number', 20)
     origin = kwargs.get('enzyme_origin', np.array([0., 0., 0.]))
-    excluded_radius = kwargs.get('radius', 5.0)
+    excluded_radius = kwargs.get('radius', 5.0) + 1.0
     max_radius = kwargs.get(
         'enyzme_radius', 
         kwargs.get(
