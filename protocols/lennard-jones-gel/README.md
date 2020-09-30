@@ -77,8 +77,6 @@ If there are any issues then the script will print instructions to console on ho
 
 ## Running the Example
 
-## Results
-
 ## Conclusions
 
 ## Notes

@@ -102,15 +102,7 @@ if __name__ == '__main__':
     parser.add_argument('--json', required=True)
     parser.add_argument('--plot-file', required=False, default=None)
     parser.add_argument('--show', action='store_true')
-
-    # parameters needed for model
-    parser.add_argument('--eps')
-    parser.add_argument('--sig')
-    parser.add_argument('--rc')
-    parser.add_argument('--box')
-    parser.add_argument('--timestep')
-    parser.add_argument('--beta')
-    parser.add_argument('--KV')
+    parser.add_argument('--enforce', action='store_true')
 
     args = vars(parser.parse_args())
     main(**args)

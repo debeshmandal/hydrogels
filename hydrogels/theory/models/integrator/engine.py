@@ -93,6 +93,12 @@ class Simulation():
 
         self.history = History(self, **kwargs)
 
+    @property
+    def string(self) -> str:
+        """Printable string summarising model"""
+        output = ""
+        return output
+
     def integrate(self):
         for equation in self.equations:
             self._variables[equation.output] = equation(self.inputs)

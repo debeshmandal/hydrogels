@@ -1,5 +1,6 @@
 import logging
 import sys
+import os
 
 class NewLineFormatter(logging.Formatter):
     def __init__(self):
@@ -26,7 +27,9 @@ class Logger:
         if name == '__main__':
             name = 'root'
         self.logger = logging.getLogger(name)
-        self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(
+            int(os.environ.get('DEBUG_LEVEL', logging.INFO))
+        )
         ch = logging.StreamHandler()
         ch.setFormatter(NewLineFormatter())
         self.logger.addHandler(ch)
