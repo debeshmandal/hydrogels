@@ -7,3 +7,12 @@ python3 -m pip install matplotlib
 python3 -m pip install .
 python3 -m pip install "pybind11[global]"
 python3 -m pip install h5py
+
+git clone https://github.com/readdy/readdy
+cd readdy
+mkdir build
+cd build
+cmake ..
+make -j8
+cd ..
+cd ..
