@@ -16,3 +16,4 @@ cmake ..
 make -j8
 cd ..
 cd ..
+python3 -m pip install ./readdy
