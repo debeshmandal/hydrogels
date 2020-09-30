@@ -27,4 +27,4 @@ install:
 
 script:
   - pytest
-  - python -m cibuildwheel --output-dir wheelhouse
+  - python3 -m cibuildwheel --output-dir wheelhouse
