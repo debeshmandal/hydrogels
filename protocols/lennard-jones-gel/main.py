@@ -2,6 +2,7 @@ import numpy as np
 from hydrogels.generators.gels import LennardJonesGel
 import readdy
 import random
+import json
 
 def generate_positions(radius_min, radius_max, N, origin):
     """
@@ -136,6 +137,7 @@ def main(**kwargs):
     gel = generate_gel(**kwargs)
     run(gel, **kwargs)
 
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -165,8 +167,15 @@ if __name__ == '__main__':
     parser.add_argument('--stride', required=False, type=int, default=1000)
     parser.add_argument('--timestep', required=False, type=float, default=0.001)
     parser.add_argument('--length', required=False, type=int, default=100)
+    parser.add_argument('--json', required=False, default=None)
+
     args = vars(parser.parse_args())
+    if args.get('json', False):
+        with open(args['json'], 'w') as f:
+            json.dump({'simulation': args}, f, indent=2)
+    
     if args.get('box', False):
         box = args['box']
         args['box'] = np.array([box, box, box])
+    
     main(**args)
