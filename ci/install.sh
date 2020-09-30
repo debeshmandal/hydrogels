@@ -5,3 +5,5 @@ python3 -m pip install scipy
 python3 -m pip install pandas
 python3 -m pip install matplotlib
 python3 -m pip install .
+python3 -m pip install "pybind11[global]"
+python3 -m pip install h5py

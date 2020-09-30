@@ -12,7 +12,7 @@ jobs:
         - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
         # make sure it's on PATH as 'python3'
         - ln -s /c/Python38/python.exe /c/Python38/python3.exe
-        
+
 install:
   - source ./ci/install.sh
 
