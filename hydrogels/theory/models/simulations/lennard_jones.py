@@ -2,18 +2,18 @@ from ..integrator import Simulation, Equation
 import potentials
 
 class LennardJones(Simulation):
-    def __init__(self, dt, sig, eps, rc, **kwargs):
+    def __init__(self, dt, N, **constants):
         super().__init__(
             dt, 
             constants = {
-                'sig' : sig,
-                'eps' : eps,
-                'rc' : rc, 
-                'beta' : kwargs.get('beta', 1.0),
-                'c0' : kwargs.get('c0', 1.0),
-                'KV' : kwargs.get('KV', 1.0),
-                'nV' : kwargs.get('nV', 1.0)
-            }
+                'sig' : constants['sig'],
+                'eps' : constants['eps'],
+                'rc' : constants['rc'], 
+                'beta' : constants['beta'],
+                'c0' : constants['c0'],
+                'KV' : constants['KV'],
+                'nV' : constants['nV']
+            },
             variables = {
                 'N' : N,
                 'R' : None,
@@ -46,7 +46,7 @@ class LennardJones(Simulation):
 
         return [
             Equation(radius, string=radius.__doc__),
-            self.potential
+            self.potential,
             Equation(rate, string=rate.__doc__),
             Equation(number, string=number.__doc__),
         ]
