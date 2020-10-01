@@ -14,6 +14,7 @@ set -e
 echo "Using downloaded HDF5"
 #python3 -m pip install requests
 #python3 ci/get_hdf5.py
+HDF5_VERSION=1.12
 if [ -f $HDF5_DIR/lib/libhdf5.so ]; then
 echo "using cached build"
 else
