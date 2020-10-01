@@ -1,11 +1,24 @@
 language: python
 python: 3.8
-os:
-  - linux
+matrix:
+  include:
+    - os: linux
+
+    - os: osx
+      osx_image: xcode11
+      language: shell
+      before_install: python3 --version; pip3 --version
+
+    - os: windows
+      language: shell
+      before_install:
+        - choco install python
+        - python -m pip install --upgrade pip
+      env: PATH=/c/Python38:/c/Python38/Scripts:$PATH
 
 install:
   - source ./ci/install.sh
 
 script:
   - pytest
-  - python3 -m cibuildwheel --output-dir wheelhouse
+  - python3 -m cibuildwheel --output-dir wheelhouse || python -m cibuildwheel --output-dir wheelhouse
