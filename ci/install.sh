@@ -24,7 +24,7 @@ else
     tar -xzf hdf5-$HDF5_VERSION.tar.gz
     pushd hdf5-$HDF5_VERSION
     chmod u+x autogen.sh
-    source configure --prefix $HDF5_DIR
+    source configure
     make -j $(nproc)
     sudo make install
     popd
