@@ -5,8 +5,8 @@ pushd /tmp
 wget "https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-${HDF5_VERSION%.*}/hdf5-$HDF5_VERSION/src/hdf5-$HDF5_VERSION.tar.gz"
 tar -xzf hdf5-$HDF5_VERSION.tar.gz
 pushd hdf5-$HDF5_VERSION
-chmod u+x autogen.sh
-source configure --prefix $HDF5_DIR
+#chmod u+x autogen.sh
+#source configure --prefix $HDF5_DIR
 make -j $(nproc)
 sudo make install
 popd
