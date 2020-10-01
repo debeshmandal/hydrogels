@@ -1,26 +1,7 @@
 language: python
-
-jobs:
-  include:
-    - services: docker
-      addons:
-        apt:
-          packages:
-            - libhdf5-serial-dev
-    - os: osx
-      language: shell
-      addons:
-        apt:
-          packages:
-            - libhdf5-serial-dev
-    - os: windows
-      language: shell
-      before_install:
-        - choco install python --version 3.8.0
-        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
-        # make sure it's on PATH as 'python3'
-        - ln -s /c/Python38/python.exe /c/Python38/python3.exe
-        - choco install libhdf5-serial-dev
+python: 3.8
+os:
+  - linux
 
 install:
   - source ./ci/install.sh
