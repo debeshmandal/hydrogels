@@ -3,6 +3,8 @@ from hydrogels.generators.gels import LennardJonesGel
 import readdy
 import random
 import json
+from hydrogels.utils.logger import Logger
+logger = Logger('main.py')
 
 def generate_positions(radius_min, radius_max, N, origin):
     """

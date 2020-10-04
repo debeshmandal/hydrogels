@@ -25,3 +25,22 @@ def test_constant_density():
     simu.integrate()
     simu.run(1000)
     return
+
+def test_lennard_jones():
+    from hydrogels.theory.models.simulations import LennardJones
+    simu = LennardJones(0.1, 10, **{
+                'sig' : 1.0,
+                'eps' : 1.0,
+                'rc' : 5.0, 
+                'beta' : 1.0,
+                'c0' : 5.0,
+                'KV' : 1.0,
+                'nV' : 1.0,
+            })
+    simu.integrate()
+    simu.run(10)
+    return
+
+if __name__ == '__main__':
+    test_constant_density()
+    test_lennard_jones()

@@ -4,6 +4,7 @@ Reads a trajectory to determine the degradation rate
 of a hydrogel and applies an analytical model to which a 
 comparison can be made.
 """
+import json 
 import hydrogels
 import numpy as np
 import pandas as pd
@@ -17,7 +18,8 @@ from hydrogels.utils.logger import Logger
 logger = Logger('model.py')
 
 def _extract_data(fname : str) -> dict:
-    df = pd.read_csv('fname')
+    df = pd.read_csv(fname)
+    logger.debug(f'Particles:\n{df.head()}')
     data = {
         'particles' : df,
         'N' : max(df.iloc[:, 0])
@@ -34,18 +36,19 @@ def _plot_trajectory(
 def _model(
     N, 
     conc, 
-    density, 
+    density,
+    simulation,
     **kwargs
 ) -> LennardJonesSimulation:
     return LennardJonesSimulation(
-        kwargs['timestep'],
+        simulation['timestep'],
         N,
-        sig=kwargs['sig'],
-        eps=kwargs['eps'],
-        rc=kwargs['rc'],
-        beta=kwargs['beta'],
+        sig=simulation['lj_sig'],
+        eps=simulation['lj_eps'],
+        rc=simulation['lj_cutoff'],
+        beta=1.0,
         c0=conc,
-        KV=kwargs['KV'],
+        KV=1.0,
         nV=density,
     )
 
@@ -53,6 +56,7 @@ def _plot_model(
     ax: plt.Axes, 
     model: LennardJonesSimulation
 ) -> plt.Line2D:
+    ax.plot(model.history.dataframe.iloc[:, 0], 'k-')
     return
 
 def main(**kwargs):
@@ -60,27 +64,37 @@ def main(**kwargs):
     logger.debug(f'Creating Axes...')
     fig, ax = plt.subplots()
 
-    logger.debug(f'Plotting Trajectory...')
-    fname = kwargs['particles_file']
+    f_json = kwargs['json']
+    logger.info(f'Using JSON file {f_json}')
+    with open(f_json, 'r') as f:
+        settings = json.load(f)
+
+    logger.debug(f'JSON Data: {json.dumps(settings, indent=2)}')
     
-    logger.info(f'Using file: {fname}')   
-    data = _extract_data(fname) 
-    _plot_trajectory(ax, data['gel'])
+    logger.debug(f'Plotting Trajectory...')
+    f_particles = settings['trajectory']['f_particles']
+    logger.info(f'Using particles file: {f_particles}')   
+    data = _extract_data(f_particles)
+    _plot_trajectory(ax, data['particles'])
 
     logger.debug(f'Running _model...')
     N = data['N']
-    conc = data['N'] / kwargs['box'] ** 3
-    density = data['density']
-    model = _model(N, conc, density, **kwargs)
-    logger.debug(f'Created Model: {model.string}')
+    conc = data['N'] / settings['simulation']['box'] ** 3
+    density = settings['trajectory']['gel_density']
 
-    n_timesteps = kwargs['timestep'] * data['steps']
+    dt = settings['simulation']['timestep']
+    n_timesteps =  settings['simulation']['stride'] \
+                 * settings['simulation']['length']
     logger.debug(
         f'Using {n_timesteps} timesteps'
-        f' with dt={kwargs["timestep"]}')
+        f' with dt={dt}')
+
+    model = _model(N, conc, density, settings['simulation'])
+    #logger.debug(f'Created Model: {model.string}')
     model.run(n_timesteps)
+    logger.info(f'Ran model and returned history:\n{model.history.dataframe}')
     logger.debug(f'Plotting Model...')
-    _plot_model(ax)
+    _plot_model(ax, model)
 
     fout = kwargs.get('plot_file', False)
     if fout:

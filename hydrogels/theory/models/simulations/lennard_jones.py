@@ -1,5 +1,6 @@
 from ..integrator import Simulation, Equation
 import potentials
+import functions
 
 class LennardJones(Simulation):
     def __init__(self, dt, N, **constants):
@@ -34,15 +35,15 @@ class LennardJones(Simulation):
     def equations(self) -> list:
         def radius(N: int = 0, nV: float = 1.0) -> 'R':
             """Radius from number of particles and density"""
-            return potentials.radius_from_N(N, nV)
+            return functions.radius_from_number(N, nV)
 
         def rate(V: float = 0.0, beta: float = 1.0, KV: float = 1.0, c0: float = 1.0) -> 'k':
             """rate from potential, concentratin and rate of encounter"""
-            return potentials.rate_from_boltzmann(KV, c0, beta, V)
+            return functions.rate_from_potential_energy(KV, c0, V, beta)
 
         def number(N: int = 0, k: float = 1.0, dt: float = 1.0) -> 'N':
             """New number from old number and rate"""
-            return potentials.number_update_from_rate(N, k, dt)
+            return functions.update_number_from_rate(N, k, dt)
 
         return [
             Equation(radius, string=radius.__doc__),
