@@ -1,18 +1,19 @@
-if [[ "$TRAVIS_OS_NAME" != "linux" ]]; then
+echo $TRAVIS_OS_NAME
+if [[ $TRAVIS_OS_NAME != "linux" ]]; then
     echo "LINUX"
     wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/src/CMake-hdf5-1.12.0.tar.gz
     tar xzf CMake-hdf5-1.12.0.tar.gz 
     pushd CMake-hdf5-1.12.0
     ./build-unix.sh
     popd # leaving hdf5 directory
-elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+elif [[ $TRAVIS_OS_NAME == "osx" ]]; then
     echo "OSX"
     wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/src/CMake-hdf5-1.12.0.tar.gz
     tar xzf CMake-hdf5-1.12.0.tar.gz 
     pushd CMake-hdf5-1.12.0
     ./build-unix.sh
     popd # leaving hdf5 directory
-elif [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+elif [[ $TRAVIS_OS_NAME == "windows" ]]; then
     choco install zip
     wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/src/CMake-hdf5-1.12.0.zip
     tar.exe -x -f CMake-hdf5-1.12.0.zip
