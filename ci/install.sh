@@ -1,5 +1,5 @@
 echo $TRAVIS_OS_NAME
-if [[ $TRAVIS_OS_NAME != "linux" ]]; then
+if [[ $TRAVIS_OS_NAME == "linux" ]]; then
     echo "LINUX"
     wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/src/CMake-hdf5-1.12.0.tar.gz
     tar xzf CMake-hdf5-1.12.0.tar.gz 
