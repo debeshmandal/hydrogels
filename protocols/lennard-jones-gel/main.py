@@ -120,6 +120,10 @@ def run(gel, **kwargs):
     stride = kwargs.get('stride', 1000)
     length = kwargs.get('length', 100)
     timestep = kwargs.get('timestep', 0.001)
+    logger.info(f'Running simulation using:\n\tstride\t{stride}\n'
+                f'\tlength\t{length}\n\tts\t{timestep}')
+    logger.info(f'Total simulation steps:\t{stride*length}\n'
+                f'Total simulation time:\t{stride*length*timestep}t')
 
     simu = gel.initialise_simulation()
     simu.observe.topologies(stride)

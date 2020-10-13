@@ -8,11 +8,11 @@ LJEPS=0.0
 LJSIG=1.0
 LJCUT=5.0
 
-echo "Testing main.py..."
+echo "SCRIPT: Testing main.py..."
 python $path/main.py \
 	--box $BOX \
-	--stride 10 \
-	--length 20 \
+	--stride 5000 \
+	--length 500 \
 	--timestep $DT \
 	--number 50 \
 	--radius 3.0 \
@@ -26,7 +26,7 @@ python $path/main.py \
 	--diffusion-constant 5.0 \
 	--json $folder/simulation.json
 
-echo "Testing trajectory.py"
+echo "SCRIPT: Testing trajectory.py"
 python $path/trajectory.py \
 	--fname _out.h5 \
 	--particles-file $folder/particles.csv \
@@ -34,8 +34,7 @@ python $path/trajectory.py \
 	--traj-folder $folder/traj \
 	--json $folder/simulation.json
 
-exit 1 
-
-echo "Testing model.py"
+echo "SCRIPT: Testing model.py"
 python $path/model.py \
-	--json $folder/simulation.json
+	--json $folder/simulation.json \
+	--show

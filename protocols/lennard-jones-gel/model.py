@@ -28,9 +28,12 @@ def _extract_data(fname : str) -> dict:
 
 def _plot_trajectory(
     ax: plt.Axes, 
-    data: pd.DataFrame
+    data: pd.DataFrame,
+    timestep: float,
+    stride: float,
 ) -> plt.Line2D:
-    line = ax.plot(data.iloc[:, 0], 'k+:')
+    time = np.arange(0, len(data)) * timestep * stride
+    line = ax.plot(time, data.iloc[:, 0], 'k+:')
     return line
 
 def _model(
@@ -46,9 +49,9 @@ def _model(
         sig=simulation['lj_sig'],
         eps=simulation['lj_eps'],
         rc=simulation['lj_cutoff'],
-        beta=1.0,
+        beta=0.4,
         c0=conc,
-        KV=1.0,
+        KV=350.,
         nV=density,
     )
 
@@ -56,13 +59,15 @@ def _plot_model(
     ax: plt.Axes, 
     model: LennardJonesSimulation
 ) -> plt.Line2D:
-    ax.plot(model.history.dataframe.iloc[:, 0], 'k-')
+    ax.plot(model.history.dataframe['t'], model.history.dataframe['N'], 'k-')
     return
 
 def main(**kwargs):
 
     logger.debug(f'Creating Axes...')
     fig, ax = plt.subplots()
+    ax.set_xlabel(r"Time [$\tau$]", fontsize='x-large')
+    ax.set_ylabel(r"Number of Particles in Gel", fontsize='x-large')
 
     f_json = kwargs['json']
     logger.info(f'Using JSON file {f_json}')
@@ -75,16 +80,16 @@ def main(**kwargs):
     f_particles = settings['trajectory']['f_particles']
     logger.info(f'Using particles file: {f_particles}')   
     data = _extract_data(f_particles)
-    _plot_trajectory(ax, data['particles'])
+    dt = settings['simulation']['timestep']
+    stride = settings['simulation']['stride']
+    _plot_trajectory(ax, data['particles'], dt, stride)
 
     logger.debug(f'Running _model...')
     N = data['N']
     conc = data['N'] / settings['simulation']['box'] ** 3
     density = settings['trajectory']['gel_density']
 
-    dt = settings['simulation']['timestep']
-    n_timesteps =  settings['simulation']['stride'] \
-                 * settings['simulation']['length']
+    n_timesteps =  stride * settings['simulation']['length']
     logger.debug(
         f'Using {n_timesteps} timesteps'
         f' with dt={dt}')
@@ -106,6 +111,11 @@ def main(**kwargs):
         logger.info('Showing plot...')
         plt.show()
 
+    f_model = kwargs.get('model_file', False)
+    if f_model:
+        logger.info(f'Writing model history to {f_model}')
+        model.history.dataframe.to_csv(f_model, index=False)
+
     return
 
 if __name__ == '__main__':
@@ -115,6 +125,7 @@ if __name__ == '__main__':
     # files and plotting options
     parser.add_argument('--json', required=True)
     parser.add_argument('--plot-file', required=False, default=None)
+    parser.add_argument('--model-file', required=False, default=None)
     parser.add_argument('--show', action='store_true')
     parser.add_argument('--enforce', action='store_true')
 
