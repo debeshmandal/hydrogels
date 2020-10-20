@@ -39,5 +39,3 @@ jobs:
       run: pip install .
     - name: Test
       run: pytest
-    - name: Build wheels
-      run: python -m cibuildwheel --output-dir wheelhouse
