@@ -33,7 +33,7 @@ def _plot_trajectory(
     stride: float,
 ) -> plt.Line2D:
     time = np.arange(0, len(data)) * timestep * stride
-    line = ax.plot(time, data.iloc[:, 0], 'k+:')
+    line = ax.plot(time, data.iloc[:, 0], 'k+:', label='Simulation Trajectory')
     return line
 
 def _model(
@@ -51,15 +51,20 @@ def _model(
         rc=simulation['lj_cutoff'],
         beta=0.4,
         c0=conc,
-        KV=350.,
         nV=density,
+        thickness=simulation['reaction_radius'],
+        rate=simulation['enzyme_number']/simulation['reaction_rate'],
     )
 
 def _plot_model(
     ax: plt.Axes, 
     model: LennardJonesSimulation
 ) -> plt.Line2D:
-    ax.plot(model.history.dataframe['t'], model.history.dataframe['N'], 'k-')
+    temp = model.history.dataframe
+    skip = len(temp) // 100
+    temp = temp.iloc[::skip]
+    logger.debug(f'Using temp with {len(temp)} rows')
+    ax.plot(temp['t'], temp['N'], 'k-', label='Analytical Model')
     return
 
 def main(**kwargs):
@@ -100,11 +105,12 @@ def main(**kwargs):
     logger.info(f'Ran model and returned history:\n{model.history.dataframe}')
     logger.debug(f'Plotting Model...')
     _plot_model(ax, model)
+    ax.legend(frameon=False, fontsize='x-large')
 
     fout = kwargs.get('plot_file', False)
     if fout:
         logger.info(f'Saving plot to {fout}...')
-        fig.savefig()
+        fig.savefig(fout)
         logger.info(f'Save successful!')
 
     if kwargs.get('show', False):

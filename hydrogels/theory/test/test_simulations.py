@@ -34,7 +34,6 @@ def test_lennard_jones():
                 'rc' : 5.0, 
                 'beta' : 1.0,
                 'c0' : 5.0,
-                'KV' : 1.0,
                 'nV' : 1.0,
                 'rate': 0.1,
                 'thickness': 0.01

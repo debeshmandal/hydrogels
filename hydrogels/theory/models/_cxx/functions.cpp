@@ -53,7 +53,7 @@ double vectorNorm (std::vector<double> vect) {
 
 double KVFromR (double R, double rate, double thickness) {
     double result;
-    result = (0.75 * rate) / (M_PI * R * R * thickness);
+    result = (4.0 * rate * M_PI * R * R * thickness);
     return result;
 }
 

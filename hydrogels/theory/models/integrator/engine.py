@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import List
 import functools
+from tqdm import tqdm
 
 class Equation():
     """
@@ -127,7 +128,7 @@ class Simulation():
         return self._equations
 
     def run(self, n_timesteps):
-        for i in range(n_timesteps):
+        for i in tqdm(range(n_timesteps)):
             self.integrate()
         return
 
