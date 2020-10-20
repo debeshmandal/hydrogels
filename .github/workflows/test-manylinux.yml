@@ -20,8 +20,7 @@ jobs:
     steps:
     - name: show binary directory
       run: |
-        ls /opt/python
-        ls ${PYTHON_BINARY_DIR}
+        ls /opt/python/*
     - uses: actions/checkout@v2
     - name: Set up HDF5
       run: |
