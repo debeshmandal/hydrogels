@@ -11,7 +11,8 @@ jobs:
     strategy:
       matrix:
         py: [3.8]
-    
+    env:
+      CIBW_SKIP: cp27-*
     steps:
     - uses: actions/checkout@v2
     - name: Set up HDF5
