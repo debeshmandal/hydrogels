@@ -9,8 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     env:
-      CP: cp3${{matrix.minor_version}}
-      PYTHON_BINARY_DIR: /opt/python/${CP}-${CP}/bin
+      PYTHON_BINARY_DIR: /opt/python/cp3${{matrix.minor_version}}-cp3${{matrix.minor_version}}/bin
     container: quay.io/pypa/${{matrix.image}}
     strategy:
       matrix:
@@ -21,6 +20,7 @@ jobs:
     - name: show binary directory
       run: |
         ls /opt/python/*
+        ls ${PYTHON_BINARY_DIR}
     - uses: actions/checkout@v2
     - name: Set up HDF5
       run: |
