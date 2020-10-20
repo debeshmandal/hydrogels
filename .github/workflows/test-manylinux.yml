@@ -3,6 +3,7 @@
 name: ManyLinux
 
 on: push
+runs-on: ubuntu-latest
 jobs:
   build:
     continue-on-error: true
