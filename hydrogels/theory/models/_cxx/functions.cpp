@@ -51,6 +51,12 @@ double vectorNorm (std::vector<double> vect) {
     return result;
 }
 
+double KVFromR (double R, double rate, double thickness) {
+    double result;
+    result = (4.0 * rate * M_PI * R * R * thickness);
+    return result;
+}
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(functions, m) {
@@ -58,6 +64,7 @@ PYBIND11_MODULE(functions, m) {
     m.def("radius_from_number", &radiusFromNumber, R"pbdoc(Radius from number of particles and number density)pbdoc", py::arg("N"), py::arg("nV"));
     m.def("rate_from_potential_energy", &rateFromPotentialEnergy, R"pbdoc(Rate from Potential Energy at surface and bulk concentration)pbdoc", py::arg("KV"), py::arg("c0"), py::arg("U"), py::arg("beta"));
     m.def("update_number_from_rate", &updateNumberFromRate, R"pbdoc(New number of particles using rate and timestep)pbdoc", py::arg("N"), py::arg("k"), py::arg("dt"));
+    m.def("kv_from_radius", &KVFromR, R"pbdoc(Returns the rate per unit volume)pbdoc", py::arg("R"), py::arg("rate"), py::arg("thickness"));
 
     #ifdef VERSION_INFO
         m.attr("__version__") = VERSION_INFO;

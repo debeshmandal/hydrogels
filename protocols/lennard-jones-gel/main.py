@@ -2,6 +2,9 @@ import numpy as np
 from hydrogels.generators.gels import LennardJonesGel
 import readdy
 import random
+import json
+from hydrogels.utils.logger import Logger
+logger = Logger('main.py')
 
 def generate_positions(radius_min, radius_max, N, origin):
     """
@@ -117,6 +120,10 @@ def run(gel, **kwargs):
     stride = kwargs.get('stride', 1000)
     length = kwargs.get('length', 100)
     timestep = kwargs.get('timestep', 0.001)
+    logger.info(f'Running simulation using:\n\tstride\t{stride}\n'
+                f'\tlength\t{length}\n\tts\t{timestep}')
+    logger.info(f'Total simulation steps:\t{stride*length}\n'
+                f'Total simulation time:\t{stride*length*timestep}t')
 
     simu = gel.initialise_simulation()
     simu.observe.topologies(stride)
@@ -135,6 +142,7 @@ def reaction_function(topology):
 def main(**kwargs):
     gel = generate_gel(**kwargs)
     run(gel, **kwargs)
+
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
@@ -165,8 +173,15 @@ if __name__ == '__main__':
     parser.add_argument('--stride', required=False, type=int, default=1000)
     parser.add_argument('--timestep', required=False, type=float, default=0.001)
     parser.add_argument('--length', required=False, type=int, default=100)
+    parser.add_argument('--json', required=False, default=None)
+
     args = vars(parser.parse_args())
+    if args.get('json', False):
+        with open(args['json'], 'w') as f:
+            json.dump({'simulation': args}, f, indent=2)
+    
     if args.get('box', False):
         box = args['box']
         args['box'] = np.array([box, box, box])
+    
     main(**args)

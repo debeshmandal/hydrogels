@@ -11,4 +11,5 @@ double rateFromPotentialEnergy (double K_V, double c_0, double U, double beta);
 double radiusFromNumber (double N, double nV);
 double updateNumberFromRate (double N, double k, double dt);
 double vectorNorm (std::vector<double> vect);
+double KVFromR (double R, double rate, double thickness);
 #endif
