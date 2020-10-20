@@ -37,4 +37,6 @@ python $path/trajectory.py \
 echo "SCRIPT: Testing model.py"
 python $path/model.py \
 	--json $folder/simulation.json \
+	--plot-file $folder/model.png \
+	--model-file $folder/model.csv \
 	--show

@@ -77,6 +77,18 @@ If there are any issues then the script will print instructions to console on ho
 
 ## Running the Example
 
+If the `hydrogels` module has been successfully installed as above, then calling the `run.sh` shell script will run the simulation.
+```
+bash run.sh
+```
+This takes around the scale of half an hour on a reasonably fast machine but can be slower depending on the specifications of the CPU.
+
+The final figure will show the trajectory of the number of bonded gel particles in the simulation and plot it against the analytical model produced by the trajectory of the numerical simulation, shown below.
+
+![model](model.png)
+
+Finally, all data is written to CSV files and a file containing all of the settings of the simulation, trajectory analysis, and analytical model is contained in a single JSON file.
+
 ## Conclusions
 
 ## Notes
