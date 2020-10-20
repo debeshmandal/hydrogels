@@ -61,9 +61,6 @@ def generate_gel(**kwargs):
 
     print(f'Number: {number}, Radius: {radius}')
 
-@pytest.mark.skip
-def test_LennardJonesGel_generation():
-    from hydrogels.generators.gels import LennardJonesGel
     gel = LennardJonesGel(
         box,
         N = number,
@@ -135,22 +132,41 @@ def reaction_function(topology):
         recipe.change_particle_type(index, "released")
     return recipe
 
-def test_LennardJonesGel_generation():
-    params = {
-        "box": [50.0, 50.0, 50.0],
-        "stride": 100,
-        "length": 10,
-        "number": 50,
-        "radius": 3.0,
-        "lj_eps": 0.0,
-        "bond_strength": 1.0,
-        "enzyme_number": 100,
-        "enzyme_radius": 24.0,
-        "reaction_radius": 2.5,
-        "diffusion_constant": 5.0,
-    }
-    gel = generate_gel(**params)
-    run(gel, **params)
+def main(**kwargs):
+    gel = generate_gel(**kwargs)
+    run(gel, **kwargs)
 
-if __name__=='__main__':
-    test_LennardJonesGel_generation()
+if __name__ == '__main__':
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+
+    # gel kwargs
+    parser.add_argument('--box', required=False, type=float, default=30.)
+    parser.add_argument('--number', required=False, type=int, default=50)
+    parser.add_argument('--radius', required=False, type=float, default=5.)
+    parser.add_argument('--bond-strength', required=False, type=float, default=2.0)
+    parser.add_argument('--bond-length', required=False, type=float, default=2.0)
+    parser.add_argument('--lj-eps', required=False, type=float, default=1.0)
+    parser.add_argument('--lj-sig', required=False, type=float, default=1.0)
+    parser.add_argument('--lj-cutoff', required=False, type=float, default=5.0)
+    parser.add_argument('--diffusion-constant', required=False, type=float, default=1.0)
+
+    # enzyme kwargs
+    parser.add_argument('--enzyme-number', required=False, type=int, default=10)
+    parser.add_argument('--enzyme-radius', required=False, type=float, default=30.)
+    parser.add_argument('--reaction-rate', required=False, type=float, default=1000.)
+    parser.add_argument('--reaction-radius', required=False, type=float, default=2.0)
+
+    # sphere kwargs
+    parser.add_argument('--sphere-radius', required=False, type=float, default=0.)
+    parser.add_argument('--sphere-force_constant', required=False, type=float, default=0.0)
+
+    # run kwargs
+    parser.add_argument('--stride', required=False, type=int, default=1000)
+    parser.add_argument('--timestep', required=False, type=float, default=0.001)
+    parser.add_argument('--length', required=False, type=int, default=100)
+    args = vars(parser.parse_args())
+    if args.get('box', False):
+        box = args['box']
+        args['box'] = np.array([box, box, box])
+    main(**args)
