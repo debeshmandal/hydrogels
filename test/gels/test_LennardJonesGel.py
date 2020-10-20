@@ -61,8 +61,6 @@ def generate_gel(**kwargs):
 
     print(f'Number: {number}, Radius: {radius}')
 
-def test_LennardJonesGel_generation():
-    from hydrogels.generators.gels import LennardJonesGel
     gel = LennardJonesGel(
         box,
         N = number,
