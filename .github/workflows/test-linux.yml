@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        pip install numpy scipy pandas matplotlib pytest tqdm h5py cibuildwheel pybind11 cmake starpolymers
+        pip install numpy scipy pandas matplotlib pytest tqdm h5py cibuildwheel pybind11 cmake starpolymers pytest
     - name: Install readdy
       run: |
         pushd /tmp
