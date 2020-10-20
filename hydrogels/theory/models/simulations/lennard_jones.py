@@ -14,6 +14,7 @@ class LennardJones(Simulation):
                 'c0' : constants['c0'],
                 'rate' : constants['rate'],
                 'nV' : constants['nV'],
+                'thickness' : constants['thickness']
             },
             variables = {
                 'N' : N,
@@ -57,4 +58,3 @@ class LennardJones(Simulation):
             Equation(rate, string=rate.__doc__),
             Equation(number, string=number.__doc__),
         ]
-        

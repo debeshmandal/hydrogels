@@ -36,6 +36,8 @@ def test_lennard_jones():
                 'c0' : 5.0,
                 'KV' : 1.0,
                 'nV' : 1.0,
+                'rate': 0.1,
+                'thickness': 0.01
             })
     simu.integrate()
     simu.run(10)
