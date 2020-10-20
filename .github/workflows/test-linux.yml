@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Set up HDF5
       run: |
-        sudo apt-get -y libhdf5-dev
+        sudo apt-get -y install libhdf5-dev
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
