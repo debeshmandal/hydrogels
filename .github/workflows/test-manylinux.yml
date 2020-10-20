@@ -3,9 +3,10 @@
 name: ManyLinux
 
 on: push
-runs-on: ubuntu-latest
+
 jobs:
   build:
+    runs-on: ubuntu-latest
     continue-on-error: true
     env:
       PYTHON_BINARY_DIR: /opt/python/cp3${{matrix.minor_version}}-${{matrix.image}}/bin
