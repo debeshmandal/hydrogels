@@ -47,9 +47,9 @@ jobs:
         ${PYTHON_BINARY_DIR}/pip wheel --wheel-dir=/tmp/wheelhouse .
         ${PYTHON_BINARY_DIR}/auditwheel show /tmp/wheelhouse/*.whl
         ${PYTHON_BINARY_DIR}/auditwheel repair /tmp/wheelhouse/*.whl
-        ls /tmp/wheelhouse/
+        ls ./wheelhouse/
     - name: Upload wheel as artifact
       uses: actions/upload-artifact@v2
       with:
         name: test-wheel
-        path: /tmp/wheelhouse/*.whl
+        path: ./wheelhouse/*.whl
