@@ -3,11 +3,11 @@
 name: ManyLinux
 
 on: push
-continue-on-error: true
-env:
-  PYTHON_BINARY_DIR: /opt/python/cp3${{matrix.minor_version}}-${{matrix.image}}/bin
 jobs:
   build:
+    continue-on-error: true
+    env:
+      PYTHON_BINARY_DIR: /opt/python/cp3${{matrix.minor_version}}-${{matrix.image}}/bin
     container: quay.io/pypa/${{matrix.image}}
     strategy:
       matrix:
