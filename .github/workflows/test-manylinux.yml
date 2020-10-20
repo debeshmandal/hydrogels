@@ -28,7 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
         ${PYTHON_BINARY_DIR}/pip install --upgrade pip setuptools wheel
-        ${PYTHON_BINARY_DIR}/pip install numpy scipy pandas matplotlib pytest tqdm h5py pybind11 cmake starpolymers pytest
+        ${PYTHON_BINARY_DIR}/pip install numpy scipy pandas matplotlib pytest tqdm h5py pybind11 cmake starpolymers pytest auditwheel
     - name: Install readdy
       run: |
         pushd /tmp
@@ -42,4 +42,14 @@ jobs:
     - name: Test
       run: ${PYTHON_BINARY_DIR}/pytest
     - name: Make wheel
-      run: ${PYTHON_BINARY_DIR}/pip wheel .
+      run: |
+        mkdir -p /tmp/wheelhouse
+        ${PYTHON_BINARY_DIR}/pip wheel --wheel-dir=/tmp/wheelhouse .
+        ${PYTHON_BINARY_DIR}/auditwheel show /tmp/wheelhouse/*.whl
+        ${PYTHON_BINARY_DIR}/auditwheel repair /tmp/wheelhouse/*.whl
+        ls /tmp/wheelhouse/
+    - name: Upload wheel as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-wheel
+        path: /tmp/wheelhouse/*.whl
