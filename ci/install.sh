@@ -8,9 +8,12 @@ pip3 install tqdm
 pip3 install pybind11
 pip3 install h5py
 
-export HDF5_DIR=/usr/local/HDF_Group/HDF5/1.12.0/share/cmake 
+pushd /tmp
 git clone https://github.com/readdy/readdy
-pip3 install ./readdy
+pushd readdy
+pip3 install .
+popd
+popd
 
 # install hydrogels
 pip3 install .
