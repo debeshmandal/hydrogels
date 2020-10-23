@@ -9,6 +9,8 @@ Then, in the `theory` folder, a numerical integration framework for integrating 
 
 ## Installation:
 
+`hydrogels` is available on Linux, MacOS and Windows using Python 3.6, 3.7 and 3.8. It is not available yet on Python 3.9 because there is a dependency on SciPy which currently has no wheels built for Python 3.9.
+
 At the time of writing it is only possible to install the package on a Linux architecture. This requires the following prerequisites:
   - gxx
   - pybind11
