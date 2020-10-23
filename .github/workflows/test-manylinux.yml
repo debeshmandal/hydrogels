@@ -2,7 +2,10 @@
 
 name: ManyLinux
 
-on: push
+on: 
+  push:
+    branches: master
+    tags: v*.*
 
 jobs:
   build:
