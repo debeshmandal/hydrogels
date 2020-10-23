@@ -12,7 +12,7 @@ class LennardJones(Simulation):
                 'rc' : constants['rc'], 
                 'beta' : constants['beta'],
                 'c0' : constants['c0'],
-                'rate' : constants['rate'],
+                'base_rate' : constants['rate'],
                 'nV' : constants['nV'],
                 'thickness' : constants['thickness']
             },
@@ -47,9 +47,9 @@ class LennardJones(Simulation):
             """New number from old number and rate"""
             return functions.update_number_from_rate(N, k, dt)
 
-        def KV(R: float = 0.0, rate: float = 0.0, thickness: float = 0.0) -> 'KV':
+        def KV(R: float = 0.0, base_rate: float = 0.0, thickness: float = 0.0) -> 'KV':
             """Rate for unit volume in the shell of the reaction"""
-            return functions.kv_from_radius(R, rate, thickness)
+            return functions.kv_from_radius(R, base_rate, thickness)
 
         return [
             Equation(radius, string=radius.__doc__),

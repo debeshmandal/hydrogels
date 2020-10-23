@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-path=~/hydrogels/protocols/lennard-jones-gel
+path=.
 folder=.
 
 BOX=50.0

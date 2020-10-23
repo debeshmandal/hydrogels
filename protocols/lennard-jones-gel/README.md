@@ -67,13 +67,13 @@ Many of the functions are importable from within this folder but there is intent
 
 ## Reproduce from JSON
 
-To reproduce the results of any script provided in this folder, run the script in this way:
+To reproduce a set of results in this folder. Make a copy of your JSON file that is generated when running the steps, then re-run the trajectory by running the following command:
 
 ```
-python <script> --json <JSON_filename> --enforce
+python main.py --json <JSON_filename> --enforce
 ```
 
-If there are any issues then the script will print instructions to console on how to remedy them.
+This will re-run the simulation and then the user can take inspiration from the `run.sh` bash script to do the trajectory analysis and also create an analytical model.
 
 ## Running the Example
 
