@@ -37,3 +37,12 @@ jobs:
       run: pip install .
     - name: Test
       run: pytest
+    - name: Make wheel
+      run: |
+        pip install auditwheel
+        mkdir -p /tmp/wheelhouse
+        pip wheel --wheel-dir=/tmp/wheelhouse .
+        python -m auditwheel show /tmp/wheelhouse/*.whl
+        python -m auditwheel repair /tmp/wheelhouse/*.whl
+        ls ./wheelhouse/
+
