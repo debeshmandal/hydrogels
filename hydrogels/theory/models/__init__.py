@@ -1,1 +1,2 @@
-import potentials, functions
+import hydrogelsbindings.potentials as potentials
+import hydrogelsbindings.functions as functions

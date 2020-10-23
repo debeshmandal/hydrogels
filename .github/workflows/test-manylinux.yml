@@ -1,0 +1,61 @@
+# Builds using pip and tests using pytest
+
+name: ManyLinux
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_BINARY_DIR: /opt/python/${{matrix.cp}}/bin
+    container: quay.io/pypa/${{matrix.image}}
+    strategy:
+      matrix:
+        cp:
+          - "cp36-cp36m"
+          - "cp37-cp37m"
+          - "cp38-cp38"
+        image: 
+          - manylinux2014_x86_64
+
+    steps:
+    - name: show binary directory
+      run: |
+        ls /opt/python/*
+        echo "PYTHON_BINARY_DIR:"
+        ls ${PYTHON_BINARY_DIR}
+    - uses: actions/checkout@v2
+    - name: Set up HDF5
+      run: |
+        yum install -y hdf5-devel
+    - name: Install dependencies
+      run: |
+        ${PYTHON_BINARY_DIR}/pip install --upgrade pip setuptools wheel
+        ${PYTHON_BINARY_DIR}/pip install numpy scipy pandas matplotlib pytest tqdm h5py pybind11 cmake starpolymers pytest auditwheel
+    - name: Install readdy
+      run: |
+        pushd /tmp
+        git clone https://github.com/readdy/readdy
+        pushd readdy
+        ${PYTHON_BINARY_DIR}/pip install .
+        popd
+        popd
+    - name: Build and Install
+      run: ${PYTHON_BINARY_DIR}/pip install .
+    - name: Test
+      run: ${PYTHON_BINARY_DIR}/pytest
+    - name: Make wheel
+      run: |
+        mkdir -p /tmp/wheelhouse
+        ${PYTHON_BINARY_DIR}/pip wheel --wheel-dir=/tmp/wheelhouse .
+        ${PYTHON_BINARY_DIR}/auditwheel show /tmp/wheelhouse/*.whl
+        ${PYTHON_BINARY_DIR}/auditwheel repair /tmp/wheelhouse/*.whl
+        ls ./wheelhouse/
+    - name: Deploy
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_PASSWORD }}
+        packages_dir: wheelhouse

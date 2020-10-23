@@ -1,7 +1,7 @@
 #ifndef FUNCTION_HPP
 #define FUNCTION_HPP
-#include <bits/stdc++.h>
 #include <cmath>
+#include <vector>
 #include "pybind11/pybind11.h"
 double addNumbers (double a, double b);
 double massFromRadius (double R, double rho);

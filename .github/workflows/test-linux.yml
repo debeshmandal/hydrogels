@@ -1,0 +1,40 @@
+# Builds using pip and tests using pytest
+
+name: Linux
+
+on: push
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        py: [3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up HDF5
+      run: |
+        sudo apt-get -y install libhdf5-dev
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{matrix.py}}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install numpy scipy pandas matplotlib pytest tqdm h5py cibuildwheel pybind11 cmake starpolymers pytest
+    - name: Install readdy
+      run: |
+        pushd /tmp
+        git clone https://github.com/readdy/readdy
+        pushd readdy
+        pip install .
+        popd
+        popd
+        python -c 'from readdy import *'
+    - name: Build and Install
+      run: pip install .
+    - name: Test
+      run: pytest
