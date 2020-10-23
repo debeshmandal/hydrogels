@@ -18,6 +18,7 @@ jobs:
           - "cp38-cp38"
         image: 
           - manylinux2014_x86_64
+          - manylinux2014_i686
 
     steps:
     - name: show binary directory
