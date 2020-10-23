@@ -8,5 +8,8 @@ test/configs/*/test_config.dat
 build/
 **.egg-info/
 **/.ipynb_checkpoints/**
-_out.h5*
+*.h5*
 **/traj/
+protocols/*/*.csv
+protocols/*/*.json
+protocols/*/*.pdf

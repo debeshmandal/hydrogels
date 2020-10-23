@@ -6,13 +6,36 @@ from pathlib import Path
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import json
+
+from hydrogels.utils.logger import Logger
+logger = Logger('trajectory.py')
+
+def calculate_radius(positions: np.ndarray) -> float:
+    logger.debug(type(positions[0][0]))
+    logger.debug(f'Calculating radius using:\n{np.round(positions, 4)}')
+    covariance_matrix = np.cov(positions)
+    logger.debug(f'Covariance Matrix:\n{covariance_matrix}')
+    eigenvalues, eigenvectors = np.linalg.eig(np.cov(positions.T))
+    radius = np.sqrt(sum([i**2 for i in eigenvalues]))
+    logger.debug(f'Calculated gel radius as {radius} using {eigenvalues}')
+    return radius
 
 def count(array):
     result = np.histogram(array, range(0, 5))[0]
     return result
 
+def write_json(fname, settings):
+    with open(fname, 'r') as f:
+        data = json.load(f)
+    data['trajectory'] = settings
+
+    with open(fname, 'w') as f:
+        json.dump(data, f, indent=2)
+
 def main(**kwargs):
     h5_fname = kwargs['fname']
+    logger.info(f'Reading trajectory from {h5_fname}')
     trajectory = readdy.Trajectory(h5_fname)
     trajectory.convert_to_xyz()
     xyz_fname = f'{h5_fname}.xyz'
@@ -24,7 +47,7 @@ def main(**kwargs):
 
     start = 2
     n_frames = int(n_lines / (n_atoms + 2))
-    f_folder = f'./{kwargs.get("traj_folder", "traj")}'
+    f_folder = f'{kwargs.get("traj_folder", "traj")}'
     try:
         rmtree(Path(f_folder))
     except FileNotFoundError:
@@ -51,6 +74,13 @@ def main(**kwargs):
             2: 'y',
             3: 'z'
         })
+        
+        if i == 1:
+            logger.debug(data)
+            gel = data[data['type']=='type_0'].reset_index(drop=True).dropna()[['x', 'y', 'z']]
+            gel_radius = calculate_radius(gel.to_numpy(dtype=np.float))
+            gel_density = len(gel) / ((4./3.) * np.pi * gel_radius ** 3)
+
         n_active_atoms = n_atoms - data.isnull().sum().values[-1]
         data = data.dropna().reset_index(drop=True)
         with open(f'{f_folder}/readdy.xyz.{i}', 'w') as f:
@@ -78,13 +108,28 @@ def main(**kwargs):
     if kwargs.get('show', False):
         plt.show()
 
+    if kwargs.get('json', False):
+        write_json(kwargs.get('json'), {
+            'N_frames' : n_frames,
+            'f_particles' : p_file,
+            'f_plot': kwargs.get('plot_file', 'particles.pdf'),
+            'f_h5': h5_fname,
+            'f_xyz': xyz_fname,
+            'f_traj': f_folder,
+            'gel_N': max(n_particles.iloc[:, 0]),
+            'gel_radius': gel_radius,
+            'gel_density': gel_density,
+        })
+
 if __name__=='__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('fname')
+    parser.add_argument('--fname', required=True)
     parser.add_argument('--show', action='store_true')
     parser.add_argument('--plot-file', required=False, default='particles.pdf')
     parser.add_argument('--traj-folder', required=False, default='traj')
-    parser.add_argument('--particles-file', required=False, default=None)
+    parser.add_argument('--particles-file', required=False, default='particles.csv')
+    parser.add_argument('--radius-file', required=False, default='radius.csv')
+    parser.add_argument('--json', required=False, default=None)
     args = vars(parser.parse_args())
     main(**args)

@@ -3,23 +3,25 @@ import hydrogelsbindings.potentials as potentials
 import hydrogelsbindings.functions as functions
 
 class LennardJones(Simulation):
-    def __init__(self, dt, sig, eps, rc, **kwargs):
+    def __init__(self, dt, N, **constants):
         super().__init__(
             dt, 
             constants = {
-                'sig' : sig,
-                'eps' : eps,
-                'rc' : rc, 
-                'beta' : kwargs.get('beta', 1.0),
-                'c0' : kwargs.get('c0', 1.0),
-                'KV' : kwargs.get('KV', 1.0),
-                'nV' : kwargs.get('nV', 1.0)
-            }
+                'sig' : constants['sig'],
+                'eps' : constants['eps'],
+                'rc' : constants['rc'], 
+                'beta' : constants['beta'],
+                'c0' : constants['c0'],
+                'base_rate' : constants['rate'],
+                'nV' : constants['nV'],
+                'thickness' : constants['thickness']
+            },
             variables = {
                 'N' : N,
                 'R' : None,
                 'V' : None,
-                'k' : None
+                'k' : None,
+                'KV' : None,
             },
             equations= self.equations
         )
@@ -35,19 +37,24 @@ class LennardJones(Simulation):
     def equations(self) -> list:
         def radius(N: int = 0, nV: float = 1.0) -> 'R':
             """Radius from number of particles and density"""
-            return potentials.radius_from_N(N, nV)
+            return functions.radius_from_number(N, nV)
 
         def rate(V: float = 0.0, beta: float = 1.0, KV: float = 1.0, c0: float = 1.0) -> 'k':
             """rate from potential, concentratin and rate of encounter"""
-            return potentials.rate_from_boltzmann(KV, c0, beta, V)
+            return functions.rate_from_potential_energy(KV, c0, V, beta)
 
         def number(N: int = 0, k: float = 1.0, dt: float = 1.0) -> 'N':
             """New number from old number and rate"""
-            return potentials.number_update_from_rate(N, k, dt)
+            return functions.update_number_from_rate(N, k, dt)
+
+        def KV(R: float = 0.0, base_rate: float = 0.0, thickness: float = 0.0) -> 'KV':
+            """Rate for unit volume in the shell of the reaction"""
+            return functions.kv_from_radius(R, base_rate, thickness)
 
         return [
             Equation(radius, string=radius.__doc__),
-            self.potential
+            self.potential,
+            Equation(KV, string=KV.__doc__),
             Equation(rate, string=rate.__doc__),
             Equation(number, string=number.__doc__),
         ]
