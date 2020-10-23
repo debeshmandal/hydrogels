@@ -7,7 +7,6 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
-    continue-on-error: true
     env:
       PYTHON_BINARY_DIR: /opt/python/${{matrix.cp}}/bin
     container: quay.io/pypa/${{matrix.image}}
@@ -25,6 +24,7 @@ jobs:
     - name: show binary directory
       run: |
         ls /opt/python/*
+        echo "PYTHON_BINARY_DIR:"
         ls ${PYTHON_BINARY_DIR}
     - uses: actions/checkout@v2
     - name: Set up HDF5
