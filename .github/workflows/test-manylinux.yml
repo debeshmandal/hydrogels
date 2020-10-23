@@ -6,7 +6,7 @@ on: push
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       PYTHON_BINARY_DIR: /opt/python/${{matrix.cp}}/bin
     container: quay.io/pypa/${{matrix.image}}
@@ -18,7 +18,10 @@ jobs:
           - "cp38-cp38"
         image: 
           - manylinux2014_x86_64
-          - manylinux2010_i686
+          - manylinux2014_i686
+          - manylinux2014_aarch64
+          - manylinux2014_ppc64le
+          - manylinux2014_s390x
 
     steps:
     - name: show binary directory
