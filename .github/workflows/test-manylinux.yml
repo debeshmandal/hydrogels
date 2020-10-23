@@ -9,17 +9,17 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     env:
-      PYTHON_BINARY_DIR: /opt/python/cp3${{matrix.minor_version}}-cp3${{matrix.minor_version}}/bin
+      PYTHON_BINARY_DIR: /opt/python/${{matrix.cp}}/bin
     container: quay.io/pypa/${{matrix.image}}
     strategy:
       matrix:
-        minor_version: [6, 7, 8, 9]
+        cp:
+          - "cp36-cp36m"
+          - "cp37-cp37m"
+          - "cp38-cp38"
+          - "cp39-cp39"
         image: 
           - manylinux2014_x86_64
-          - manylinux2014_i686
-          - manylinux2014_aarch64
-          - manylinux2014_ppc64le
-          - manylinux2014_s390x
 
     steps:
     - name: show binary directory

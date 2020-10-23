@@ -10,10 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        py: [3.8]
+        py: [3.6, 3.7, 3.8, 3.9]
 
-    env:
-      CIBW_SKIP: cp27-* cp39-*
     steps:
     - uses: actions/checkout@v2
     - name: Set up HDF5
