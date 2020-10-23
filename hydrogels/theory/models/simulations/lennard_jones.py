@@ -1,5 +1,6 @@
 from ..integrator import Simulation, Equation
-import potentials
+import hydrogelsbindings.potentials as potentials
+import hydrogelsbindings.functions as functions
 
 class LennardJones(Simulation):
     def __init__(self, dt, sig, eps, rc, **kwargs):

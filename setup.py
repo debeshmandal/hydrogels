@@ -46,6 +46,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: POSIX",
     ],
-    python_requires=">=3.5",
+    python_requires=">=3.6",
+    ext_package='hydrogelsbindings',
     ext_modules=[potentials, functions]
 )

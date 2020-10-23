@@ -1,6 +1,6 @@
 from ..integrator import Simulation, Equation
-import potentials
-import functions
+import hydrogelsbindings.potentials as potentials
+import hydrogelsbindings.functions as functions
 
 class ConstantDensity(Simulation):
     def __init__(self, dt, potential_equation, **kwargs):
