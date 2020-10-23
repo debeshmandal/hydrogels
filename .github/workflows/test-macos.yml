@@ -49,5 +49,5 @@ jobs:
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
       run: |
         pip install twine
-        python -m twine wheelhouse/* -u __token__ -p ${{secrets.PYPI_PASSWORD}} --non-interactive
+        python -m twine upload wheelhouse/* -u __token__ -p ${{secrets.PYPI_PASSWORD}} --non-interactive
 
