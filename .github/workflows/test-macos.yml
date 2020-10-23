@@ -39,11 +39,8 @@ jobs:
       run: pytest
     - name: Make wheel
       run: |
-        pip install auditwheel
-        mkdir -p /tmp/wheelhouse
-        pip wheel --wheel-dir=/tmp/wheelhouse .
-        python -m auditwheel show /tmp/wheelhouse/*.whl
-        python -m auditwheel repair /tmp/wheelhouse/*.whl
+        mkdir -p ./wheelhouse
+        pip wheel --wheel-dir=./wheelhouse .
         ls ./wheelhouse/
     - name: Deploy
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
