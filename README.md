@@ -1,5 +1,8 @@
 # hydrogels
-[![Build Status](https://travis-ci.com/debeshmandal/hydrogels.svg?branch=master)](https://travis-ci.com/debeshmandal/hydrogels)
+
+[![Manylinux](https://github.com/debeshmandal/hydrogels/workflows/ManyLinux/badge.svg)](https://github.com/debeshmandal/hydrogels/actions?query=workflow%3ALinux)
+[![MacOS](https://github.com/debeshmandal/hydrogels/workflows/MacOS/badge.svg)](https://github.com/debeshmandal/hydrogels/actions?query=workflow%3AMacOS)
+[![Coverage](https://codecov.io/github/debeshmandal/hydrogels/coverage.svg?branch=master)](https://codecov.io/gh/debeshmandal/hydrogels)
 
 #### Simulation and Numerical Integration for Hydrogel Degradation
 
