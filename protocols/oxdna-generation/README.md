@@ -4,6 +4,13 @@
 
 In this protocol, oxDNA is used to generate crosslinked gel networks. It does this by implementing patchy particle potentials.
 
+Four files are outputted:
+
+- CSV: table containing edges with positional information that can be extracted
+- BILD: viewable by UCSF Chimera
+- XYZ: simple XYZ positions
+- LAMMPS: LAMMPS data file
+
 ## Usage
 
 The `settings.yml` file can be customised to set up filenames and parameters. Once this has been set up. The script can access it by doing:
