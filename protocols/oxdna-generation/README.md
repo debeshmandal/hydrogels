@@ -52,7 +52,7 @@ folders:
 initial:
   box: cubic box length
   N: total number of particles
-  crosslinker: no. of crosslinker particles if > 1.0 
+  crosslinker: number of crosslinker particles if > 1.0 
                or fraction if less than
   configuration: name of initial configuration file
   topology: name of initial topology file
