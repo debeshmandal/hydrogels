@@ -47,6 +47,6 @@ setuptools.setup(
         "Operating System :: POSIX",
     ],
     python_requires=">=3.6",
-    ext_package='hydrogelsbindings',
+    ext_package='hydrogels',
     ext_modules=[potentials, functions]
 )
