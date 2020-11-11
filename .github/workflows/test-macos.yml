@@ -39,7 +39,7 @@ jobs:
     - name: Build and Install
       run: pip install .
     - name: Test
-      run: pytest
+      run: pytest --import-mode=importlib
     - name: Make wheel
       run: |
         mkdir -p ./wheelhouse
