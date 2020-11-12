@@ -30,7 +30,7 @@ class LennardJones(Simulation):
     @property
     def potential(self) -> Equation:
         def func(
-            sig: float = 1., @
+            sig: float = 1.,
             eps: float =1., 
             rc: float = 5.0, 
             R: float = 2.0, 
