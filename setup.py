@@ -3,6 +3,8 @@ from distutils.core import setup, Extension
 from distutils import sysconfig
 import os
 
+import versioneer
+
 with open("README.md", "r") as f:
     long_description = f.read()
 
@@ -34,7 +36,7 @@ functions = Extension(
 
 setuptools.setup(
     name="hydrogels",
-    version="0.4.4",
+    version=versioneer.get_version(),
     author="Debesh Mandal",
     description="Package for creating and analysing hydrogels in ReaDDy",
     long_description=long_description,
@@ -48,5 +50,6 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     ext_package='hydrogels',
-    ext_modules=[potentials, functions]
+    ext_modules=[potentials, functions],
+    cmdclass=versioneer.get_cmdclass()
 )

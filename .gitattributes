@@ -1,2 +1,4 @@
 *.py linguist-language=python
 *.ipynb linguist-documentation
+hydrogels/_version.py export-subst
+hydrogels/_version.py export-subst
