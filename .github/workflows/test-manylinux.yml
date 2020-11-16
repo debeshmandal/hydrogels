@@ -47,7 +47,7 @@ jobs:
     - name: Build and Install
       run: ${PYTHON_BINARY_DIR}/pip install .
     - name: Test
-      run: ${PYTHON_BINARY_DIR}/pytest
+      run: ${PYTHON_BINARY_DIR}/pytest --import-mode=importlib
     - name: Make wheel
       run: |
         mkdir -p /tmp/wheelhouse

@@ -1,0 +1,21 @@
+### METADATA
+debug = 0
+seed = 104123
+
+### UNUSED MANDATORY VARIABLES
+T = 0.03
+trajectory_file = trajectory.dat
+
+### GEOMETRY
+box_type = cubic
+interaction_type = FSInteraction
+FS_N = 4
+FS_N_B = 2
+FS_B_attraction = true
+
+### FILENAMES
+topology = oxdna.main.top
+conf_file = oxdna.init.conf 
+
+### PLUGINS
+plugin_search_path = /rds/general/user/dm3613/home/software/oxDNA/contrib/rovigatti

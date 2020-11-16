@@ -1,5 +1,7 @@
 import hydrogels.theory.models as models
+import pytest
 
+@pytest.mark.skip()
 def test_cxx():
     from hydrogels.theory.models import potentials, functions
     assert potentials.zero(1) == 0
