@@ -17,12 +17,15 @@ class System(ReactionDiffusionSystem):
     """
     Wrapper for a ReaDDy system
     """
-    def __init__(self, box):
+    def __init__(self, box, diffusion_constant=1.0):
         super().__init__(box)
         self._topologies = []
         self._reactions = []
         self._potentials = []
         self._species = []
+        self._topology_species = []
+
+        self.constants = {}
 
     @property
     def potential_list(self):
@@ -39,6 +42,15 @@ class System(ReactionDiffusionSystem):
     @property
     def species_list(self):
         return self._species
+
+    @property
+    def topologies_species_list(self):
+        return self._topology_species
+
+    def register_species(self):
+        for spec in self.species_list:
+            
+        return
 
     def insert_particles(self):
         return
