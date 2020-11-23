@@ -1,3 +1,5 @@
+import numpy as np
+
 from .core import Gel
 
 class LennardJonesGel(Gel):
@@ -10,7 +12,7 @@ class LennardJonesGel(Gel):
             self,
             bonded = 'bonded',
             unbonded = 'unbonded',
-            topology_type = 'gel'
+            topology_type = 'gel',
             **kwargs
         ):
         self.top_type = top_type

@@ -1,3 +1,5 @@
+import numpy as np
+
 from .lennard_jones import LennardJonesGel
 
 class GenericLJGel(LennardJonesGel):

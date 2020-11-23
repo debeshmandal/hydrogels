@@ -1,6 +1,8 @@
+import numpy as np
+
 from .lennard_jones import LennardJonesGel
 
-class LatticeGel(LennardJonesGel):
+class LatticeLJGel(LennardJonesGel):
     def __init__(self, *args, **kwargs):
         pass
 
