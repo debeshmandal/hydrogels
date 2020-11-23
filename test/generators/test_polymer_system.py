@@ -1,6 +1,9 @@
 import numpy as np
 import os
 
+import pytest
+
+@pytest.mark.skip
 def test_polymer_system():
     # do imports
     from hydrogels.generators.polymers import LinearPolymer

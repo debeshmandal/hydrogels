@@ -10,9 +10,10 @@ class LennardJonesGel(Gel):
     """
     def __init__(
             self,
+            monomer = 'monomer',
             bonded = 'bonded',
             unbonded = 'unbonded',
-            topology_type = 'gel',
+            top_type = 'gel',
             **kwargs
         ):
         self.top_type = top_type

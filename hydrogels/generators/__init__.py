@@ -5,5 +5,3 @@ These frameworks allow for generic systems to be
 generated, for example polymers with different
 architectures and gel networks.
 """
-
-import gels
