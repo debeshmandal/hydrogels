@@ -10,12 +10,12 @@ import pandas as pd
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 
-from ..utils.system import System
-from .polymers import LinearPolymer, CrosslinkingPolymer
+from ...utils.topology import Topology
+from ..polymers import LinearPolymer, CrosslinkingPolymer
 
-class Gel(System):
+class Gel(Topology):
     """
-    A Gel is a ReaDDy ReactionDiffusionSystem that can be used
+    A Gel is a ReaDDy Topology that can be used
     to generate systems to model hydrogels.
     """
     def __init__(
@@ -35,8 +35,7 @@ class Gel(System):
             self._topology_species += topology_species
         if topologies:
             self._topologies += topology_species
-
-        self._box = box
+            
         self._particles = {} # positions
         self._bonds = pd.DataFrame() # edges
         self._pairs = pd.DataFrame() # pair potentials

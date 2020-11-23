@@ -13,6 +13,9 @@ from readdy.api.reaction_diffusion_system import ReactionDiffusionSystem
 
 from .topology import Topology
 
+from ..utils.logger import Logger
+logger = Logger(__name__)
+
 class System(ReactionDiffusionSystem):
     """
     Wrapper for a ReaDDy system
@@ -23,9 +26,6 @@ class System(ReactionDiffusionSystem):
         self._reactions = []
         self._potentials = []
         self._species = []
-        self._topology_species = []
-
-        self.constants = {}
 
     @property
     def potential_list(self):
@@ -41,18 +41,18 @@ class System(ReactionDiffusionSystem):
 
     @property
     def species_list(self):
-        return self._species
+        return list(self._species)
 
-    @property
-    def topologies_species_list(self):
-        return self._topology_species
-
-    def register_species(self):
-        for spec in self.species_list:
-            
-        return
-
-    def insert_particles(self):
+    def insert_species(self, name: str, D: float, positions: np.ndarray, overwrite: bool = False):
+        """Registers the name and positions of a new species
+        """
+        if name not in self._species:
+            self.add_species(name, D)
+            self._species[name] = positions
+        elif overwrite:
+            self._species[name] = positions
+        else:
+            logger.error(f'Trying to overwrite {name} but positions already exist for it!')
         return
 
     def insert_topology(self, topology : Topology, **kwargs):
@@ -83,18 +83,30 @@ class System(ReactionDiffusionSystem):
                 self.add_topology_species(name, diffusion_constant=D)
                 if name not in self._species: self._species.append(name)
             except ValueError:
-                pass
+                logger.debug(f'{name} is already registered as a topology species')
                 
 
         # store in system - be aware that storing this information
         # may cause unnecessary memory usage
         self._topologies.append(topology)
 
-    def initialise_simulation(self, fout='_out.h5'):
+    def initialise_simulation(self, fout='_out.h5', checkpoint: bool = None):
         simulation = self.simulation()
+
+        if checkpoint:
+            # implement loading particles from checkpoint
+            raise NotImplementedError
+
         simulation.output_file = fout
         if os.path.exists(simulation.output_file):
             os.remove(simulation.output_file)
+
+
+        # add species from dictionary
+        for species, positions in self._species.values():
+            simulation.add_particles(species, positions)
+
+        # 
         for top in self.topology_list:
             top.add_to_sim(simulation)
         return simulation

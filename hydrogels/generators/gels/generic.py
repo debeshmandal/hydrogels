@@ -1,6 +1,6 @@
-from .core import Gel
+from .lennard_jones import LennardJonesGel
 
-class GenericGel(Gel):
+class GenericLJGel(LennardJonesGel):
     def __init__(self, fname: str, **kwargs):
         _box, _positions, _edges = self.read_oxDNA(fname)
         self._box = np.array(_box)

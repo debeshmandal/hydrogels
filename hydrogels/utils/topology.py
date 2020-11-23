@@ -11,6 +11,23 @@ import readdy
 from readdy._internal.readdybinding.api import TopologyRecord
 from readdy._internal.readdybinding.common.util import TrajectoryParticle
 
+class TopologyBond:
+    """Dataclass containing bond information for a topology"""
+    def __init__(self, kind, species_1, species_2, **kwargs):
+        self.kind = kind
+        self.species = [species_1, species_2]
+        self.settings = kwargs
+
+    def register(self, system: "System"):
+        if self.kind == 'harmonic':
+            system.topologies.configure_harmonic_bond(
+                *self.species,
+                **self.settings
+            )
+        else:
+            raise TypeError(f'Bond kind must be harmonic but is {self.kind}')
+        return
+
 class Topology():
     """
     Wrapper for a readdy topology
@@ -19,6 +36,7 @@ class Topology():
         self.top_type = top_type
         self._sequence = kwargs.get('sequence', [])
         self._positions = kwargs.get('positions', np.array([]))
+        self._bonds = []
 
     def _string(self):
         return f'{self.top_type}[{self.N}]'
@@ -97,7 +115,7 @@ class Topology():
         """
         self.dataframe.to_csv(fout, index=False, header=False, float_format="%g", sep='\t')
 
-    def add_to_sim(self, simulation : readdy.Simulation):
+    def add_to_sim(self, simulation: readdy.Simulation, shift: int = 0):
         """
         Adds the topology to a readdy simulation
         """
@@ -108,7 +126,7 @@ class Topology():
         )
 
         for atoms in self.edges:
-            topology.get_graph().add_edge(atoms[0], atoms[1])
+            topology.get_graph().add_edge(atoms[0] + shift, atoms[1] + shift)
 
 class ReaddyTopology(Topology):
     """
