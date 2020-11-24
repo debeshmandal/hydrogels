@@ -1,11 +1,7 @@
-def test_GenericLJGel():
-    return
+from hydrogels.utils.system import System
 
-def test_GenericLJGel_enzyme():
-    return
+import numpy as np
+import pandas as pd
 
-def test_GenericLJGel_drug():
-    return
-
-def test_GenericLJGel_drug_enzyme():
+def test_GenericGel():
     return
