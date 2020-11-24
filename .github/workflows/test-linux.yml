@@ -40,6 +40,6 @@ jobs:
         pip install .
         ls /usr/lib/python3.8/site-packages
         pytest --import-mode=importlib --cov=/usr/lib/python3.8/site-packages/hydrogels --cov-report=xml
-        sed -i 's/\/home.*site-packages\///g' coverage.xml 
+        sed -i 's/\/usr.*site-packages\///g' coverage.xml 
         rm .coverage
         bash <(curl -s https://codecov.io/bash)
