@@ -36,6 +36,7 @@ class Topology():
         self.top_type = top_type
         self._sequence = kwargs.get('sequence', [])
         self._positions = kwargs.get('positions', np.array([]))
+        self._edges = []
         self._bonds = []
 
     def _string(self):
@@ -52,9 +53,38 @@ class Topology():
     def positions(self) -> np.ndarray:
         return self._positions
 
+    @positions.setter
+    def positions(self, value):
+        self._positions = value
+
     @property
     def sequence(self) -> typing.List[str]:
         return self._sequence
+
+    @sequence.setter
+    def sequence(self, value):
+        self._sequence = value
+
+    @property
+    def edges(self) -> typing.List[tuple]:
+        return self._edges
+
+    @edges.setter
+    def edges(self, value):
+        self._edges = value
+
+    @property
+    def bonds(self):
+        return self._bonds
+
+    def add_bond(self, *args, **kwargs):
+        """Add TopologyBond or args for it"""
+        if isinstance(args[0], TopologyBond):
+            bond = args[0]
+        else:
+            bond = TopologyBond(*args, **kwargs)
+
+        self._bonds.append(bond)
 
     def species(
             self, 

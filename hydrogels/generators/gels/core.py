@@ -19,23 +19,21 @@ class Gel(Topology):
     to generate systems to model hydrogels.
     """
     def __init__(
-        self, 
-        species: list = None, 
-        topology_species: list = None, 
-        topologies: list = None, 
-        *args, 
-        **kwargs
+        self,
+        top_type,
+        positions: np.ndarray,
+        monomer: str = 'monomer',
+        bonded: str = 'bonded',
     ):
-        super().__init__(*args, **kwargs)
+        super().__init__(top_type, *args, **kwargs)
+        self.names = [monomer, bonded]
 
-        # record and register all species, topology_species and topologies
-        if species:
-            self._species += species
-        if topology_species:
-            self._topology_species += topology_species
-        if topologies:
-            self._topologies += topology_species
-            
-        self._particles = {} # positions
-        self._bonds = pd.DataFrame() # edges
-        self._pairs = pd.DataFrame() # pair potentials
+    def configure_bonds(self, kind, **kwargs):
+        self.add_bond(kind, self.monomer, self.monomer, **kwargs)
+        self.add_bond(kind, self.monomer, self.bonded, **kwargs)
+        self.add_bond(kind, self.bonded, self.bonded, **kwargs)
+        return
+
+    def configure_potentials(self):
+        return
+

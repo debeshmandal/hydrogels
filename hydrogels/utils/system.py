@@ -20,12 +20,12 @@ class System(ReactionDiffusionSystem):
     """
     Wrapper for a ReaDDy system
     """
-    def __init__(self, box, diffusion_constant=1.0):
+    def __init__(self, box):
         super().__init__(box)
         self._topologies = []
         self._reactions = []
         self._potentials = []
-        self._species = []
+        self._species = {}
 
     @property
     def potential_list(self):
@@ -81,11 +81,16 @@ class System(ReactionDiffusionSystem):
         for name, D in topology.species(**kwargs).items():
             try:
                 self.add_topology_species(name, diffusion_constant=D)
-                if name not in self._species: self._species.append(name)
+                # if name not in self._species: self._species.append(name)
             except ValueError:
                 logger.debug(f'{name} is already registered as a topology species')
-                
 
+        if topology.bonds:
+            for bond in topology.bonds:
+                bond.register(self)
+        else:
+            logger.error('Cannot find any registered bonds when adding topology!')
+                
         # store in system - be aware that storing this information
         # may cause unnecessary memory usage
         self._topologies.append(topology)
@@ -103,7 +108,7 @@ class System(ReactionDiffusionSystem):
 
 
         # add species from dictionary
-        for species, positions in self._species.values():
+        for species, positions in self._species.items():
             simulation.add_particles(species, positions)
 
         # 
