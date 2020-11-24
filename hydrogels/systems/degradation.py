@@ -6,9 +6,6 @@ class EnzymaticDegradation(System):
     def __init__(self, box: list):
         super().__init__(box)
 
-    def configure_potentials(self):
-        return
-
     def add_enzyme(self):
         return
 

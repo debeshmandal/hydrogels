@@ -43,6 +43,9 @@ class System(ReactionDiffusionSystem):
     def species_list(self):
         return list(self._species)
 
+    def configure_potentials(self):
+        return
+
     def insert_species(self, name: str, D: float, positions: np.ndarray, overwrite: bool = False):
         """Registers the name and positions of a new species
         """
@@ -78,7 +81,9 @@ class System(ReactionDiffusionSystem):
             pass
 
         # do the same for the topology species
-        for name, D in topology.species(**kwargs).items():
+        items = topology.species(**kwargs).items()
+        logger.debug(items)
+        for name, D in items:
             try:
                 self.add_topology_species(name, diffusion_constant=D)
                 # if name not in self._species: self._species.append(name)

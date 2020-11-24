@@ -35,9 +35,10 @@ class Topology():
     def __init__(self, top_type : str, **kwargs):
         self.top_type = top_type
         self._sequence = kwargs.get('sequence', [])
+        self._names = list(set(self._sequence + kwargs.get('names', [])))
         self._positions = kwargs.get('positions', np.array([]))
-        self._edges = []
-        self._bonds = []
+        self._edges = kwargs.get('edges', [])
+        self._bonds = kwargs.get('bonds', [])
 
     def _string(self):
         return f'{self.top_type}[{self.N}]'
@@ -74,6 +75,26 @@ class Topology():
         self._edges = value
 
     @property
+    def names(self) -> typing.List[str]:
+        return self._names
+
+    @names.setter
+    def names(self, value):
+        assert isinstance(value, (list, tuple, set))
+        self._names = value
+
+    def add_names(self, value):
+        if isinstance(value, (list, tuple, set)):
+            self._names += list(value)
+        elif isinstance(value, str):
+            self._names.append(value)
+        else:
+            logger.error(
+                f'When adding names, ensure that they are strings '
+                f'or iters of strings, at the moment they are {type(value)}'
+            )
+
+    @property
     def bonds(self):
         return self._bonds
 
@@ -100,12 +121,12 @@ class Topology():
             
 
         if diffusion_dictionary:
-            assert set(diffusion_dictionary.keys()) == set(self.sequence)
+            assert set(diffusion_dictionary.keys()) == set(self.names)
             return diffusion_dictionary
 
         elif diffusion_constant:
             result = {}
-            names = set(self.sequence)
+            names = set(self.names)
             for name in names:
                 result[name] = diffusion_constant
             return result
@@ -157,13 +178,4 @@ class Topology():
 
         for atoms in self.edges:
             topology.get_graph().add_edge(atoms[0] + shift, atoms[1] + shift)
-
-class ReaddyTopology(Topology):
-    """
-    Class to handle readdy.Topology objects
-    """
-    def __init__(
-        self, 
-        topology : TopologyRecord, 
-        particles : typing.List[TrajectoryParticle]):
-        pass
+            

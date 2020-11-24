@@ -21,19 +21,36 @@ class Gel(Topology):
     def __init__(
         self,
         top_type,
-        positions: np.ndarray,
+        positions: np.ndarray = None,
         monomer: str = 'monomer',
-        bonded: str = 'bonded',
+        unbonded: str = 'unbonded',
     ):
-        super().__init__(top_type, *args, **kwargs)
-        self.names = [monomer, bonded]
+
+        self.monomer = monomer
+        self.unbonded = unbonded
+
+        if isinstance(positions, (np.ndarray, list, tuple)):
+            super().__init__(
+                top_type,
+                positions=positions,
+                sequence=len(positions) * [monomer],
+                names=[self.monomer, self.unbonded]
+            )
+
+        else:
+            super().__init__(top_type)
 
     def configure_bonds(self, kind, **kwargs):
-        self.add_bond(kind, self.monomer, self.monomer, **kwargs)
-        self.add_bond(kind, self.monomer, self.bonded, **kwargs)
-        self.add_bond(kind, self.bonded, self.bonded, **kwargs)
-        return
 
-    def configure_potentials(self):
+        # configure normal bond like normal
+        self.add_bond(kind, self.monomer, self.monomer, **kwargs)
+
+        # set force constant to zero for unbonded topology particles
+        ghost_bond = {
+            'force_constant': 0.0,
+            'length': 1.0
+        }
+        self.add_bond('harmonic', self.monomer, self.unbonded, **ghost_bond)
+        self.add_bond('harmonic', self.unbonded, self.unbonded, **ghost_bond)
         return
 
