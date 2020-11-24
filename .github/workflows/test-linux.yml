@@ -23,6 +23,7 @@ jobs:
         python-version: ${{matrix.py}}
     - name: Install dependencies
       run: |
+        python -c "import sys; print(sys.path)" | sed "s/['|,]//g" | tr " " "\n"
         python -m pip install --upgrade pip setuptools wheel
         pip install numpy scipy pandas matplotlib pytest tqdm h5py cibuildwheel pybind11 cmake starpolymers pytest
         pip install pytest-cov
