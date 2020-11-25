@@ -23,7 +23,7 @@ class Potential:
         self.settings = kwargs
 
     def __repr__(self):
-        return f"{self.kind.upper()}({atom_1}:{atom_2})"
+        return f"{self.kind.upper()}({'<>'.join(self.atoms)}; {', '.join([f'{key}:{value}' for key, value in self.settings.items()])})"
 
     def register(self, system):
         if self.kind == 'lj':
@@ -46,8 +46,8 @@ class PotentialManager:
 
     @property
     def species(self):
-        _species = list(system.species.keys())
-        _deep_names = [i.names for i in system.topology_list]
+        _species = list(self.system._species.keys())
+        _deep_names = [i.names for i in self.system.topology_list]
         _names = []
         for name in _deep_names:
             _names.append(name)
@@ -65,7 +65,7 @@ class PotentialManager:
         if atom_1 == 'all':
             atom_1 = species
 
-        if atom_2 = 'all':
+        if atom_2 == 'all':
             atom_2 = species
 
         if isinstance(atom_1, str):
@@ -91,12 +91,12 @@ class System(ReactionDiffusionSystem):
     def __init__(self, box):
         super().__init__(box)
         self._topologies = []
-        self._potentials = PotentialManager(self)
+        self.manager = PotentialManager(self)
         self._species = {}
 
     @property
     def potential_list(self):
-        return self._potentials.potentials
+        return self.manager.potentials
         
     @property
     def topology_list(self):
@@ -108,7 +108,7 @@ class System(ReactionDiffusionSystem):
 
     def configure_potentials(self):
         """Shortcut to configuring the PotentialManager instance"""
-        self._potentials.configure()
+        self.manager.configure()
 
     def insert_species(self, name: str, D: float, positions: np.ndarray, overwrite: bool = False):
         """Registers the name and positions of a new species
@@ -165,7 +165,7 @@ class System(ReactionDiffusionSystem):
         self._topologies.append(topology)
 
     def initialise_simulation(self, fout='_out.h5', checkpoint: bool = None):
-        self._potentials.configure()
+        self.manager.configure()
         simulation = self.simulation()
 
         if checkpoint:
