@@ -23,7 +23,8 @@ class Potential:
         self.settings = kwargs
 
     def __repr__(self):
-        return f"{self.kind.upper()}({'<>'.join(self.atoms)}; {', '.join([f'{key}:{value}' for key, value in self.settings.items()])})"
+        return (f"{self.kind.upper()}({'<->'.join(self.atoms)};"
+        f" {', '.join([f'{key}:{value}' for key, value in self.settings.items()])})")
 
     def register(self, system):
         if self.kind == 'lj':
