@@ -30,7 +30,6 @@ def test_degradation():
     system = EnzymaticDegradation([10., 10., 10.])
     system.insert_topology(gel, diffusion_constant=1.0)
     system.add_enzyme()
-    system.add_payload()
     simulation = system.initialise_simulation()
     simulation.run(10, 0.1)
     return

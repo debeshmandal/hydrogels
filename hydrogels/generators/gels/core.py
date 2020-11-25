@@ -54,3 +54,49 @@ class Gel(Topology):
         self.add_bond('harmonic', self.unbonded, self.unbonded, **ghost_bond)
         return
 
+    def register_decay(
+        self, 
+        system, 
+        released: str = 'released', 
+        rate = 1e-3
+    ):
+        """Registers the decay of unbonded topology particles 
+        to released particles"""
+
+        def function(topology):
+            recipe = readdy.StructuralReactionRecipe(topology)
+            index = np.random.randint(0, len(topology.particles))
+            if topology.particles[index].type == self.unbonded:
+                recipe.separate_vertex(index)
+                recipe.change_particle_type(index, released)
+            return recipe
+
+        system.topologies.add_structural_reaction(
+            'decay',
+            topology_type=self.top_type,
+            reaction_function=function,
+            rate_function=lambda x: 1e-3,
+        )
+
+        return
+
+    def register_degradation(
+        system, 
+        enzyme: str = 'enzyme',
+        rate: float = 1e-3,
+        radius: float = 2.0
+    ):
+
+        reaction = (
+            f'reaction: {self.top_type}({self.monomer})'
+            f'+({enzyme}) -> {self.top_type}({self.unbonded})+({enzyme})'
+        )
+
+        system.reactions.add(
+            reaction, 
+            rate=rate, 
+            radius=radius
+        )
+
+        return
+
