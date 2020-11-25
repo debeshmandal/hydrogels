@@ -13,5 +13,5 @@ build/
 protocols/*/*.csv
 protocols/*/*.json
 protocols/*/*.pdf
-.coverage
 screen.out
+*coverage*
