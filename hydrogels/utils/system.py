@@ -50,8 +50,9 @@ class PotentialManager:
         _species = list(self.system._species.keys())
         _deep_names = [i.names for i in self.system.topology_list]
         _names = []
-        for name in _deep_names:
-            _names.append(name)
+        for item in _deep_names:
+            for name in item:
+                _names.append(name)
         return _species + _names
 
     @property
@@ -63,23 +64,26 @@ class PotentialManager:
 
         species = self.species.copy()
 
-        if atom_1 == 'all':
-            atom_1 = species
-
-        if atom_2 == 'all':
-            atom_2 = species
-
         if isinstance(atom_1, str):
-            assert atom_1 in species
-            atom_1 = [atom_1]
-        
-        if isinstance(atom_2, str):
-            assert atom_2 in species
-            atom_2 = [atom_2]
+            if atom_1 == 'all':
+                atom_1 = species
+            else:
+                assert atom_1 in species
+                atom_1 = [atom_1]
 
-        for i in atom_1:
-            for j in atom_2:
-                self._potentials.append(Potential(kind, i, j, **kwargs))
+        for i, a in enumerate(atom_1):
+            assert isinstance(a, str), f'{a} should be a string but is not!'
+            if isinstance(atom_2, str):
+                if atom_2 == 'all':
+                    atom_2 = species
+                else:
+                    assert atom_2 in species
+                    atom_2 = [atom_2]
+
+            for j, b in enumerate(atom_2):
+                if j > i: continue
+                assert isinstance(b, str), f'{b} should be a string but is not!'
+                self._potentials.append(Potential(kind, a, b, **kwargs))
 
     def configure(self):
         for potential in self.potentials:
@@ -180,7 +184,8 @@ class System(ReactionDiffusionSystem):
 
         # add species from dictionary
         for species, positions in self._species.items():
-            simulation.add_particles(species, positions)
+            if len(positions) != 0:
+                simulation.add_particles(species, positions)
 
         # 
         for top in self.topology_list:

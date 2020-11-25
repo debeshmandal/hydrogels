@@ -81,21 +81,20 @@ class Gel(Topology):
         return
 
     def register_degradation(
+        self,
         system, 
         enzyme: str = 'enzyme',
         rate: float = 1e-3,
         radius: float = 2.0
     ):
 
-        reaction = (
-            f'reaction: {self.top_type}({self.monomer})'
-            f'+({enzyme}) -> {self.top_type}({self.unbonded})+({enzyme})'
-        )
-
-        system.reactions.add(
-            reaction, 
+        system.reactions.add_enzymatic(
+            name="degradation", 
+            type_catalyst=enzyme, 
+            type_from=self.monomer, 
+            type_to=self.unbonded, 
             rate=rate, 
-            radius=radius
+            educt_distance=radius
         )
 
         return
