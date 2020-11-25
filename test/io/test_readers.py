@@ -2,7 +2,7 @@ from pathlib import Path
 
 import numpy as np
 
-from hydrogels.utils.io import CoreReader, LAMMPSDataReader, AutoReader
+from hydrogels.utils.io import CoreReader, LAMMPSDataReader, AutoReader, HydrogelsReader
 
 PATH = (Path(__file__).parents[0] / '_assets').resolve()
 
