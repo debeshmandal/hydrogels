@@ -16,6 +16,74 @@ from .topology import Topology
 from ..utils.logger import Logger
 logger = Logger(__name__)
 
+class Potential:
+    def __init__(self, kind, atom_1, atom_2, **kwargs):
+        self.kind = kind
+        self.atoms = [atom_1, atom_2]
+        self.settings = kwargs
+
+    def __repr__(self):
+        return f"{self.kind.upper()}({atom_1}:{atom_2})"
+
+    def register(self, system):
+        if self.kind == 'lj':
+            system.potentials.add_lennard_jones(
+                self.atoms[0],
+                self.atoms[1],
+                m=self.settings.get('m', 12),
+                n=self.settings.get('n', 6),
+                shift=True,
+                epsilon=self.settings['epsilon'],
+                sigma=self.settings['sigma'],
+                cutoff=self.settings['cutoff'],
+            )
+
+class PotentialManager:
+    """Class that ensures all of the correct potentials are used"""
+    def __init__(self, system: "System"):
+        self.system = system
+        self._potentials = []
+
+    @property
+    def species(self):
+        _species = list(system.species.keys())
+        _deep_names = [i.names for i in system.topology_list]
+        _names = []
+        for name in _deep_names:
+            _names.append(name)
+        return _species + _names
+
+    @property
+    def potentials(self):
+        return self._potentials
+
+    def add(self, kind, atom_1, atom_2, **kwargs):
+        """Adds a potential to be registered"""
+
+        species = self.species.copy()
+
+        if atom_1 == 'all':
+            atom_1 = species
+
+        if atom_2 = 'all':
+            atom_2 = species
+
+        if isinstance(atom_1, str):
+            assert atom_1 in species
+            atom_1 = [atom_1]
+        
+        if isinstance(atom_2, str):
+            assert atom_2 in species
+            atom_2 = [atom_2]
+
+        for i in atom_1:
+            for j in atom_2:
+                self._potentials.append(Potential(kind, i, j, **kwargs))
+
+    def configure(self):
+        for potential in self.potentials:
+            potential.register(self.system)
+
 class System(ReactionDiffusionSystem):
     """
     Wrapper for a ReaDDy system
@@ -23,28 +91,24 @@ class System(ReactionDiffusionSystem):
     def __init__(self, box):
         super().__init__(box)
         self._topologies = []
-        self._reactions = []
-        self._potentials = []
+        self._potentials = PotentialManager(self)
         self._species = {}
 
     @property
     def potential_list(self):
-        return self._potentials
+        return self._potentials.potentials
         
     @property
     def topology_list(self):
         return self._topologies
 
     @property
-    def reaction_list(self):
-        return self._reactions
-
-    @property
     def species_list(self):
         return list(self._species)
 
     def configure_potentials(self):
-        return
+        """Shortcut to configuring the PotentialManager instance"""
+        self._potentials.configure()
 
     def insert_species(self, name: str, D: float, positions: np.ndarray, overwrite: bool = False):
         """Registers the name and positions of a new species
@@ -101,6 +165,7 @@ class System(ReactionDiffusionSystem):
         self._topologies.append(topology)
 
     def initialise_simulation(self, fout='_out.h5', checkpoint: bool = None):
+        self._potentials.configure()
         simulation = self.simulation()
 
         if checkpoint:
