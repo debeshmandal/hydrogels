@@ -48,24 +48,28 @@ class CoreReader:
     @property
     def topologies(self) -> List[Topology]:
         return self._topologies
-
-    def system(
+    
+    def system(self, **kwargs) -> System:
+        if 'box' in self.metadata:
+            system = System(self.metadata['box'])
+        else:
+            system = System(kwargs['box'])
+        self.configure(system, **kwargs)
+        return system
+        
+    def configure(
         self,
+        system,
         diffusion_constant: float = None,
         diffusion_dictionary: float = None,
         bonding: dict = None,
-    ) -> System:
+    ):
         if diffusion_dictionary != None and diffusion_constant != None:
             raise ValueError('Please provide only one form for the diffusion constants!')
 
         metadata = self.metadata
         topologies = self.topologies
         particles = self.particles
-
-        if 'box' in self.metadata:
-            system = System(metadata['box'])
-        else:
-            system = System(kwargs['box'])
 
         if diffusion_constant:
             diffusion = diffusion_constant
@@ -91,5 +95,4 @@ class CoreReader:
                 diffusion_dictionary=diffusion_dictionary, 
                 diffusion_constant=diffusion_constant
             )
-
-        return system
+        return

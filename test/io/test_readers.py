@@ -68,5 +68,5 @@ def test_AutoReader():
     return
 
 if __name__ == '__main__':
-    #test_CoreReader()
+    test_CoreReader()
     test_LAMMPSDataReader()
