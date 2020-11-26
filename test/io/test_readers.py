@@ -47,10 +47,26 @@ def test_HydrogelsReader():
 
 def test_LAMMPSDataReader():
     fname = f"{PATH}/lammps.test.conf"
+    reader = LAMMPSDataReader(fname, names=['top'], species={1: 'A', 2: 'A'})
+    system = reader.system(
+        diffusion_constant=1.0,
+        bonding={
+            'top': {
+                'kind': 'harmonic',
+                'species_1': 'A',
+                'species_2': 'A',
+                'length': 1.0,
+                'force_constant': 1.0,
+            }
+        }
+    )
+    simulation = system.initialise_simulation()
+    simulation.run(10, 0.1)    
     return
 
 def test_AutoReader():
     return
 
 if __name__ == '__main__':
-    test_CoreReader()
+    #test_CoreReader()
+    test_LAMMPSDataReader()
