@@ -1,0 +1,1 @@
+from .degradation import EnzymaticDegradation

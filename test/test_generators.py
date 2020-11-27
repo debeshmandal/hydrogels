@@ -2,6 +2,7 @@
 """
 Pytest script for testing the generators folder
 """
+import pytest
 
 def test_polymers():
     import hydrogels.generators.polymers as polymers

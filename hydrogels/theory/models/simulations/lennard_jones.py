@@ -14,7 +14,8 @@ class LennardJones(Simulation):
                 'c0' : constants['c0'],
                 'base_rate' : constants['rate'],
                 'nV' : constants['nV'],
-                'thickness' : constants['thickness']
+                'thickness' : constants['thickness'],
+                'rE' : constants['rE']
             },
             variables = {
                 'N' : N,
@@ -28,9 +29,16 @@ class LennardJones(Simulation):
 
     @property
     def potential(self) -> Equation:
-        def func(sig: float = 1., eps: float =1., rc: float = 5.0, R: float = 2.0) -> 'V':
-            """ Lennard-Jones 12-6"""
-            return potentials.lennard_jones(sig, eps, rc, R)
+        def func(
+            sig: float = 1.,
+            eps: float =1., 
+            rc: float = 5.0, 
+            R: float = 2.0, 
+            nV: float = 0.0,
+            rE: float = 0.0,
+        ) -> 'V':
+            """Macroscopic Lennard-Jones 12-6"""
+            return potentials.macro_LJ(sig, eps, nV, 12, rE, R) - potentials.macro_LJ(sig, eps, nV, 6, rE, R)
         return Equation(func, string=func.__doc__)
 
     @property

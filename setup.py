@@ -32,15 +32,23 @@ functions = Extension(
     extra_compile_args = cpp_args,
     )
 
+packages = []
+
+for package in setuptools.find_packages():
+    if package.split('.')[0] == 'hydrogels':
+        packages.append(package)
+
+print(packages)
+
 setuptools.setup(
     name="hydrogels",
-    version="0.4.4",
+    version="1.0.0",
     author="Debesh Mandal",
     description="Package for creating and analysing hydrogels in ReaDDy",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/debeshmandal/hydrogels",
-    packages=setuptools.find_packages(),
+    packages=packages,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

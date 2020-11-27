@@ -11,6 +11,23 @@ import readdy
 from readdy._internal.readdybinding.api import TopologyRecord
 from readdy._internal.readdybinding.common.util import TrajectoryParticle
 
+class TopologyBond:
+    """Dataclass containing bond information for a topology"""
+    def __init__(self, kind, species_1, species_2, **kwargs):
+        self.kind = kind
+        self.species = [species_1, species_2]
+        self.settings = kwargs
+
+    def register(self, system: "System"):
+        if self.kind == 'harmonic':
+            system.topologies.configure_harmonic_bond(
+                *self.species,
+                **self.settings
+            )
+        else:
+            raise TypeError(f'Bond kind must be harmonic but is {self.kind}')
+        return
+
 class Topology():
     """
     Wrapper for a readdy topology
@@ -18,7 +35,10 @@ class Topology():
     def __init__(self, top_type : str, **kwargs):
         self.top_type = top_type
         self._sequence = kwargs.get('sequence', [])
+        self._names = list(set(self._sequence + kwargs.get('names', [])))
         self._positions = kwargs.get('positions', np.array([]))
+        self._edges = kwargs.get('edges', [])
+        self._bonds = kwargs.get('bonds', [])
 
     def _string(self):
         return f'{self.top_type}[{self.N}]'
@@ -34,9 +54,61 @@ class Topology():
     def positions(self) -> np.ndarray:
         return self._positions
 
+    @positions.setter
+    def positions(self, value):
+        self._positions = value
+
     @property
     def sequence(self) -> typing.List[str]:
         return self._sequence
+
+    @sequence.setter
+    def sequence(self, value):
+        self._sequence = value
+
+    @property
+    def edges(self) -> typing.List[tuple]:
+        return self._edges
+
+    @edges.setter
+    def edges(self, value):
+        self._edges = value
+
+    @property
+    def names(self) -> typing.List[str]:
+        return self._names
+
+    @names.setter
+    def names(self, value):
+        assert isinstance(value, (list, tuple, set))
+        self._names = value
+
+    def add_names(self, value):
+        if isinstance(value, (list, tuple, set)):
+            self._names += list(value)
+        elif isinstance(value, str):
+            self._names.append(value)
+        else:
+            logger.error(
+                f'When adding names, ensure that they are strings '
+                f'or iters of strings, at the moment they are {type(value)}'
+            )
+
+    @property
+    def bonds(self):
+        return self._bonds
+
+    def add_bond(self, *args, **kwargs):
+        """Add TopologyBond or args for it"""
+        if len(args) != 0:
+            if isinstance(args[0], TopologyBond):
+                bond = args[0]
+            else:
+                bond = TopologyBond(*args, **kwargs)
+        else:
+            bond = TopologyBond(**kwargs)
+
+        self._bonds.append(bond)
 
     def species(
             self, 
@@ -52,12 +124,12 @@ class Topology():
             
 
         if diffusion_dictionary:
-            assert set(diffusion_dictionary.keys()) == set(self.sequence)
+            assert set(diffusion_dictionary.keys()) == set(self.names)
             return diffusion_dictionary
 
         elif diffusion_constant:
             result = {}
-            names = set(self.sequence)
+            names = set(self.names)
             for name in names:
                 result[name] = diffusion_constant
             return result
@@ -97,7 +169,7 @@ class Topology():
         """
         self.dataframe.to_csv(fout, index=False, header=False, float_format="%g", sep='\t')
 
-    def add_to_sim(self, simulation : readdy.Simulation):
+    def add_to_sim(self, simulation: readdy.Simulation, shift: int = 0):
         """
         Adds the topology to a readdy simulation
         """
@@ -108,14 +180,5 @@ class Topology():
         )
 
         for atoms in self.edges:
-            topology.get_graph().add_edge(atoms[0], atoms[1])
-
-class ReaddyTopology(Topology):
-    """
-    Class to handle readdy.Topology objects
-    """
-    def __init__(
-        self, 
-        topology : TopologyRecord, 
-        particles : typing.List[TrajectoryParticle]):
-        pass
+            topology.get_graph().add_edge(atoms[0] + shift, atoms[1] + shift)
+            
