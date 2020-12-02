@@ -11,7 +11,7 @@ from typing import Union
 logger = Logger(__name__)
 
 class LAMMPSDataReader(CoreReader):
-    def __init__(self, fname, names: Union[dict, list, tuple] = None, species: dict = None):
+    def __init__(self, fname, names: Union[dict, list, tuple] = None, species: dict = None, **kwargs):
         super().__init__()
         self.fname = fname
         self.names = names

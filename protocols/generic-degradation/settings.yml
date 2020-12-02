@@ -1,5 +1,5 @@
-read:
-  name: assets/lammps.main.conf
+reader:
+  fname: assets/lammps.main.conf
   kind: lammps-data
   names: [gel]
   species: 
