@@ -22,6 +22,18 @@ bonding:
     species_2: 'monomer'
     length: 1.0
     force_constant: 1.0
+  gel:
+    kind: harmonic
+    species_1: 'unbonded'
+    species_2: 'monomer'
+    length: 1.0
+    force_constant: 1.0
+  gel:
+    kind: harmonic
+    species_1: 'unbonded'
+    species_2: 'unbonded'
+    length: 1.0
+    force_constant: 1.0
 
 potentials:
   - kind: 'lj'
