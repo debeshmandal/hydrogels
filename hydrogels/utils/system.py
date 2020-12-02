@@ -4,6 +4,7 @@ Objects for handling commonly used high-level readdy systems
 """
 import typing
 import os
+import json
 
 import numpy as np
 import pandas as pd
@@ -83,10 +84,15 @@ class PotentialManager:
             for j, b in enumerate(atom_2):
                 if j > i: continue
                 assert isinstance(b, str), f'{b} should be a string but is not!'
-                self._potentials.append(Potential(kind, a, b, **kwargs))
+                logger.debug(f'Adding potential with\n\tkind: {kind}\n\ta<->b: {a}<->{b}\n\tkwargs: {json.dumps(kwargs, indent=2)}')
+                potential = Potential(kind, a, b, **kwargs.copy())
+                logger.debug(f'Potential added: {potential}')
+                self._potentials.append(potential)
 
     def configure(self):
-        for potential in self.potentials:
+        logger.debug('Configuring potentials...')
+        for potential in self._potentials:
+            logger.debug(f'Configuring:\n\t{potential}')
             potential.register(self.system)
 
 class System(ReactionDiffusionSystem):
@@ -110,6 +116,12 @@ class System(ReactionDiffusionSystem):
     @property
     def species_list(self):
         return list(self._species)
+
+    def add_potential(self, *args, **kwargs):
+        logger.debug(
+            f'Adding potential to system with:\n\targs: {args}\n\tkwargs:{json.dumps(kwargs, indent=2)}'
+        )
+        self.manager.add(*args, **kwargs)
 
     def configure_potentials(self):
         """Shortcut to configuring the PotentialManager instance"""

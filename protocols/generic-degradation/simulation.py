@@ -17,24 +17,39 @@ def get_reader(settings):
 def generate_system(settings):
     reader = get_reader(settings['reader'])
     system = EnzymaticDegradation(
+        settings['box'],
         **settings['simulation'], 
-        topologies=reader.topologies,
+    )
+    logger.debug(
+        f'System:\n'
+        f'{system.species_list}\n'
     )
     reader.configure(system, **settings)
-    return
+    system.register_gels()
+    logger.info(f'Species: {system.species_list}')
+    for potential in settings['potentials']:
+        logger.debug(f'Adding potential:\n{json.dumps(potential, indent=2)}')
+        system.add_potential(**potential)
+    return system
 
-def generate_simulation(system, stride):
-    simu = system.initialise_simulation()
-    simu.observe.topologies(stride)
-    simu.observe.particles(stride)
-    simu.record_trajectory(stride)
-    return simu
+def run_simulation(system, settings):
+    sim = system.initialise_simulation()
+
+    _settings = settings['simulation']
+    length = _settings['length']
+    stride = _settings['stride']
+    timestep = _settings['timestep']
+
+    sim.observe.topologies(stride)
+    sim.observe.particles(stride)
+    sim.record_trajectory(stride)
+    sim.run(length * stride, timestep)
+    return sim
 
 def main(fname: str):
     settings = tools.parse_yaml(fname)
     system = generate_system(settings)
-    simulation = generate_simulation(system)
-    simu.run(length * stride, timestep)
+    sim = run_simulation(system, settings)
     return
 
 if __name__ == '__main__':

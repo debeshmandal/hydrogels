@@ -63,6 +63,7 @@ class CoreReader:
         diffusion_constant: float = None,
         diffusion_dictionary: float = None,
         bonding: dict = None,
+        **kwargs
     ):
         if diffusion_dictionary != None and diffusion_constant != None:
             raise ValueError('Please provide only one form for the diffusion constants!')
@@ -95,4 +96,5 @@ class CoreReader:
                 diffusion_dictionary=diffusion_dictionary, 
                 diffusion_constant=diffusion_constant
             )
+
         return

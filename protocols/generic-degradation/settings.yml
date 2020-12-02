@@ -18,15 +18,18 @@ diffusion_dictionary:
 bonding:
   gel:
     kind: harmonic
-    species_1: 'A'
-    species_2: 'A'
+    species_1: 'monomer'
+    species_2: 'monomer'
     length: 1.0
     force_constant: 1.0
 
 potentials:
-  epsilon: 1.0
-  sigma: 1.0
-  cutoff: 1.0
+  - kind: 'lj'
+    atom_1: 'all'
+    atom_2: 'all'
+    epsilon: 1.0
+    sigma: 1.0
+    cutoff: 1.0
 
 enzyme:
   number: 100

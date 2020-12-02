@@ -8,8 +8,7 @@ from ..generators.gels import Gel
 class EnzymaticDegradation(System):
     def __init__(
         self, 
-        box: list, 
-        topologies, 
+        box: list,
         released: str = 'released',
         decay_rate: float = 1e-3,
         **kwargs
@@ -22,16 +21,14 @@ class EnzymaticDegradation(System):
         self.released = released
         self.insert_species(released, self.settings.get('diffusion_constant', 1.0), [])
 
+        # add lj potential for everything
+        #self.manager.add('lj', 'all', 'all', **self.settings)
+
+    def register_gels(self):
         # manage topologies
-        if isinstance(topologies, Topology):
-            topologies = [topologies]
-        for top in topologies:
-            self.insert_topology(top, diffusion_constant=self.settings.get('diffusion_constant', 1.0))
+        for top in self.topology_list:
             if isinstance(top, Gel):
                 top.register_decay(self, released=self.released, rate=self.decay_rate)
-        
-        # add lj potential for everything
-        self.manager.add('lj', 'all', 'all', **self.settings)
 
     def add_enzyme(self, positions, name: str = 'enzyme', rate: float=1e-3, radius: float=2.0, diffusion_constant: float = None):
         if diffusion_constant == None:

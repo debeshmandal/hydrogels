@@ -8,6 +8,9 @@ import numpy as np
 import pandas as pd
 import readdy
 
+from softnanotools.logger import Logger
+logger = Logger(__name__)
+
 from readdy._internal.readdybinding.api import TopologyRecord
 from readdy._internal.readdybinding.common.util import TrajectoryParticle
 
@@ -124,7 +127,13 @@ class Topology():
             
 
         if diffusion_dictionary:
-            assert set(diffusion_dictionary.keys()) == set(self.names)
+            try:
+                assert set(diffusion_dictionary.keys()).intersection(set(self.names)) != 0
+            except AssertionError:
+                logger.error(
+                    f'The keys in the diffusion dictionary are: {list(diffusion_dictionary.keys())}'
+                    f' but should be {list(set(self.names))}!'
+                )
             return diffusion_dictionary
 
         elif diffusion_constant:
