@@ -10,13 +10,6 @@ from hydrogels.systems import EnzymaticDegradation
 
 import tools
 
-def get_reader(settings):
-    reader = AutoReader(
-        settings['fname'], 
-        kind=settings.get('kind', 'auto'),
-    )
-    return reader
-
 def generate_system(settings):
     reader = get_reader(settings['reader'])
     system = EnzymaticDegradation(
