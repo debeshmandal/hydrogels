@@ -7,8 +7,6 @@ import pandas as pd
 from softnanotools.logger import Logger
 logger = Logger(__name__)
 
-import hydrogels
-
 from ..system import System
 from ..topology import Topology
 
@@ -41,12 +39,10 @@ class CoreReader:
         sequence, 
         positions, 
         edges,
-        cls="Topology"
+        cls = None,
     ):
-        cls = {
-            "Topology": Topology,
-            "Gel": hydrogels.generators.Gel
-        }[cls]
+        if cls == None:
+            cls = Topology
 
         topology = cls(
             name, 

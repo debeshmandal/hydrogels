@@ -105,14 +105,14 @@ class Topology():
     def add_bond(self, *args, **kwargs):
         """Add TopologyBond or args for it"""
 
-        if isinstance(args[0], list):
-            bonds = args[0]
-            for bond in bonds:
-                self._bonds.append(TopologyBond(**bond))
-            return
+        if len(args) != 0:
+            if isinstance(args[0], list):
+                bonds = args[0]
+                for bond in bonds:
+                    self._bonds.append(TopologyBond(**bond))
+                return
 
-        elif len(args) != 0:
-            if isinstance(args[0], TopologyBond):
+            elif isinstance(args[0], TopologyBond):
                 bond = args[0]
             else:
                 bond = TopologyBond(*args, **kwargs)

@@ -21,9 +21,17 @@ class LAMMPSDataReader(CoreReader):
     ):
         super().__init__()
         self.fname = fname
-        self.names = names
+        if names == None:
+            self.names = None
+        else:
+            self.names = names
+        
         self.species = species
-        self.classes = classes
+
+        if classes == None:
+            self.classes = [None]
+        else:
+            self.classes = classes
         self._read()
         
 
@@ -101,6 +109,7 @@ class LAMMPSDataReader(CoreReader):
                 cls = self.classes[idx]
             else:
                 name = i
+                cls = None
             mol = atoms[atoms['mol']==i]
             sequence = mol['type'].apply(
                 lambda x: self.species[x] if self.species != None else x

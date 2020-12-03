@@ -18,5 +18,5 @@ class _AutoReader:
             'been implemented yet'
         )
 
-def AutoReader(fname, kind, **kwargs):
+def AutoReader(fname, kind='auto', **kwargs):
     return _AutoReader(fname, kind, **kwargs).reader
