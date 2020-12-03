@@ -35,7 +35,7 @@ def test_degradation():
         cutoff=1.0
     )
     gel = generate_gel()
-    system.insert_topology(gel)
+    system.insert_topology(gel, diffusion_constant=1.0)
     gel.register_decay(system)
     system.add_enzyme(np.array([[5.0, 0.0, 0.0]]))
     simulation = system.initialise_simulation()
@@ -51,7 +51,7 @@ def test_degradation_payload():
         cutoff=1.0
     )
     gel = generate_gel()
-    system.insert_topology(gel)
+    system.insert_topology(gel, diffusion_constant=1.0)
     gel.register_decay(system)
     system.add_enzyme(np.array([[5.0, 0.0, 0.0]]))
     system.add_payload(np.array([[3.0, 0.0, 0.0]]))

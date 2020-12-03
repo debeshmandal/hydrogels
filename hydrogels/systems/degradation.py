@@ -50,8 +50,6 @@ class EnzymaticDegradation(System):
         self.diffusion_constant = diffusion_constant
         self.diffusion_dictionary = diffusion_dictionary
 
-        
-
         # add lj potential for everything
         #self.manager.add('lj', 'all', 'all', **self.settings)
 
