@@ -131,7 +131,10 @@ class System(ReactionDiffusionSystem):
         """Registers the name and positions of a new species
         """
         if name not in self._species:
-            self.add_species(name, D)
+            try:
+                self.add_species(name, D)
+            except ValueError:
+                logger.debug(f'{name}[{D}] has already been registered')
             self._species[name] = positions
         elif overwrite:
             self._species[name] = positions

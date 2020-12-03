@@ -43,6 +43,7 @@ class Topology():
         self._edges = kwargs.get('edges', [])
         self._bonds = kwargs.get('bonds', [])
 
+    @property
     def _string(self):
         return f'{self.top_type}[{self.N}]'
 
@@ -103,7 +104,14 @@ class Topology():
 
     def add_bond(self, *args, **kwargs):
         """Add TopologyBond or args for it"""
-        if len(args) != 0:
+
+        if isinstance(args[0], list):
+            bonds = args[0]
+            for bond in bonds:
+                self._bonds.append(TopologyBond(**bond))
+            return
+
+        elif len(args) != 0:
             if isinstance(args[0], TopologyBond):
                 bond = args[0]
             else:

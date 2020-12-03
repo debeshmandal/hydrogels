@@ -5,8 +5,9 @@ reader:
   species: 
     1: 'monomer'
     2: 'monomer'
+  classes: [Gel]
 
-box: [10., 10., 10.]
+box: [50., 50., 50.]
 
 diffusion_dictionary:
   'monomer': 1.0
@@ -17,24 +18,22 @@ diffusion_dictionary:
 
 bonding:
   gel:
-    kind: harmonic
-    species_1: 'monomer'
-    species_2: 'monomer'
-    length: 1.0
-    force_constant: 1.0
-  gel:
-    kind: harmonic
-    species_1: 'unbonded'
-    species_2: 'monomer'
-    length: 1.0
-    force_constant: 1.0
-  gel:
-    kind: harmonic
-    species_1: 'unbonded'
-    species_2: 'unbonded'
-    length: 1.0
-    force_constant: 1.0
-
+    - kind: harmonic
+      species_1: 'monomer'
+      species_2: 'monomer'
+      length: 1.0
+      force_constant: 1.0
+    - kind: harmonic
+      species_1: 'monomer'
+      species_2: 'unbonded'
+      length: 0.0
+      force_constant: 0.0
+    - kind: harmonic
+      species_1: 'unbonded'
+      species_2: 'unbonded'
+      length: 0.0
+      force_constant: 0.0
+  
 potentials:
   - kind: 'lj'
     atom_1: 'all'

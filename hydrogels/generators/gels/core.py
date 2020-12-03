@@ -10,6 +10,8 @@ import pandas as pd
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 
+from typing import List
+
 from ...utils.topology import Topology
 from ..polymers import LinearPolymer, CrosslinkingPolymer
 
@@ -24,17 +26,23 @@ class Gel(Topology):
         positions: np.ndarray = None,
         monomer: str = 'monomer',
         unbonded: str = 'unbonded',
+        sequence: List[str] = None,
+        edges: List[tuple] = None,
     ):
 
         self.monomer = monomer
         self.unbonded = unbonded
+
+        if isinstance(sequence, type(None)):
+            sequence = sequence=len(positions) * [monomer]
 
         if isinstance(positions, (np.ndarray, list, tuple)):
             super().__init__(
                 top_type,
                 positions=positions,
                 sequence=len(positions) * [monomer],
-                names=[self.monomer, self.unbonded]
+                names=[self.monomer, self.unbonded],
+                edges=edges
             )
 
         else:

@@ -11,11 +11,19 @@ from typing import Union
 logger = Logger(__name__)
 
 class LAMMPSDataReader(CoreReader):
-    def __init__(self, fname, names: Union[dict, list, tuple] = None, species: dict = None, **kwargs):
+    def __init__(
+        self, 
+        fname: str, 
+        names: Union[dict, list, tuple] = None, 
+        species: dict = None, 
+        classes: Union[dict, list, tuple] = None, 
+        **kwargs
+    ):
         super().__init__()
         self.fname = fname
         self.names = names
         self.species = species
+        self.classes = classes
         self._read()
         
 
@@ -87,8 +95,10 @@ class LAMMPSDataReader(CoreReader):
         for idx, i in enumerate(mols):
             if isinstance(self.names, dict):
                 name = self.names[i]
+                cls = self.classes[i]
             elif isinstance(self.names, (list, tuple)):
                 name = self.names[idx]
+                cls = self.classes[idx]
             else:
                 name = i
             mol = atoms[atoms['mol']==i]
@@ -107,6 +117,6 @@ class LAMMPSDataReader(CoreReader):
                 self.add_particles(name, positions.to_numpy())
 
             else:
-                self.add_topology(name, list(sequence), positions.to_numpy(), edges)
+                self.add_topology(name, list(sequence), positions.to_numpy(), edges, cls=cls)
 
         return

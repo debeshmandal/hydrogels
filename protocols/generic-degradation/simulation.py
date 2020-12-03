@@ -1,6 +1,8 @@
 import yaml
 import json
 
+import numpy as np
+
 from softnanotools.logger import Logger
 logger = Logger('simulation')
 
@@ -16,20 +18,30 @@ def get_reader(settings):
 
 def generate_system(settings):
     reader = get_reader(settings['reader'])
+    box = settings['box']
+    system_settings = {
+        'diffusion_dictionary': settings.get('diffusion_dictionary', None),
+        'diffusion_constant': settings.get('diffusion_constant', None)
+    }
     system = EnzymaticDegradation(
         settings['box'],
-        **settings['simulation'], 
+        **system_settings, 
     )
+
+    reader.configure(system, **settings)  
+    system.add_enzyme(np.array([[20., 0., 0.]]))
+    system.add_payload(np.array([[23., 0., 0.]]))
+
     logger.debug(
         f'System:\n'
         f'{system.species_list}\n'
     )
-    reader.configure(system, **settings)
-    system.register_gels()
-    logger.info(f'Species: {system.species_list}')
     for potential in settings['potentials']:
         logger.debug(f'Adding potential:\n{json.dumps(potential, indent=2)}')
         system.add_potential(**potential)
+
+    system.register_gels()
+    logger.info(f'Species: {system.species_list}')
     return system
 
 def run_simulation(system, settings):
