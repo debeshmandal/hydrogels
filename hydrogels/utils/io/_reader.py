@@ -1,4 +1,3 @@
-from ._core import CoreReader
 from ._lammps import LAMMPSDataReader
 
 class _AutoReader:

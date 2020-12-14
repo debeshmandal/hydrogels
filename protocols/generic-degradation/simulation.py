@@ -9,6 +9,7 @@ logger = Logger('simulation')
 import hydrogels
 from hydrogels.utils.io import AutoReader
 from hydrogels.systems import EnzymaticDegradation
+from hydrogels import Topology
 
 import tools
 
@@ -27,10 +28,22 @@ def generate_system(settings):
         settings['box'],
         **system_settings, 
     )
-
     reader.configure(system, **settings)  
-    system.add_enzyme(np.array([[20., 0., 0.]]))
-    system.add_payload(np.array([[23., 0., 0.]]))
+
+    if False:
+        system.add_enzyme(np.array([
+            [20., 0., 0.],
+            [20., 1., 0.],
+            [20., 2., 0.],
+            [20., 3., 0.],
+            [20., 4., 0.],
+            [20., 5., 0.],
+            [20., 6., 0.],
+            [20., 7., 0.],
+            [20., 8., 0.],
+            [20., 9., 0.],
+        ]))
+        system.add_payload(np.array([[23., 0., 0.]]))
 
     logger.debug(
         f'System:\n'
@@ -42,6 +55,16 @@ def generate_system(settings):
 
     system.register_gels()
     logger.info(f'Species: {system.species_list}')
+    logger.info(f'Topologies: {system.topology_list}')
+    logger.info(f'Topology Species: {system.topology_species_list}')
+    for particle in ['monomer', 'unbonded']:
+        system.potentials.add_sphere(
+            particle_type=particle, 
+            force_constant=5.0, 
+            origin=[0., 0., 0.], 
+            radius=4.0, 
+            inclusion=True
+        )
     return system
 
 def run_simulation(system, settings):

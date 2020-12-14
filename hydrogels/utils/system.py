@@ -117,6 +117,10 @@ class System(ReactionDiffusionSystem):
     def species_list(self):
         return list(self._species)
 
+    @property
+    def topology_species_list(self):
+        return [i.names for i in self.topology_list]
+
     def add_potential(self, *args, **kwargs):
         logger.debug(
             f'Adding potential to system with:\n\targs: {args}\n\tkwargs:{json.dumps(kwargs, indent=2)}'

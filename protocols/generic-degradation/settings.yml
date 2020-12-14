@@ -10,28 +10,28 @@ reader:
 box: [50., 50., 50.]
 
 diffusion_dictionary:
-  'monomer': 1.0
-  'unbonded': 1.0
-  'released': 1.0
-  'enzyme': 1.0
-  'payload': 1.0
+  'monomer': 0.5
+  'unbonded': 0.5
+  'released': 0.5
+  'enzyme': 0.5
+  'payload': 0.5
 
 bonding:
   gel:
     - kind: harmonic
       species_1: 'monomer'
       species_2: 'monomer'
-      length: 1.0
+      length: 0.2
       force_constant: 1.0
     - kind: harmonic
       species_1: 'monomer'
       species_2: 'unbonded'
-      length: 0.0
+      length: 0.2
       force_constant: 0.0
     - kind: harmonic
       species_1: 'unbonded'
       species_2: 'unbonded'
-      length: 0.0
+      length: 0.2
       force_constant: 0.0
   
 potentials:
@@ -39,7 +39,7 @@ potentials:
     atom_1: 'all'
     atom_2: 'all'
     epsilon: 1.0
-    sigma: 1.0
+    sigma: 0.5
     cutoff: 1.0
 
 enzyme:
@@ -53,8 +53,8 @@ payload:
   number: 100
 
 simulation:
-  timestep: 0.1
-  stride: 1000
-  length: 500
+  timestep: 0.001
+  stride: 5000
+  length: 50
    
   

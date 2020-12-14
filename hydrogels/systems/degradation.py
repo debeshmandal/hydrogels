@@ -59,7 +59,7 @@ class EnzymaticDegradation(System):
             if isinstance(top, Gel):
                 top.register_decay(self, released=self.released, rate=self.decay_rate)
 
-    def add_enzyme(self, positions, name: str = 'enzyme', rate: float=1e-3, radius: float=2.0, diffusion_constant: float = None):
+    def add_enzyme(self, positions, name: str = 'enzyme', rate: float=1e-3, radius: float=2.0, diffusion_constant: float = None, potentials: bool = False):
         if diffusion_constant == None:
             if self.diffusion_constant != None:
                 diffusion_constant = self.diffusion_constant
@@ -68,13 +68,14 @@ class EnzymaticDegradation(System):
             else:
                 logger.error(f'No diffusion constant provided for {name}!')
         self.insert_species(name, diffusion_constant, positions)
-        self.manager.add('lj', name, 'all', **self._kwargs)
+        if potentials:
+            self.manager.add('lj', name, 'all', **self._kwargs)
 
         for top in self._topologies:
             top.register_degradation(self, name, rate, radius)
         return
 
-    def add_payload(self, positions: np.ndarray, name: str = 'payload', diffusion_constant: float = None):
+    def add_payload(self, positions: np.ndarray, name: str = 'payload', diffusion_constant: float = None, potentials: bool = False):
         if diffusion_constant == None:
             if self.diffusion_constant != None:
                 diffusion_constant = self.diffusion_constant
@@ -83,5 +84,6 @@ class EnzymaticDegradation(System):
             else:
                 logger.error(f'No diffusion constant provided for {name}!')
         self.insert_species(name, diffusion_constant, positions)
-        self.manager.add('lj', name, 'all', **self._kwargs)
+        if potentials:
+            self.manager.add('lj', name, 'all', **self._kwargs)
         return

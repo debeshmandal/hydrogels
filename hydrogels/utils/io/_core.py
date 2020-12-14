@@ -10,6 +10,8 @@ logger = Logger(__name__)
 from ..system import System
 from ..topology import Topology
 
+from ...generators import Gel
+
 class CoreReader:
     def __init__(
         self, 
@@ -43,6 +45,12 @@ class CoreReader:
     ):
         if cls == None:
             cls = Topology
+
+        else:
+            cls = {
+                'Topology': Topology,
+                'Gel': Gel,
+            }[cls]
 
         topology = cls(
             name, 

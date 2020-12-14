@@ -12,6 +12,8 @@ from scipy.spatial.distance import pdist, squareform
 
 from typing import List
 
+import readdy
+
 from ...utils.topology import Topology
 from ..polymers import LinearPolymer, CrosslinkingPolymer
 
