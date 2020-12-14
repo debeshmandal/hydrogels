@@ -1,0 +1,3 @@
+LAMMPS (22 Oct 2020)
+ERROR: Using suffix gpu without GPU package installed (../lammps.cpp:801)
+Last command: (unknown)
