@@ -1,0 +1,60 @@
+reader:
+  fname: assets/lammps.main.conf
+  kind: lammps-data
+  names: [gel]
+  species: 
+    1: 'monomer'
+    2: 'monomer'
+  classes: [Gel]
+
+box: [50., 50., 50.]
+
+diffusion_dictionary:
+  'monomer': 0.5
+  'unbonded': 0.5
+  'released': 0.5
+  'enzyme': 0.5
+  'payload': 0.5
+
+bonding:
+  gel:
+    - kind: harmonic
+      species_1: 'monomer'
+      species_2: 'monomer'
+      length: 0.2
+      force_constant: 1.0
+    - kind: harmonic
+      species_1: 'monomer'
+      species_2: 'unbonded'
+      length: 0.2
+      force_constant: 0.0
+    - kind: harmonic
+      species_1: 'unbonded'
+      species_2: 'unbonded'
+      length: 0.2
+      force_constant: 0.0
+  
+potentials:
+  - kind: 'lj'
+    atom_1: 'all'
+    atom_2: 'all'
+    epsilon: 1.0
+    sigma: 0.5
+    cutoff: 1.0
+
+enzyme:
+  number: 100
+  radius: 24.0
+  reaction:
+    educt_radius: 2.0
+    rate: 0.001
+
+payload:
+  number: 100
+
+simulation:
+  timestep: 0.001
+  stride: 5000
+  length: 50
+   
+  

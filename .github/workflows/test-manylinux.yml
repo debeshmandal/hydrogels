@@ -35,7 +35,7 @@ jobs:
     - name: Install dependencies
       run: |
         ${PYTHON_BINARY_DIR}/pip install --upgrade pip setuptools wheel
-        ${PYTHON_BINARY_DIR}/pip install numpy scipy pandas matplotlib pytest tqdm h5py pybind11 cmake starpolymers pytest auditwheel
+        ${PYTHON_BINARY_DIR}/pip install numpy scipy pandas matplotlib pytest tqdm h5py pybind11 cmake starpolymers pytest auditwheel softnanotools
     - name: Install readdy
       run: |
         pushd /tmp

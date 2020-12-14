@@ -26,16 +26,33 @@ def generate_gel():
     return gel
 
 def test_degradation():
+    
+    system = EnzymaticDegradation(
+        [10., 10., 10.],
+        diffusion_constant=1.0, 
+        sigma=1.0, 
+        epsilon=1.0, 
+        cutoff=1.0
+    )
     gel = generate_gel()
-    system = EnzymaticDegradation([10., 10., 10.], gel, diffusion_constant=1.0, sigma=1.0, epsilon=1.0, cutoff=1.0)
+    system.insert_topology(gel, diffusion_constant=1.0)
+    gel.register_decay(system)
     system.add_enzyme(np.array([[5.0, 0.0, 0.0]]))
     simulation = system.initialise_simulation()
     simulation.run(10, 0.1)
     return
 
 def test_degradation_payload():
+    system = EnzymaticDegradation(
+        [10., 10., 10.],
+        diffusion_constant=1.0, 
+        sigma=1.0, 
+        epsilon=1.0, 
+        cutoff=1.0
+    )
     gel = generate_gel()
-    system = EnzymaticDegradation([10., 10., 10.], gel, diffusion_constant=1.0, sigma=1.0, epsilon=1.0, cutoff=1.0)
+    system.insert_topology(gel, diffusion_constant=1.0)
+    gel.register_decay(system)
     system.add_enzyme(np.array([[5.0, 0.0, 0.0]]))
     system.add_payload(np.array([[3.0, 0.0, 0.0]]))
     simulation = system.initialise_simulation()

@@ -65,10 +65,11 @@ def test_LAMMPSDataReader():
     return
 
 def test_AutoReader():
-    reader = AutoReader(f"{PATH}/lammps.test.conf")
-    reader = AutoReader(f"{PATH}/hy.test.gel")
+    reader = AutoReader(f"{PATH}/lammps.test.conf", kind='lammps-data')
+    #reader = AutoReader(f"{PATH}/hy.test.gel")
     return
 
 if __name__ == '__main__':
     test_CoreReader()
     test_LAMMPSDataReader()
+    test_AutoReader()

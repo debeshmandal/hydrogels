@@ -8,6 +8,9 @@ import numpy as np
 import pandas as pd
 import readdy
 
+from softnanotools.logger import Logger
+logger = Logger(__name__)
+
 from readdy._internal.readdybinding.api import TopologyRecord
 from readdy._internal.readdybinding.common.util import TrajectoryParticle
 
@@ -40,6 +43,7 @@ class Topology():
         self._edges = kwargs.get('edges', [])
         self._bonds = kwargs.get('bonds', [])
 
+    @property
     def _string(self):
         return f'{self.top_type}[{self.N}]'
 
@@ -100,8 +104,15 @@ class Topology():
 
     def add_bond(self, *args, **kwargs):
         """Add TopologyBond or args for it"""
+
         if len(args) != 0:
-            if isinstance(args[0], TopologyBond):
+            if isinstance(args[0], list):
+                bonds = args[0]
+                for bond in bonds:
+                    self._bonds.append(TopologyBond(**bond))
+                return
+
+            elif isinstance(args[0], TopologyBond):
                 bond = args[0]
             else:
                 bond = TopologyBond(*args, **kwargs)
@@ -124,7 +135,13 @@ class Topology():
             
 
         if diffusion_dictionary:
-            assert set(diffusion_dictionary.keys()) == set(self.names)
+            try:
+                assert set(diffusion_dictionary.keys()).intersection(set(self.names)) != 0
+            except AssertionError:
+                logger.error(
+                    f'The keys in the diffusion dictionary are: {list(diffusion_dictionary.keys())}'
+                    f' but should be {list(set(self.names))}!'
+                )
             return diffusion_dictionary
 
         elif diffusion_constant:
