@@ -1,6 +1,6 @@
 # Hydrogels Equilibration Script
 
-variable fname string lammps.test.conf
+variable fname string configs/gel-N150-X20-b20.1.lammps
 variable fout string lammps.data.conf
 variable bond_length equal 1.0
 variable bond_strength equal 2.5
@@ -8,7 +8,8 @@ variable lj_eps equal 1.0
 variable lj_sig equal 1.0
 variable lj_cut equal 2.0
 variable T equal 1.0
-variable steps equal 100000
+variable steps equal 1000000
+variable thermo equal 100000
 variable dt equal 0.012
 
 units		lj
@@ -34,7 +35,7 @@ fix		3 all recenter 0.0 0.0 0.0
 minimize 0.0 1.0e-8 1000 100000
 reset_timestep 0
 
-thermo  ${steps}
+thermo  ${thermo}
 timestep	${dt}
 
 run		${steps}

@@ -1,1 +1,1 @@
-from _equilibrate import main as run_equilibration
+from ._equilibrate import main as run_equilibration

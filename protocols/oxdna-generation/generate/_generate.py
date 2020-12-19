@@ -152,14 +152,25 @@ def main(setup_yaml: str):
     generate_initial_topology(init['topology'], N, crosslinker_amount)
 
     # Use confGenerator to generate configuration
+
+    small_box = (np.sqrt(3)/4) * box
+    logger.debug(f'Using small-box size for generation: {small_box}')
     with open(init['screen'], 'w') as f:
         subprocess.check_output([
             programs['confGenerator'], 
             init['input_file'], 
-            str(box),
+            str(small_box),
             f"topology={init['topology']}",
             f"conf_file={init['configuration']}",
         ], stderr=f)
+
+    with open(init['configuration'], 'r') as f:
+        data = f.readlines()
+
+    data[1] = f"b = {box} {box} {box}\n"
+    with open(init['configuration'], 'w') as f:
+        f.write(''.join(data))
+
     logger.info(f"Finished Running confGenerator -> see log at {init['screen']}")
 
     if simu['forces']:
@@ -168,8 +179,8 @@ def main(setup_yaml: str):
         with open(forces_file, 'w') as f:
             f.write(json.dumps({
                 'type': 'sphere',
-                'stiff': 1,
-                'r0': 0,
+                'stiff': 3.0,
+                'r0': str(box/2),
                 'center' : ','.join([str(box/2)] * 3),
                 'particle': -1
             }, indent=2, separators=('', ' = ')).replace('"', ''))

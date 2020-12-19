@@ -11,9 +11,9 @@ folders:
   forces: data
   
 initial:
-  box: 10
-  N: 200
-  crosslinker: 10
+  box: 20
+  N: 150
+  crosslinker: 20
   configuration: oxdna.init.conf
   topology: oxdna.init.top
   bonds: oxdna.init.bonds
@@ -27,7 +27,7 @@ simulation:
   energy: oxdna.init.energy
   input_file: input
   seed: 1
-  interval: 2000000
+  interval: 200000
   steps: 10000000
   screen: simu.screen
   forces: oxdna.forces
@@ -39,11 +39,15 @@ main:
   input_file: convert
   screen: main.screen
 
+equilibration:
+  input_file: equilibrate/lammps.main.in
+
 programs:
-  oxDNA: /rds/general/user/dm3613/home/software/oxDNA/build/bin/oxDNA
-  DNAnalysis: /rds/general/user/dm3613/home/software/oxDNA/build/bin/DNAnalysis
-  confGenerator: /rds/general/user/dm3613/home/software/oxDNA/build/bin/confGenerator
+  oxDNA: oxDNA
+  DNAnalysis: DNAnalysis
+  confGenerator: confGenerator
   micro_csd: 
     bin: micro_csd
     cpp: micro_csd.cpp
   compiler: g++
+  lammps: lmp_mpi

@@ -18,4 +18,4 @@ topology = oxdna.main.top
 conf_file = oxdna.init.conf 
 
 ### PLUGINS
-plugin_search_path = /rds/general/user/dm3613/home/software/oxDNA/contrib/rovigatti
+plugin_search_path = /home/debesh/programs/oxDNA/contrib/rovigatti

@@ -40,6 +40,7 @@ def find_crosslinkers(particles: pd.DataFrame, edges: pd.DataFrame):
 
 def read_oxDNA_bonds(fname: str):
     logger.info(f'Reading {fname} bonds files')
+    
     edges = []
     with open(fname, 'r') as f:
         N, crosslinkers = [int(i) for i in f.readline().split()[2:4]]
@@ -55,11 +56,12 @@ def read_oxDNA_bonds(fname: str):
                 edges.append(tuple(sorted((idx, int(j)))))
     edges = tuple(set(tuple(edges)))
     particles = pd.read_csv(fname, skiprows=2, nrows=N, delim_whitespace=True, header=None)
+    logger.debug(particles)
     particles, edges = format_dataframes(particles, edges, box)
 
     #edges = edges.sort_values(by=['atom_1', 'atom_2']).reset_index(drop=True)
-    if any(edges['length'] > box[0] / 2):
-        logger.warning(f'Some edges are longer than {box[0] / 2}:\n{edges[edges["length"] > (box[0] / 2)]}')
+    #if any(edges['length'] > box[0] / 2):
+    #    logger.warning(f'Some edges are longer than {box[0] / 2}:\n{edges[edges["length"] > (box[0] / 2)]}')
     logger.debug(f'Particles:\n{particles}')
     logger.debug(f'Edges:\n{edges}')
     logger.info(
@@ -82,9 +84,19 @@ def format_dataframes(
         2: 'z',
     })
 
+    logger.debug(f'Renamed Particles:\n{particles}')
+
     for e, i in enumerate(['x', 'y', 'z']):
-        temp = particles[abs(particles[i]) < (box[e] / 2)]
-        particles[i] -= temp.mean()[i]
+        break
+        
+        temp = particles[abs(particles[i]) < (box[e]/2)]
+
+        if len(temp) == 0:
+            temp = particles[particles[i] > (box[e]/2)]
+            
+        logger.debug(f'Transforming {i} using box size: {box[e]} and scale {temp[i].mean()}')
+        if not np.isnan(temp[i].mean()):
+            particles[i] -= temp[i].mean()
         particles[i] = particles[i].apply(lambda x: (x - box[e]) if (x > (box[e])) else x)
         particles[i] = particles[i].apply(lambda x: (x + box[e]) if (x < (-box[e])) else x)
 
@@ -102,8 +114,8 @@ def format_dataframes(
     edges = update_edges(edges, particles)
     logger.debug(f'Formatted Edges:\n{edges}')
 
-    if any(edges['length'] > box[0] / 2):
-        logger.warning(f'Some edges are longer than {box[0] / 2}:\n{edges[edges["length"] > (box[0] / 2)]}')
+    #if any(edges['length'] > box[0] / 2):
+    #    logger.warning(f'Some edges are longer than {box[0] / 2}:\n{edges[edges["length"] > (box[0] / 2)]}')
 
     particles, edges = find_crosslinkers(particles, edges)
 

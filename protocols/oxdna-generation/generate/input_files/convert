@@ -59,7 +59,7 @@ time_scale = linear
 external_forces = false
 external_forces_file = forces.ext
 
-plugin_search_path = /rds/general/user/dm3613/home/software/oxDNA/contrib/rovigatti
+plugin_search_path = /home/debesh/programs/oxDNA/contrib/rovigatti
 
 data_output_1 = {
               name = bonds.dat

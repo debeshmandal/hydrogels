@@ -28,7 +28,7 @@ def main(settings: str, run: bool = False):
     convert.write_lammps(f'{prefix}.lammps', *inputs)
     convert.write_xyz(f'{prefix}.xyz', *inputs)
     inputs[1].to_csv(f'{prefix}.csv')
-    equilibrate.run_equilibration(f'{prefix}.lammps')
+    equilibrate.run_equilibration(params['programs']['lammps'], f'{prefix}.lammps', params['equilibration']['input_file'])
     return
 
 def analysis(inputs):
