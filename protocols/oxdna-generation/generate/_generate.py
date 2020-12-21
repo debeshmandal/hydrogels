@@ -157,11 +157,12 @@ def main(setup_yaml: str):
     logger.debug(f'Using small-box size for generation: {small_box}')
     with open(init['screen'], 'w') as f:
         subprocess.check_output([
-            programs['confGenerator'], 
+            (Path(programs['oxDNA']) / 'build' / 'bin' / 'confGenerator').resolve(), 
             init['input_file'], 
             str(small_box),
             f"topology={init['topology']}",
             f"conf_file={init['configuration']}",
+            f"plugin_search_path={programs['oxDNA']}/contrib/rovigatti"
         ], stderr=f)
 
     with open(init['configuration'], 'r') as f:
@@ -197,7 +198,7 @@ def main(setup_yaml: str):
                 "Track simulation progress at energy.dat"
             )
             subprocess.check_output([
-                programs['oxDNA'],
+                (Path(programs['oxDNA']) / 'build' / 'bin' / 'oxDNA').resolve(),
                 simu['input_file'],
                 f"topology={init['topology']}",
                 f"conf_file={init['configuration']}",
@@ -208,7 +209,8 @@ def main(setup_yaml: str):
                 f"seed={simu['seed']}",
                 f"external_forces={str(forces).lower()}",
                 f"external_forces_file={forces_file}",
-                f"energy_file={simu['energy']}"
+                f"energy_file={simu['energy']}",
+                f"plugin_search_path={programs['oxDNA']}/contrib/rovigatti"
             ], stderr=f)
     except KeyboardInterrupt:
         logger.debug('Caught KeyboardInterrupt whilst running oxDNA and not exiting')
@@ -231,9 +233,10 @@ def main(setup_yaml: str):
     # Use DNAnalysis to create the main files
     with open(main['screen'], 'w') as f:
         subprocess.check_output([
-            programs['DNAnalysis'],
+            (Path(programs['oxDNA']) / 'build' / 'bin' / 'DNAnalysis').resolve(),
             main['input_file'],
-            f"conf_file={init['configuration']}"
+            f"conf_file={init['configuration']}",
+            f"plugin_search_path={programs['oxDNA']}/contrib/rovigatti"
         ], stderr=f)
     logger.info(f"Finished Running DNAnalysis -> see log at {main['screen']}")
 

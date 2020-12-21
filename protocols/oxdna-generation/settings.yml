@@ -27,8 +27,8 @@ simulation:
   energy: oxdna.init.energy
   input_file: input
   seed: 1
-  interval: 200000
-  steps: 10000000
+  interval: 500000
+  steps: 50000000
   screen: simu.screen
   forces: oxdna.forces
 
@@ -43,9 +43,7 @@ equilibration:
   input_file: equilibrate/lammps.main.in
 
 programs:
-  oxDNA: oxDNA
-  DNAnalysis: DNAnalysis
-  confGenerator: confGenerator
+  oxDNA: /home/debesh/programs/oxDNA
   micro_csd: 
     bin: micro_csd
     cpp: micro_csd.cpp
