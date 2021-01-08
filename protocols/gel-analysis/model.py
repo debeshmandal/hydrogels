@@ -93,25 +93,7 @@ class _Model:
     def crosslinkers(self):
         return self.particles[self.particles['type']==2].copy()
 
-    def positions(self, crosslinkers=False):
-        if crosslinkers:
-            particles = self.crosslinkers.copy()
-        else:
-            particles = self.particles.copy()
-
-        return particles[['x', 'y', 'z']].to_numpy()
-        
-    def rdf(self, crosslinkers=False, bins=50):
-        distances = sorted(
-            scipy.spatial.distance.pdist(
-                self.positions(
-                    crosslinkers=crosslinkers
-                )
-            )
-        )
-        rdf = np.histogram(distances, bins=bins)
-        return rdf
-
+    @property
     def gyration(self):
         points = self.positions()
         center = points.mean(0)
@@ -127,6 +109,66 @@ class _Model:
             tensor[1, 2]
         )
 
+    @property
+    def radius(self):
+        gyr = self.gyration
+        return np.sqrt((gyr[0] ** 2 + gyr[1] ** 2 + gyr[2] ** 2) / 3) 
+
+    def density(self, crosslinkers=False):
+        if crosslinkers:
+            return self.X / ((4./3.) * np.pi * self.radius ** 2)
+
+        else:
+            return self.N / ((4./3.) * np.pi * self.radius ** 2)
+
+    def positions(self, crosslinkers=False):
+        if crosslinkers:
+            particles = self.crosslinkers.copy()
+        else:
+            particles = self.particles.copy()
+
+        return particles[['x', 'y', 'z']].to_numpy()
+        
+    def rdf(self, crosslinkers=False, bins=50, delta=False):
+        distances = scipy.spatial.distance.pdist(
+            self.positions(
+                crosslinkers=crosslinkers
+            )
+        )
+        rdf = np.histogram(distances, bins=bins)
+        _delta = rdf[1][1] - rdf[1][0]
+        rdf = [rdf[0], rdf[1]]
+
+        # remove last value for distance bounds
+        rdf[1] = rdf[1][:-1]
+        
+        # normalise
+        rdf[0] = rdf[0] 
+        rdf[0] = rdf[0]/(len(distances) * 4 * np.pi * rdf[1] ** 2 * _delta)
+        rdf[0] = rdf[0]/self.density(crosslinkers=crosslinkers)
+
+        logger.debug(f'RDF Delta: {_delta}')
+        logger.debug(f'RDF:\n\t{rdf[0]}\n\t{rdf[1]}')
+        logger.debug(f'RDF Sum: {sum(rdf[0])}')
+        
+        if delta:
+            return rdf, _delta
+
+        else:
+            return rdf
+    
+    def density_profile(self, rmax, dr, crosslinkers=crosslinkers):
+        com = np.array([np.mean(self.positions(crosslinkers=crosslinkers), axis=0)])
+        logger.debug(com)
+        distances = scipy.spatial.distance.cdist(self.positions(crosslinkers=crosslinkers), com)
+        bins = np.arange(dr, rmax+dr, dr)
+        hist = np.histogram(distances, bins=bins)
+        r = hist[1][:-1]
+        counts = hist[0]
+        rho = counts/(len(distances) * 4 * np.pi * r ** 2 * dr)
+        #logger.info(f'r={r}, rho={rho}')
+        return r, rho
+
     def bond_to_atoms_ratio(self):
         return self.E / self.N
     
@@ -135,28 +177,12 @@ class _Model:
         fig, ax = plt.subplots()
 
         # N
-        rdf = self.rdf(**kwargs)
-        delta = np.diff(rdf[0])
-        logger.debug(
-            pd.DataFrame({                
-                'distance': rdf[1][:-1],
-                'count': rdf[0], 
-                'delta': [0] + list(delta)
-            })
-        )
-        ax.plot(rdf[1][:-1], rdf[0]/sum(rdf[0]), label=f'N={sum(rdf[0])}')
+        rdf, delta = self.rdf(**kwargs, delta=True)
+        #ax.bar(rdf[1] - delta/4, rdf[0], width=delta/2, label=f'N={self.N}')
 
         # X
         rdf = self.rdf(bins=rdf[1], crosslinkers=True)
-        delta = np.diff(rdf[0])
-        logger.debug(
-            pd.DataFrame({                
-                'distance': rdf[1][:-1],
-                'count': rdf[0], 
-                'delta': [0] + list(delta)
-            })
-        )
-        ax.plot(rdf[1][:-1], rdf[0]/sum(rdf[0]), label=f'X={sum(rdf[0])}')
+        ax.bar(rdf[1] + delta/4, rdf[0], width=delta/2, label=f'X={self.X}')
                 
         if title:
             ax.set_title(title)
@@ -171,8 +197,10 @@ class _Model:
         if show:
             plt.show()
 
-    def mesh_size(self):
-        return
+    def mesh_size(self, bins=50):
+        g_r, r = self.rdf(crosslinkers=True, bins=bins)
+        idx = np.argmax(g_r)
+        return r[idx] 
 
 class Model(_Model):
     def __init__(self, fname):
@@ -189,10 +217,16 @@ class Model(_Model):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f', '--fname', default='lammps.test.conf')
+    parser.add_argument('fname')
     model = Model(parser.parse_args().fname)
     logger.info(f"{model}\n")
     logger.info(f"    Bonds:Atoms     -> {model.bond_to_atoms_ratio()}")
-    logger.info(f"    Gyration Tensor -> {' '.join([f'{i:.3f}' for i in model.gyration()])}")
-    model.plot_rdf(show=True, bins=100, title=model.fname.split('/')[-1])
-    #logger.info(f"    Mesh Size     -> {model.mesh_size()}")
+    logger.info(f"    Gyration Tensor -> {' '.join([f'{i:.3f}' for i in model.gyration])}")
+    logger.info(f"    Gyration Radius -> {model.radius:.3f}")
+    logger.info(f"    Density         -> N={model.density():.3f}/X={model.density(crosslinkers=True):.3f}")
+    logger.info(f"    Mesh Size       -> {model.mesh_size(bins=25):.3f}")
+    print(f"{model.fname.split('/')[-1].split('.')[1]},{model.N},{model.X},{model.E},{model.bond_to_atoms_ratio():.3f},{model.radius:.3f},{model.density():.3f},{model.density(crosslinkers=True):.3f},{model.mesh_size(bins=25):.3f}")
+    #model.plot_rdf(show=True, bins=25, title=model.fname.split('/')[-1])
+    #r, rho = model.density_profile(model.radius, 0.1)
+    #plt.plot(r, rho)
+    #plt.show()
