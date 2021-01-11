@@ -87,7 +87,7 @@ if __name__ == '__main__':
 
     particles = read_lammps_conf(args.fname)['particles']
     delta = [particles[i].max() - particles[i].min() for i in ['x', 'y', 'z']]
-    cutoff = max(delta)
+    cutoff = int(2 * max(delta))
 
     # set variables
 

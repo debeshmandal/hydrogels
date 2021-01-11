@@ -11,7 +11,7 @@ variable T equal 0.05
 variable steps equal 100000
 variable thermo equal 10000
 variable dt equal 0.025
-variable global_cutoff equal 9.930895091411733
+variable global_cutoff equal 19
 variable comm_cutoff equal "v_global_cutoff + 0.5"
 
 variable delta equal 0.5
