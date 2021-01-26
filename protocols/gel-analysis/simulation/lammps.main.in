@@ -8,13 +8,13 @@ variable lj_eps equal 1.0
 variable lj_sig equal 1.0
 variable lj_cut equal 1.12
 variable T equal 0.05
-variable steps equal 100000
-variable thermo equal 10000
-variable dt equal 0.025
+variable steps equal 10000000
+variable thermo equal 100000
+variable dt equal 0.012
 variable global_cutoff equal 19
 variable comm_cutoff equal "v_global_cutoff + 0.5"
 
-variable delta equal 0.5
+variable delta equal 0.25
 variable n_bins equal "floor(v_global_cutoff / v_delta)"
 
 units		lj

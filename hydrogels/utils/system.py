@@ -48,7 +48,7 @@ class PotentialManager:
 
     @property
     def species(self):
-        _species = list(self.system._species.keys())
+        _species = self.system.species_list
         _deep_names = [i.names for i in self.system.topology_list]
         _names = []
         for item in _deep_names:
@@ -64,6 +64,7 @@ class PotentialManager:
         """Adds a potential to be registered"""
 
         species = self.species.copy()
+        species = list(set(species))
 
         if isinstance(atom_1, str):
             if atom_1 == 'all':
@@ -115,7 +116,7 @@ class System(ReactionDiffusionSystem):
 
     @property
     def species_list(self):
-        return list(self._species)
+        return list(set(list(self._species)))
 
     @property
     def topology_species_list(self):

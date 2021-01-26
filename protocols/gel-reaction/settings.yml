@@ -1,5 +1,5 @@
 reader:
-  fname: assets/lammps.main.conf
+  fname: lammps.test.conf
   kind: lammps-data
   names: [gel]
   species: 
@@ -48,5 +48,6 @@ simulation:
   timestep: 0.001
   stride: 5000
   length: 50
+  box: [50, 50, 50]
    
   

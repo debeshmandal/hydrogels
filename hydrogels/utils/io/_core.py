@@ -92,22 +92,6 @@ class CoreReader:
         logger.debug(f'\ttopologies: {topologies}')
         logger.debug(f'\tparticles: {particles}')
 
-        logger.debug(f'Using reader to insert species...')
-
-        if diffusion_constant:
-            logger.debug(f'Using diffusion_constant ({diffusion_constant})')
-            diffusion = diffusion_constant
-            for name, value in self.particles.items():
-                logger.debug(f'Adding {name}')
-                system.insert_species(name, diffusion, value)
-            
-        elif diffusion_dictionary:
-            logger.debug(f'Using diffusion_dictionary: {diffusion_dictionary}')
-            diffusion = diffusion_dictionary
-            for name, value in self.particles.items():
-                logger.debug(f'Adding {name}')
-                system.insert_species(name, diffusion[name], value)
-
         logger.debug('Using reader to insert topologies...')        
             
         for topology in self.topologies:
@@ -127,5 +111,30 @@ class CoreReader:
                 diffusion_dictionary=diffusion_dictionary, 
                 diffusion_constant=diffusion_constant
             )
+
+        logger.debug(f'Using reader to insert species...')
+
+        if diffusion_constant:
+            logger.debug(f'Using diffusion_constant ({diffusion_constant})')
+            diffusion = diffusion_constant
+            for name, value in self.particles.items():
+                logger.debug(f'Adding {name}')
+                system.insert_species(name, diffusion, value)
+
+            for name in set(self.species.values()):
+                if name not in system.species_list + system.topology_species_list:
+                    system.insert_species(name, diffusion, []) # type: ignore
+            
+            
+        elif diffusion_dictionary:
+            logger.debug(f'Using diffusion_dictionary: {diffusion_dictionary}')
+            diffusion = diffusion_dictionary
+            for name, value in self.particles.items():
+                logger.debug(f'Adding {name}')
+                system.insert_species(name, diffusion[name], value)
+
+            for name in set(self.species.values()):
+                if name not in system.species_list + system.topology_species_list:
+                    system.insert_species(name, diffusion[name], []) # type: ignore
 
         return
