@@ -29,6 +29,33 @@ def get_system(settings: dict, reader: AutoReader = None):
     logger.debug(json.dumps(settings, indent=2))
     return
 
+def register_reactions(
+    system: hydrogels.System, 
+    released: str ='released',
+    enzyme: str = 'enzyme',
+    decay_rate: float = 0.01,
+    degradation_rate: float = 0.01,
+    radius: float = 1.0,
+):
+    
+    for top in system.topology_list:
+        if isinstance(top, Gel):
+            # register spatial reaction: enzyme + bonded -> enzyme + unbonded
+            top.register_degradation(
+                system, 
+                enzyme=enzyme,
+                rate=degradation_rate,
+                radius=radius,
+            )
+    
+            # register structural reaction: unbonded -> released
+            top.register_decay(
+                system, 
+                released=released, 
+                rate=decay_rate
+            )
+
+
 def read_settings(settings: dict) -> hydrogels.System:
     simulation = settings['simulation']
     system = hydrogels.System(simulation['box'])
@@ -44,8 +71,11 @@ def read_settings(settings: dict) -> hydrogels.System:
 
     for potential in settings['potentials']:
         system.add_potential(**potential)
-
-    system.configure_potentials()
     
+    if settings.get('reaction', False):
+        logger.debug('Registering reaction with the following settings:')
+        logger.debug(json.dumps(settings['reaction'], indent=2))
+        register_reactions(system, **settings['reaction'])
+
     return system
 

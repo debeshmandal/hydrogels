@@ -1,0 +1,7 @@
+initial: lammps.test.conf
+final: lammps.main.conf
+input: lammps.main.in
+box: [50, 50, 50]
+enzyme: 1000
+payload: 100
+lammps: lmp_mpi

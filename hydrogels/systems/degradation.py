@@ -57,7 +57,11 @@ class EnzymaticDegradation(System):
         # manage topologies
         for top in self.topology_list:
             if isinstance(top, Gel):
-                top.register_decay(self, released=self.released, rate=self.decay_rate)
+                top.register_decay(
+                    self, 
+                    released=self.released, 
+                    rate=self.decay_rate
+                )
 
     def add_enzyme(self, positions, name: str = 'enzyme', rate: float=1e-3, radius: float=2.0, diffusion_constant: float = None, potentials: bool = False):
         if diffusion_constant == None:

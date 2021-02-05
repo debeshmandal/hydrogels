@@ -100,32 +100,65 @@ class LAMMPSDataReader(CoreReader):
         logger.debug(f'BONDS:\n{bonds}')
 
         mols = set(list(atoms['mol']))
+        logger.debug(f'reader.names: {self.names}')
+        logger.debug(f'mols (from data file): {mols}')
         for idx, i in enumerate(mols):
+            logger.debug(f'IDX: {idx} - {i}')
             if isinstance(self.names, dict):
                 name = self.names[i]
-                cls = self.classes[i]
+                try:
+                    cls = self.classes[i]
+                except IndexError:
+                    logger.debug('Caught IndexError whilst allocating classes')
+                    cls = None
+
             elif isinstance(self.names, (list, tuple)):
                 name = self.names[idx]
-                cls = self.classes[idx]
+                try:
+                    cls = self.classes[idx]
+                except IndexError:
+                    logger.debug('Caught IndexError whilst allocating classes')
+                    cls = None
             else:
                 name = i
                 cls = None
             mol = atoms[atoms['mol']==i]
+            logger.debug(f'{mol}')
             sequence = mol['type'].apply(
                 lambda x: self.species[x] if self.species != None else x
             )
             positions = mol[['x', 'y', 'z']]
+            
             edges = []
             for j, row in bonds.iterrows():
-                if row['atom_1'] in mol['id']:
+                if row['atom_1'] in list(mol['id']):
                     edges.append((row['atom_1']-1, row['atom_2']-1))
-                elif row['atom_2'] in mol['id']:
+                elif row['atom_2'] in list(mol['id']):
                     edges.append((row['atom_1']-1, row['atom_2']-1))
-                
+            logger.debug(
+                f'For mol[{i}], there are {len(positions)} atoms '
+                f'and {len(edges)} edges'
+            )    
             if len(edges) == 0:
-                self.add_particles(name, positions.to_numpy())
+                logger.info(
+                    f'Adding {i} as a set of particles because it has no edges'
+                )
+                self.add_particles(
+                    name, 
+                    positions.to_numpy()
+                )
 
             else:
-                self.add_topology(name, list(sequence), positions.to_numpy(), edges, cls=cls)
+                logger.info(
+                    f'Adding {i} as a topology because it has edges:'
+                    f'\n{pd.DataFrame(edges)}'
+                )                    
+                self.add_topology(
+                    name, 
+                    list(sequence), 
+                    positions.to_numpy(), 
+                    edges, 
+                    cls=cls
+                )
 
         return

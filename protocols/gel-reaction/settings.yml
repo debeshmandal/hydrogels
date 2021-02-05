@@ -1,7 +1,10 @@
 reader:
-  fname: lammps.test.conf
+  fname: data.out
   kind: lammps-data
-  names: [gel]
+  names: 
+    - gel 
+    - enzyme 
+    - payload
   species: 
     1: 'monomer'
     2: 'monomer'
@@ -12,28 +15,28 @@ reader:
   classes: [Gel]
 
 diffusion_dictionary:
-  'monomer': 0.5
-  'unbonded': 0.5
-  'released': 0.5
-  'enzyme': 0.5
-  'payload': 0.5
+  'monomer': 1.0
+  'unbonded': 1.0
+  'released': 1.0
+  'enzyme': 1.0
+  'payload': 1.0
 
 bonding:
   gel:
     - kind: harmonic
       species_1: 'monomer'
       species_2: 'monomer'
-      length: 0.2
-      force_constant: 1.0
+      length: 1.122
+      force_constant: 2.5
     - kind: harmonic
       species_1: 'monomer'
       species_2: 'unbonded'
-      length: 0.2
+      length: 0.0
       force_constant: 0.0
     - kind: harmonic
       species_1: 'unbonded'
       species_2: 'unbonded'
-      length: 0.2
+      length: 0.0
       force_constant: 0.0
   
 potentials:
@@ -42,12 +45,19 @@ potentials:
     atom_2: 'all'
     epsilon: 1.0
     sigma: 1.0
-    cutoff: 1.12
+    cutoff: 1.122
+
+reaction:
+  released: released
+  enzyme: enzyme
+  decay_rate: 1.
+  degradation_rate: 1.
+  radius: 2.0
 
 simulation:
-  timestep: 0.001
-  stride: 5000
-  length: 50
+  timestep: 0.00012
+  stride: 500
+  length: 1000
   box: [50, 50, 50]
    
   
