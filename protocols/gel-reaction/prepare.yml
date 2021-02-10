@@ -3,5 +3,5 @@ final: lammps.main.conf
 input: lammps.main.in
 box: [50, 50, 50]
 enzyme: 1000
-payload: 100
-lammps: lmp_mpi
+payload: 0
+lammps: mpirun -np 8 lmp_mpi

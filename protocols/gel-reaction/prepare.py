@@ -107,7 +107,7 @@ class Model(Runner):
     @Runner.task(0)
     def add_particles(self):
         self.add_enzyme(self.settings['enzyme'])
-        if self.settings['payload']:
+        if self.settings.get('payload', 0):
             self.add_payload(self.settings['payload'])
         return
 
