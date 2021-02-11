@@ -1,0 +1,74 @@
+# Hydrogels Equilibration Script
+
+variable fname string lammps.main.conf
+variable fout string data.out
+variable bond_length equal 1.122
+variable bond_strength equal 2.5
+variable lj_eps equal 1.0
+variable lj_sig equal 1.0
+variable lj_cut equal 1.122
+variable T equal 0.05
+variable steps equal 10000000
+variable thermo equal 100000
+variable dt equal 0.00012
+variable global_cutoff equal 19
+variable comm_cutoff equal "v_global_cutoff + 0.5"
+
+variable delta equal 0.25
+variable n_bins equal "floor(v_global_cutoff / v_delta)"
+
+units		lj
+special_bonds  lj 1.0 1.0 1.0
+atom_style	bond
+bond_style  harmonic
+pair_style	lj/cut ${lj_cut}
+pair_modify shift yes
+read_data	${fname}
+
+bond_coeff	* ${bond_strength} ${bond_length}
+pair_coeff	* * ${lj_eps} ${lj_sig} ${lj_cut}
+
+comm_style tiled
+comm_modify cutoff ${comm_cutoff}
+
+group gel type 1 2
+group crosslinkers type 2
+
+neighbor	0.4 bin
+neigh_modify	every 1 delay 1 page 100000000 one 1000000
+
+fix		1 all nve
+fix		2 all langevin ${T} ${T} 10.0 904297
+fix		3 gel recenter 0.0 0.0 0.0
+fix   4 all balance ${thermo} 1.1 rcb
+
+# compute gyration radius
+compute gyr gel gyration
+
+# compute rdfs
+# variable rdf_bins equal "v_global_cutoff / 0.5"
+# compute rdf_N all rdf ${n_bins} * * cutoff ${global_cutoff}
+# compute rdf_X crosslinkers rdf ${n_bins} 2 2 cutoff ${global_cutoff}
+
+# compute density profile
+# variable rho_bins equal "ceil(v_global_cutoff)"
+# compute rho_N all chunk/atom bin/sphere 0 0 0 0.0 ${global_cutoff} ${n_bins} discard yes
+# compute rho_X crosslinkers chunk/atom bin/sphere 0 0 0 0.0 ${global_cutoff} ${n_bins} discard yes
+
+minimize 0.0 1.0e-8 1000 100000
+reset_timestep 0
+
+
+thermo_style custom step temp press pe ke etotal c_gyr
+thermo  ${thermo}
+timestep	${dt}
+
+# fix rdf_out all ave/time 10 1000 ${steps} c_rdf_N[*] c_rdf_X[*] file out.rdf mode vector
+# fix gyr_out all ave/time 10 1000 ${steps} c_gyr c_gyr[1] c_gyr[2] c_gyr[3] c_gyr[4] c_gyr[5] c_gyr[6] file out.gyr
+# fix rho_out_N all ave/histo 10 1000 ${steps} 0.0 ${global_cutoff} ${rho_bins} c_rho_N[*] file out.rho.N mode vector kind peratom
+# fix rho_out_X all ave/histo 10 1000 ${steps} 0.0 ${global_cutoff} ${rho_bins} c_rho_X[*] file out.rho.X mode vector kind peratom
+
+dump out all atom ${thermo} dump.out
+write_data ${fout} pair ij
+
+run		${steps}
