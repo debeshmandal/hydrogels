@@ -8,6 +8,8 @@ from parse import read_settings # type: ignore
 def main(**kwargs):
     logger.info('Running...')
     system = read_settings(kwargs)
+    system.evaulate_reactions = False
+    system.evaulate_topology_reactions = False
     sim = system.initialise_simulation()
     _settings = settings['simulation']
     length = _settings['length']
