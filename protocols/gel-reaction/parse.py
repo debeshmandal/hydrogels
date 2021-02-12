@@ -78,7 +78,7 @@ def read_settings(settings: dict) -> hydrogels.System:
     if settings.get('reaction', False):
         logger.debug('Registering reaction with the following settings:')
         logger.debug(json.dumps(settings['reaction'], indent=2))
-        register_reactions(system, **settings['reaction'])
+        #register_reactions(system, **settings['reaction'])
 
     return system
 

@@ -80,7 +80,7 @@ class LAMMPSDataReader(CoreReader):
             3: 'x',
             4: 'y',
             5: 'z',
-        })
+        }).sort_values(by='id')
 
         logger.debug(f'ATOMS:\n{atoms}')
         

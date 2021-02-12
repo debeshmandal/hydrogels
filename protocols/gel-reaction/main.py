@@ -10,8 +10,8 @@ def main(**kwargs):
     system = read_settings(kwargs)
     sim = system.initialise_simulation()
     _settings = settings['simulation']
-    sim.observe.forces(stride=_settings['stride'])
-    sim.observe.energy(stride=_settings['stride'], callback=lambda x: logger.info(f'PE: {x}'))
+    #sim.observe.forces(stride=_settings['stride'])
+    #sim.observe.energy(stride=_settings['stride'])
     length = _settings['length']
     stride = _settings['stride']
     timestep = _settings['timestep']
