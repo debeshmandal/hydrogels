@@ -15,29 +15,29 @@ reader:
   classes: [Gel]
 
 diffusion_dictionary:
-  'monomer': 0.01
+  'monomer':  0.01
   'unbonded': 0.01
   'released': 0.01
-  'enzyme': 0.01
-  'payload': 0.01
+  'enzyme':   0.01
+  'payload':  0.01
 
 bonding:
   gel:
     - kind: harmonic
       species_1: 'monomer'
       species_2: 'monomer'
-      length: 1.12
-      force_constant: 2.5
+      length: 8.0
+      force_constant: 1.0
     - kind: harmonic
       species_1: 'monomer'
       species_2: 'unbonded'
-      length: 1.12
-      force_constant: 2.5
+      length: 1.122
+      force_constant: 0.0
     - kind: harmonic
       species_1: 'unbonded'
       species_2: 'unbonded'
-      length: 1.12
-      force_constant: 2.5
+      length: 1.122
+      force_constant: 0.0
   
 potentials:
   - kind: 'lj'
@@ -56,7 +56,7 @@ reaction:
 
 simulation:
   timestep: 0.00012
-  stride: 500
+  stride: 100
   length: 50
   box: [50, 50, 50]
    

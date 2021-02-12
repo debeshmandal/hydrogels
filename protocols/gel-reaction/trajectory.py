@@ -67,8 +67,8 @@ def main(**kwargs):
     n_particles = n_particles.reset_index(drop=True)
     fig, ax = plt.subplots()
     particle_names = [
-        'unbonded',
         'gel',
+        'unbonded',
         'released',
         'enzyme',
     ]

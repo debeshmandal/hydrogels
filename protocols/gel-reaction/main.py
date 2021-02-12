@@ -8,10 +8,10 @@ from parse import read_settings # type: ignore
 def main(**kwargs):
     logger.info('Running...')
     system = read_settings(kwargs)
-    system.evaulate_reactions = False
-    system.evaulate_topology_reactions = False
     sim = system.initialise_simulation()
     _settings = settings['simulation']
+    sim.observe.forces(stride=_settings['stride'])
+    sim.observe.energy(stride=_settings['stride'], callback=lambda x: logger.info(f'PE: {x}'))
     length = _settings['length']
     stride = _settings['stride']
     timestep = _settings['timestep']

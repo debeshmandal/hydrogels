@@ -60,7 +60,9 @@ def read_settings(settings: dict) -> hydrogels.System:
     simulation = settings['simulation']
     system = hydrogels.System(simulation['box'], unit_system=None)
     system.kbt = 0.05
-
+    logger.info(f'Energy Unit: {system.energy_unit}')
+    logger.info(f'Length Unit: {system.length_unit}')
+    logger.info(f'Temperature Unit: {system.temperature_unit}')
     reader = get_reader(settings['reader'])
     reader.configure(
         system, 

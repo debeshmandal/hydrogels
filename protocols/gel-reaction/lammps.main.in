@@ -8,7 +8,7 @@ variable lj_eps equal 1.0
 variable lj_sig equal 1.0
 variable lj_cut equal 1.122
 variable T equal 0.05
-variable steps equal 10000000
+variable steps equal 1000000
 variable thermo equal 100000
 variable dt equal 0.00012
 variable global_cutoff equal 19
@@ -68,7 +68,7 @@ timestep	${dt}
 # fix rho_out_N all ave/histo 10 1000 ${steps} 0.0 ${global_cutoff} ${rho_bins} c_rho_N[*] file out.rho.N mode vector kind peratom
 # fix rho_out_X all ave/histo 10 1000 ${steps} 0.0 ${global_cutoff} ${rho_bins} c_rho_X[*] file out.rho.X mode vector kind peratom
 
-dump out all atom ${thermo} dump.out
+dump out all custom ${thermo} dump.out id type mol x y z vx vy vz fx fy fz
 write_data ${fout} pair ij
 
 run		${steps}

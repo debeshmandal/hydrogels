@@ -4,4 +4,4 @@ input: lammps.main.in
 box: [50, 50, 50]
 enzyme: 1000
 payload: 0
-lammps: mpirun -np 8 lmp_mpi
+lammps: mpirun -np 2 lmp_mpi
