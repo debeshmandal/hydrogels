@@ -15,3 +15,15 @@ protocols/*/*.json
 protocols/*/*.pdf
 screen.out
 *coverage*
+
+log.*
+out.*
+*.out
+configs
+data
+logs
+
+protocols/oxdna-generation/lammps.data.conf
+protocols/lennard-jones-gel/
+protocols/generic-degradation/model.py
+protocols/gel-reaction/lammps.main.conf
