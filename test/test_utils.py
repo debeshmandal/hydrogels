@@ -3,7 +3,7 @@
 pytest script for testing utils folder
 """
 import typing
-
+from pathlib import Path
 import numpy as np
 
 from hydrogels.utils import *
@@ -11,9 +11,33 @@ from hydrogels.utils import simulation
 from hydrogels.utils import system
 from hydrogels.utils import topology
 
+import pytest
+
 def test_topology():
     top = topology.Topology('polymer')
     assert top.is_valid
+
+    top.add_names('Hello')
+    top.add_names(['Goodbye'])
+    with pytest.raises(SystemError):
+        top.add_names(111)
+
+    top.names = ['A', 'B', 'C']
+
+    top = topology.Topology(
+        'polymer',
+        sequence=['A', 'A', 'A'],
+        positions=np.array([
+            [0., 0., 0.],
+            [0., 0., 1.],
+            [0., 0., 2.],
+        ]),
+        edges=[(0, 1), (1, 2), (2, 0)]
+    )
+    assert top.connected
+    xyz_path = Path(__file__).parent / 'test.xyz'
+    top.export_xyz(xyz_path)
+    xyz_path.unlink(missing_ok=True)
 
 def test_system():
     sys = system.System([10., 10., 10.,])
