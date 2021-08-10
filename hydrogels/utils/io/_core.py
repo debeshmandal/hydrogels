@@ -66,9 +66,9 @@ class CoreReader:
     
     def system(self, **kwargs) -> System:
         if 'box' in self.metadata:
-            system = System(self.metadata['box'])
+            system = System(self.metadata['box'], unit_system=None)
         else:
-            system = System(kwargs['box'])
+            system = System(kwargs['box'], unit_system=None)
         self.configure(system, **kwargs)
         return system
         
@@ -92,25 +92,10 @@ class CoreReader:
         logger.debug(f'\ttopologies: {topologies}')
         logger.debug(f'\tparticles: {particles}')
 
-        logger.debug(f'Using reader to insert species...')
-
-        if diffusion_constant:
-            logger.debug(f'Using diffusion_constant ({diffusion_constant})')
-            diffusion = diffusion_constant
-            for name, value in self.particles.items():
-                logger.debug(f'Adding {name}')
-                system.insert_species(name, diffusion, value)
-            
-        elif diffusion_dictionary:
-            logger.debug(f'Using diffusion_dictionary: {diffusion_dictionary}')
-            diffusion = diffusion_dictionary
-            for name, value in self.particles.items():
-                logger.debug(f'Adding {name}')
-                system.insert_species(name, diffusion[name], value)
-
         logger.debug('Using reader to insert topologies...')        
             
         for topology in self.topologies:
+            logger.info(f'Processing topology: {topology}')
             if topology.top_type not in bonding:
                 raise TypeError(
                     f'Topology ({topology.top_type}) has been found'
@@ -127,5 +112,21 @@ class CoreReader:
                 diffusion_dictionary=diffusion_dictionary, 
                 diffusion_constant=diffusion_constant
             )
+
+        logger.debug(f'Using reader to insert species...')
+
+        if diffusion_constant:
+            logger.debug(f'Using diffusion_constant ({diffusion_constant})')
+            diffusion = diffusion_constant
+            for name, value in self.particles.items():
+                logger.debug(f'Adding {name}')
+                system.insert_species(name, diffusion, value)
+            
+        elif diffusion_dictionary:
+            logger.debug(f'Using diffusion_dictionary: {diffusion_dictionary}')
+            diffusion = diffusion_dictionary
+            for name, value in self.particles.items():
+                logger.debug(f'Adding {name}')
+                system.insert_species(name, diffusion[name], value)
 
         return

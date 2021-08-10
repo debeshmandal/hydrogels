@@ -80,7 +80,7 @@ class LAMMPSDataReader(CoreReader):
             3: 'x',
             4: 'y',
             5: 'z',
-        })
+        }).sort_values('id')
 
         logger.debug(f'ATOMS:\n{atoms}')
         
@@ -95,7 +95,7 @@ class LAMMPSDataReader(CoreReader):
             1: 'type',
             2: 'atom_1',
             3: 'atom_2',
-        })
+        }).sort_values('id')
 
         logger.debug(f'BONDS:\n{bonds}')
 
@@ -111,21 +111,36 @@ class LAMMPSDataReader(CoreReader):
                 name = i
                 cls = None
             mol = atoms[atoms['mol']==i]
+            logger.debug(f"For molecule[{idx+1}] {name}:\n\nAtoms:\n{mol}")
             sequence = mol['type'].apply(
                 lambda x: self.species[x] if self.species != None else x
             )
             positions = mol[['x', 'y', 'z']]
             edges = []
-            for j, row in bonds.iterrows():
-                if row['atom_1'] in mol['id']:
-                    edges.append((row['atom_1']-1, row['atom_2']-1))
-                elif row['atom_2'] in mol['id']:
-                    edges.append((row['atom_1']-1, row['atom_2']-1))
+
+            if cls != None:
+                for j, row in bonds.iterrows():
+                    if row['atom_1'] in mol['id']:
+                        edges.append((row['atom_1']-1, row['atom_2']-1))
+                    elif row['atom_2'] in mol['id']:
+                        edges.append((row['atom_1']-1, row['atom_2']-1))
+
+            logger.debug(f"Edges:\n{pd.DataFrame(edges)}")
+
+            # translate due to shifting of box centred at 0 0 0 to box/2 box/2 box/2
+            #positions[:, 0] += self.metadata['box'][0]
+            #positions[:, 1] += self.metadata['box'][1]
+            #positions[:, 2] += self.metadata['box'][2]
                 
-            if len(edges) == 0:
-                self.add_particles(name, positions.to_numpy())
+            if len(edges) != 0:
+                logger.info(f'Adding <{name}> to topology')
+                self.add_topology(name, list(sequence), positions.to_numpy(), edges, cls=cls)
 
             else:
-                self.add_topology(name, list(sequence), positions.to_numpy(), edges, cls=cls)
+                logger.info(f'Adding <{name}> to particles')
+                self.add_particles(name, positions.to_numpy())
+                
+            # delete edges list
+            del edges
 
         return
