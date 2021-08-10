@@ -6,13 +6,17 @@ import typing
 
 import numpy as np
 import pandas as pd
+import networkx as nx
+
 import readdy
 
 from softnanotools.logger import Logger
 logger = Logger(__name__)
 
-from readdy._internal.readdybinding.api import TopologyRecord
-from readdy._internal.readdybinding.common.util import TrajectoryParticle
+from readdy._internal.readdybinding.api import TopologyRecord #type: ignore
+from readdy._internal.readdybinding.common.util import TrajectoryParticle #type:ignore
+
+class System: pass # placeholder for System class
 
 class TopologyBond:
     """Dataclass containing bond information for a topology"""
@@ -121,6 +125,26 @@ class Topology():
 
         self._bonds.append(bond)
 
+    @property
+    def graph(self) -> nx.Graph:
+        """Uses NetworkX to get graph of the particles and bonds"""
+        g = nx.Graph()
+        for edge in self._edges:
+            # add edges (nodes are added automatically)
+            g.add_edge(edge[0], edge[1])
+
+        # add all the nodes in case any were left out
+        # to check that the graph is connected (it must be connected)
+        # use self.connected
+        for i, _ in enumerate(self.positions):
+            g.add_node(i)
+
+        return g
+    
+    @property
+    def connected(self) -> bool:
+        return nx.is_connected(self.graph)
+
     def species(
             self, 
             diffusion_dictionary : dict = None,
@@ -190,12 +214,18 @@ class Topology():
         """
         Adds the topology to a readdy simulation
         """
+        # use property to make sure that the topology
+        # is actually connected before adding it to the simulation
+        assert self.connected
+
+        # Add to simulation using its own method
         topology = simulation.add_topology(
             self.top_type,
             self.sequence,
             self.positions
         )
 
+        # add the bonds connecting the network
         for atoms in self.edges:
             topology.get_graph().add_edge(atoms[0] + shift, atoms[1] + shift)
             

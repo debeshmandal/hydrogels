@@ -80,9 +80,16 @@ class LAMMPSDataReader(CoreReader):
             3: 'x',
             4: 'y',
             5: 'z',
-        })
+        }).sort_values('id').reset_index(drop=True)
 
         logger.debug(f'ATOMS:\n{atoms}')
+        
+        try:
+            assert len(atoms) == n_atoms
+            assert atoms['id'].iloc[0] == 1
+            assert atoms['id'].iloc[-1] == n_atoms
+        except:
+            logger.error('Assertion Error when importing Atoms')
         
         bonds = pd.read_csv(
             self.fname,
@@ -95,9 +102,15 @@ class LAMMPSDataReader(CoreReader):
             1: 'type',
             2: 'atom_1',
             3: 'atom_2',
-        })
+        }).sort_values('id').reset_index(drop=True)
 
         logger.debug(f'BONDS:\n{bonds}')
+        try:
+            assert len(bonds) == n_bonds
+            assert bonds['id'].iloc[0] == 1
+            assert bonds['id'].iloc[-1] == n_bonds
+        except:
+            logger.error('Assertion Error when importing Bonds')
 
         mols = set(list(atoms['mol']))
         for idx, i in enumerate(mols):
@@ -111,21 +124,31 @@ class LAMMPSDataReader(CoreReader):
                 name = i
                 cls = None
             mol = atoms[atoms['mol']==i]
+            logger.debug(f"For molecule[{idx+1}] {name}:\n\nAtoms:\n{mol}")
             sequence = mol['type'].apply(
                 lambda x: self.species[x] if self.species != None else x
             )
             positions = mol[['x', 'y', 'z']]
             edges = []
-            for j, row in bonds.iterrows():
-                if row['atom_1'] in mol['id']:
-                    edges.append((row['atom_1']-1, row['atom_2']-1))
-                elif row['atom_2'] in mol['id']:
-                    edges.append((row['atom_1']-1, row['atom_2']-1))
+
+            if cls != None:
+                for j, row in bonds.iterrows():
+                    if row['atom_1'] in mol['id']:
+                        edges.append((row['atom_1']-1, row['atom_2']-1))
+                    elif row['atom_2'] in mol['id']:
+                        edges.append((row['atom_1']-1, row['atom_2']-1))
+
+            logger.debug(f"Edges:\n{pd.DataFrame(edges)}")
                 
-            if len(edges) == 0:
-                self.add_particles(name, positions.to_numpy())
+            if len(edges) != 0:
+                logger.info(f'Adding <{name}> to topology')
+                self.add_topology(name, list(sequence), positions.to_numpy(), edges, cls=cls)
 
             else:
-                self.add_topology(name, list(sequence), positions.to_numpy(), edges, cls=cls)
+                logger.info(f'Adding <{name}> to particles')
+                self.add_particles(name, positions.to_numpy())
+                
+            # delete edges list
+            del edges
 
         return
