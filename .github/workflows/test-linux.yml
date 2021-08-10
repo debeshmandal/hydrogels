@@ -39,7 +39,7 @@ jobs:
     - name: Coverage
       run: |
         pip install .
-        pytest --import-mode=importlib --cov=/opt/hostedtoolcache/Python/3.8.6/x64/lib/python3.8/site-packages/hydrogels --cov-report=xml
+        pytest --import-mode=importlib --cov=/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/hydrogels --cov-report=xml
         sed -i 's/\/opt.*site-packages\///g' coverage.xml 
         rm .coverage
         bash <(curl -s https://codecov.io/bash)
