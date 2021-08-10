@@ -25,7 +25,7 @@ jobs:
       run: |
         python -c "import sys; print(sys.path)" | sed "s/['|,]//g" | tr " " "\n"
         python -m pip install --upgrade pip setuptools wheel
-        pip install numpy scipy pandas matplotlib pytest tqdm h5py cibuildwheel pybind11 cmake starpolymers pytest softnanotools
+        pip install numpy scipy pandas matplotlib pytest tqdm h5py cibuildwheel pybind11 cmake starpolymers pytest softnanotools networkx
         pip install pytest-cov
     - name: Install readdy
       run: |

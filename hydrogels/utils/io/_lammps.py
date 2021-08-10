@@ -80,9 +80,16 @@ class LAMMPSDataReader(CoreReader):
             3: 'x',
             4: 'y',
             5: 'z',
-        }).sort_values('id')
+        }).sort_values('id').reset_index(drop=True)
 
         logger.debug(f'ATOMS:\n{atoms}')
+        
+        try:
+            assert len(atoms) == n_atoms
+            assert atoms['id'].iloc[0] == 1
+            assert atoms['id'].iloc[-1] == n_atoms
+        except:
+            logger.error('Assertion Error when importing Atoms')
         
         bonds = pd.read_csv(
             self.fname,
@@ -95,9 +102,15 @@ class LAMMPSDataReader(CoreReader):
             1: 'type',
             2: 'atom_1',
             3: 'atom_2',
-        }).sort_values('id')
+        }).sort_values('id').reset_index(drop=True)
 
         logger.debug(f'BONDS:\n{bonds}')
+        try:
+            assert len(bonds) == n_bonds
+            assert bonds['id'].iloc[0] == 1
+            assert bonds['id'].iloc[-1] == n_bonds
+        except:
+            logger.error('Assertion Error when importing Bonds')
 
         mols = set(list(atoms['mol']))
         for idx, i in enumerate(mols):
