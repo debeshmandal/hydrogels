@@ -28,6 +28,8 @@ class CoreReader:
         if not metadata:
             self.metadata = {}
 
+        self.species = {}
+
     def add_particles(self, name, value):
         self._particles[name] = value
 

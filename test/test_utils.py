@@ -7,7 +7,7 @@ import typing
 import numpy as np
 
 from hydrogels.utils import *
-from hydrogels.utils import simulation
+#from hydrogels.utils import simulation
 from hydrogels.utils import system
 from hydrogels.utils import topology
 
