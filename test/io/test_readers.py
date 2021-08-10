@@ -1,3 +1,4 @@
+from hydrogels.utils.topology import Topology
 from pathlib import Path
 
 import numpy as np
@@ -47,7 +48,12 @@ def test_HydrogelsReader():
 
 def test_LAMMPSDataReader():
     fname = f"{PATH}/lammps.test.conf"
-    reader = LAMMPSDataReader(fname, names=['top'], species={1: 'A', 2: 'A'})
+    reader = LAMMPSDataReader(
+        fname, 
+        names=['top', 'part'], 
+        species={1: 'A', 2: 'A', 3: 'B'},
+        classes=['Topology', None]
+    )
     system = reader.system(
         diffusion_constant=1.0,
         bonding={

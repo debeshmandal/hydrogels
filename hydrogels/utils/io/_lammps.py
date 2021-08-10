@@ -139,11 +139,6 @@ class LAMMPSDataReader(CoreReader):
                         edges.append((row['atom_1']-1, row['atom_2']-1))
 
             logger.debug(f"Edges:\n{pd.DataFrame(edges)}")
-
-            # translate due to shifting of box centred at 0 0 0 to box/2 box/2 box/2
-            #positions[:, 0] += self.metadata['box'][0]
-            #positions[:, 1] += self.metadata['box'][1]
-            #positions[:, 2] += self.metadata['box'][2]
                 
             if len(edges) != 0:
                 logger.info(f'Adding <{name}> to topology')
