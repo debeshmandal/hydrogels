@@ -37,7 +37,7 @@ def test_topology():
     assert top.connected
     xyz_path = Path(__file__).parent / 'test.xyz'
     top.export_xyz(xyz_path)
-    xyz_path.unlink(missing_ok=True)
+    xyz_path.unlink()
 
 def test_system():
     sys = system.System([10., 10., 10.,])
