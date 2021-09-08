@@ -70,6 +70,8 @@ class PotentialManager:
             if atom_1 == 'all':
                 atom_1 = species
             else:
+                # this is commented out because sometimes potentials
+                # are registered before species - same as below
                 #assert atom_1 in species
                 atom_1 = [atom_1]
 
