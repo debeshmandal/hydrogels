@@ -64,12 +64,13 @@ class PotentialManager:
         """Adds a potential to be registered"""
 
         species = self.species.copy()
+        logger.debug(species)
 
         if isinstance(atom_1, str):
             if atom_1 == 'all':
                 atom_1 = species
             else:
-                assert atom_1 in species
+                #assert atom_1 in species
                 atom_1 = [atom_1]
 
         for i, a in enumerate(atom_1):
@@ -78,7 +79,7 @@ class PotentialManager:
                 if atom_2 == 'all':
                     atom_2 = species
                 else:
-                    assert atom_2 in species
+                    #assert atom_2 in species
                     atom_2 = [atom_2]
 
             for j, b in enumerate(atom_2):
@@ -108,7 +109,7 @@ class System(ReactionDiffusionSystem):
     @property
     def potential_list(self):
         return self.manager.potentials
-        
+
     @property
     def topology_list(self):
         return self._topologies
@@ -183,7 +184,7 @@ class System(ReactionDiffusionSystem):
                 bond.register(self)
         else:
             logger.error('Cannot find any registered bonds when adding topology!')
-                
+
         # store in system - be aware that storing this information
         # may cause unnecessary memory usage
         self._topologies.append(topology)
@@ -206,9 +207,7 @@ class System(ReactionDiffusionSystem):
             if len(positions) != 0:
                 simulation.add_particles(species, positions)
 
-        # 
+        #
         for top in self.topology_list:
             top.add_to_sim(simulation)
         return simulation
-
-    
