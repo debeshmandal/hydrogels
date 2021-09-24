@@ -42,7 +42,7 @@ print(packages)
 
 setuptools.setup(
     name="hydrogels",
-    version="1.0.0",
+    version="1.0.1",
     author="Debesh Mandal",
     description="Package for creating and analysing hydrogels in ReaDDy",
     long_description=long_description,
