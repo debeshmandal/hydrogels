@@ -14,7 +14,7 @@ from readdy.api.reaction_diffusion_system import ReactionDiffusionSystem
 
 from .topology import Topology
 
-from ..utils.logger import Logger
+from softnanotools.logger import Logger
 logger = Logger(__name__)
 
 class Potential:
