@@ -2,7 +2,7 @@
 
 name: MacOS
 
-on: 
+on:
   push:
     branches: master
     tags: v*.*
@@ -32,6 +32,7 @@ jobs:
         pushd /tmp
         git clone https://github.com/readdy/readdy
         pushd readdy
+        git checkout v2.0.5
         pip install .
         popd
         popd
@@ -50,4 +51,3 @@ jobs:
       run: |
         pip install twine
         python -m twine upload wheelhouse/* -u __token__ -p ${{secrets.PYPI_PASSWORD}} --non-interactive
-
