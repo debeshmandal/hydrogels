@@ -85,7 +85,7 @@ class Gel(Topology):
         def function_2(topology):
             recipe = readdy.StructuralReactionRecipe(topology)
             graph = topology.get_graph()
-            for edge in graph.edges():
+            for edge in graph.edges:
                 v1, v2 = edge[0], edge[1]
                 types = [topology.particles[v1.particle_index].type]
                 types.append(topology.particles[v2.particle_index].type)
