@@ -4,19 +4,19 @@ import pandas as pd
 import numpy as np
 
 from ._core import CoreReader
-from ..logger import Logger
 
 from typing import Union
 
+from softnanotools.logger import Logger
 logger = Logger(__name__)
 
 class LAMMPSDataReader(CoreReader):
     def __init__(
-        self, 
-        fname: str, 
-        names: Union[dict, list, tuple] = None, 
-        species: dict = None, 
-        classes: Union[dict, list, tuple] = None, 
+        self,
+        fname: str,
+        names: Union[dict, list, tuple] = None,
+        species: dict = None,
+        classes: Union[dict, list, tuple] = None,
         **kwargs
     ):
         super().__init__()
@@ -25,7 +25,7 @@ class LAMMPSDataReader(CoreReader):
             self.names = None
         else:
             self.names = names
-        
+
         self.species = species
 
         if classes == None:
@@ -33,10 +33,10 @@ class LAMMPSDataReader(CoreReader):
         else:
             self.classes = classes
         self._read()
-        
+
 
     def _read(self):
-        """Reads a LAMMPS Data File containing configuration and 
+        """Reads a LAMMPS Data File containing configuration and
         topology information"""
 
         box = {}
@@ -83,14 +83,14 @@ class LAMMPSDataReader(CoreReader):
         }).sort_values('id').reset_index(drop=True)
 
         logger.debug(f'ATOMS:\n{atoms}')
-        
+
         try:
             assert len(atoms) == n_atoms
             assert atoms['id'].iloc[0] == 1
             assert atoms['id'].iloc[-1] == n_atoms
         except:
             logger.error('Assertion Error when importing Atoms')
-        
+
         bonds = pd.read_csv(
             self.fname,
             delim_whitespace=True,
@@ -139,7 +139,7 @@ class LAMMPSDataReader(CoreReader):
                         edges.append((row['atom_1']-1, row['atom_2']-1))
 
             logger.debug(f"Edges:\n{pd.DataFrame(edges)}")
-                
+
             if len(edges) != 0:
                 logger.info(f'Adding <{name}> to topology')
                 self.add_topology(name, list(sequence), positions.to_numpy(), edges, cls=cls)
@@ -147,7 +147,7 @@ class LAMMPSDataReader(CoreReader):
             else:
                 logger.info(f'Adding <{name}> to particles')
                 self.add_particles(name, positions.to_numpy())
-                
+
             # delete edges list
             del edges
 

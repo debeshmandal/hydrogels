@@ -2,7 +2,7 @@
 
 name: ManyLinux
 
-on: 
+on:
   push:
     branches: master
     tags: v*.*
@@ -20,7 +20,7 @@ jobs:
           - "cp37-cp37m"
           - "cp38-cp38"
           - "cp39-cp39"
-        image: 
+        image:
           - manylinux2014_x86_64
 
     steps:
@@ -42,6 +42,7 @@ jobs:
         pushd /tmp
         git clone https://github.com/readdy/readdy
         pushd readdy
+        git checkout v2.0.5
         ${PYTHON_BINARY_DIR}/pip install .
         popd
         popd

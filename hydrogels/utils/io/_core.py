@@ -14,9 +14,9 @@ from ...generators import Gel
 
 class CoreReader:
     def __init__(
-        self, 
-        particles: dict = None, 
-        topologies: list = None, 
+        self,
+        particles: dict = None,
+        topologies: list = None,
         metadata: dict = None
     ):
         if not particles:
@@ -36,10 +36,10 @@ class CoreReader:
         return self._particles
 
     def add_topology(
-        self, 
-        name, 
-        sequence, 
-        positions, 
+        self,
+        name,
+        sequence,
+        positions,
         edges,
         cls = None,
     ):
@@ -53,7 +53,7 @@ class CoreReader:
             }[cls]
 
         topology = cls(
-            name, 
+            name,
             sequence=sequence,
             positions=positions,
             edges=edges
@@ -63,7 +63,7 @@ class CoreReader:
     @property
     def topologies(self) -> List[Topology]:
         return self._topologies
-    
+
     def system(self, **kwargs) -> System:
         if 'box' in self.metadata:
             system = System(self.metadata['box'], unit_system=None)
@@ -71,7 +71,7 @@ class CoreReader:
             system = System(kwargs['box'], unit_system=None)
         self.configure(system, **kwargs)
         return system
-        
+
     def configure(
         self,
         system,
@@ -92,8 +92,8 @@ class CoreReader:
         logger.debug(f'\ttopologies: {topologies}')
         logger.debug(f'\tparticles: {particles}')
 
-        logger.debug('Using reader to insert topologies...')        
-            
+        logger.debug('Using reader to insert topologies...')
+
         for topology in self.topologies:
             logger.info(f'Processing topology: {topology}')
             if topology.top_type not in bonding:
@@ -108,8 +108,8 @@ class CoreReader:
             else:
                 topology.add_bond(**settings)
             system.insert_topology(
-                topology, 
-                diffusion_dictionary=diffusion_dictionary, 
+                topology,
+                diffusion_dictionary=diffusion_dictionary,
                 diffusion_constant=diffusion_constant
             )
 
@@ -121,7 +121,7 @@ class CoreReader:
             for name, value in self.particles.items():
                 logger.debug(f'Adding {name}')
                 system.insert_species(name, diffusion, value)
-            
+
         elif diffusion_dictionary:
             logger.debug(f'Using diffusion_dictionary: {diffusion_dictionary}')
             diffusion = diffusion_dictionary

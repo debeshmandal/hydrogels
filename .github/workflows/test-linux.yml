@@ -32,14 +32,16 @@ jobs:
         pushd /tmp
         git clone https://github.com/readdy/readdy
         pushd readdy
+        git checkout v2.0.5
         pip install .
         popd
         popd
-        python -c 'from readdy import *' 
+        python -c 'from readdy import *'
     - name: Coverage
       run: |
         pip install .
-        pytest --import-mode=importlib --cov=/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/hydrogels --cov-report=xml
-        sed -i 's/\/opt.*site-packages\///g' coverage.xml 
+        export pythonversion=$(python -V | sed "s/Python //")
+        pytest --import-mode=importlib --cov=/opt/hostedtoolcache/Python/$pythonversion/x64/lib/python3.8/site-packages/hydrogels --cov-report=xml
+        sed -i 's/\/opt.*site-packages\///g' coverage.xml
         rm .coverage
         bash <(curl -s https://codecov.io/bash)
