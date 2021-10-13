@@ -1,0 +1,14 @@
+enzymes: 50
+particles: 500
+timestep: 0.001
+stride: 1000
+length: 10000
+reaction_radius: 2.0
+reaction_rate: 1.0
+spring_constant: 5.0
+spring_length: 1.0
+diffusion_dictionary:
+  A: 1.0
+  E: 1.0
+  B: 1.0
+box: 25.0
