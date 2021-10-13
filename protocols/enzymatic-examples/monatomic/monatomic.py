@@ -139,7 +139,7 @@ def gather_results(targets: List[Path]) -> pd.DataFrame:
 
     return results
 
-def plot_final(data: pd.DataFrame):
+def plot_final(data: pd.DataFrame, name: str = 'monatomic'):
     fig, ax = plt.subplots()
     params = dict(
         markevery=len(data) // 30 if len(data) > 50 else 5,
@@ -169,7 +169,8 @@ def plot_final(data: pd.DataFrame):
     ax.set_ylabel('N', fontsize='xx-large')
     ax.legend(frameon=False, fontsize='x-large')
     fig.tight_layout()
-    fig.savefig('monatomic.png')
+    fig.savefig(f'{name}.png')
+    data.to_csv(f'{name}.csv', index=False)
     return
 
 def main(settings: str, run: bool = False, seeds: int = 5, name: str = 'monatomic', **kwargs):
@@ -192,7 +193,7 @@ def main(settings: str, run: bool = False, seeds: int = 5, name: str = 'monatomi
 
     results = gather_results(Path().glob(f'{name}.*.csv'))
     logger.info(results)
-    plot_final(results)
+    plot_final(results, name=name)
     logger.info('All Done!')
     return
 

@@ -1,8 +1,8 @@
 enzymes: 50
 particles: 500
 timestep: 0.001
-stride: 1000
-length: 10000
+stride: 100
+length: 50000
 reaction_radius: 2.0
 reaction_rate: 1.0
 spring_constant: 5.0

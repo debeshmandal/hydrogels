@@ -15,3 +15,12 @@ protocols/*/*.json
 protocols/*/*.pdf
 screen.out
 *coverage*
+
+protocols/enzymatic-examples/**/img
+protocols/enzymatic-examples/**/csv
+protocols/enzymatic-examples/**/raw
+protocols/enzymatic-examples/**/screen
+protocols/enzymatic-examples/**/*.csv
+
+
+
