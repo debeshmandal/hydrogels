@@ -99,8 +99,8 @@ class System(ReactionDiffusionSystem):
     """
     Wrapper for a ReaDDy system
     """
-    def __init__(self, box, **kwargs):
-        super().__init__(box, **kwargs)
+    def __init__(self, box, units=None, **kwargs):
+        super().__init__(box, units=units, **kwargs)
         self._topologies = []
         self.manager = PotentialManager(self)
         self._species = {}
