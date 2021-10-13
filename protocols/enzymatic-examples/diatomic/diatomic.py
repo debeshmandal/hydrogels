@@ -22,8 +22,12 @@ Uses hydrogels to configure the following system
     harmonic repulsion (pair; all) r0=1.0, k=2.0
     harmonic bonding (bond; A-A A-B) r0=1.0, k=5.0
 """
-from typing import List
+from pathlib import Path
+from typing import List, Union
 import numpy as np
+import readdy
+import pandas as pd
+
 from softnanotools.logger import Logger
 logger = Logger('DIATOMIC')
 
@@ -40,6 +44,7 @@ DEFAULT_DICTIONARY = {
 def register_bonding(
     system: System,
     monomer: str = 'A',
+    unbonded: str = 'B',
     length: float = 1.0,
     force_constant: float = 2.5,
 ):
@@ -51,20 +56,60 @@ def register_bonding(
         force_constant=force_constant
     )
     bond.register(system)
+
+    bond = TopologyBond(
+        'harmonic',
+        monomer,
+        unbonded,
+        length=length,
+        force_constant=0.0
+    )
+    bond.register(system)
+
+    bond = TopologyBond(
+        'harmonic',
+        unbonded,
+        unbonded,
+        length=length,
+        force_constant=0.0
+    )
+    bond.register(system)
+    return
+
+def register_potentials(system: System, spring_constant=2.5, spring_length=1.0):
+    for pair in [
+        ['A', 'A'],
+        ['A', 'B'],
+        ['A', 'E'],
+        ['A', 'C'],
+        ['B', 'B'],
+        ['B', 'E'],
+        ['B', 'C'],
+        ['E', 'E'],
+        ['E', 'C'],
+        ['C', 'C'],
+    ]:
+        system.potentials.add_harmonic_repulsion(
+            *pair,
+            force_constant=spring_constant,
+            interaction_distance=spring_length
+        )
     return
 
 def create_topologies(
     N: int,
-    box: float = 25.0,
     top_type: str = 'molecule',
     monomer: str = 'A'
 ) -> List[Topology]:
     result = []
     for i in range(N):
-        positions = np.array([])
+        positions = np.array([
+            [float(i), 0.0, 0.0],
+            [float(i), 1.0, 0.0]
+        ])
         molecule = Topology(
             top_type,
-            sequence=f'{monomer}{monomer}',
+            sequence=[monomer] * 2,
             edges=[(0, 1)],
             positions=positions,
         )
@@ -74,13 +119,107 @@ def create_topologies(
 def create_system(
     box: float = 25.0,
     diffusion_dictionary: dict = DEFAULT_DICTIONARY,
+    reaction_radius: float = 2.0,
+    reaction_rate: float = 1.0
 ):
     system = System([box, box, box], units=None)
-    return
+
+    # register species
+    system.add_species('C', DEFAULT_DICTIONARY['C'])
+    system.add_species('E', DEFAULT_DICTIONARY['E'])
+
+    # register topology species
+    system.add_topology_species('B', DEFAULT_DICTIONARY['B'])
+    system.add_topology_species('A', DEFAULT_DICTIONARY['A'])
+
+    system.topologies.add_type('molecule')
+
+    # register bonding
+    register_bonding(system)
+
+    # add potentials
+    register_potentials(system)
+
+    # register enzymatic reaction
+    system.topologies.add_spatial_reaction(
+        f'reaction: molecule(A) + (E) -> molecule(B) + (E)',
+        rate=reaction_rate,
+        radius=reaction_radius
+    )
+
+    # register A-B -> C + C reaction
+    def reaction_function(topology):
+        recipe = readdy.StructuralReactionRecipe(topology)
+        vertices = topology.get_graph().get_vertices()
+        types = sorted([topology.particle_type_of_vertex(v) for v in vertices])
+        indices = [topology.particle_id_of_vertex(v) for v in vertices]
+        if types[0] == 'A' and types[1] == 'B':
+            recipe.separate_vertex(0)
+            #recipe.separate_vertex(indices[1])
+            recipe.change_particle_type(vertices[0], 'C')
+            recipe.change_particle_type(vertices[1], 'C')
+
+        return recipe
+
+    system.topologies.add_structural_reaction(
+        name="BondBreaking",
+        topology_type="molecule",
+        reaction_function=reaction_function,
+        rate_function=lambda x: 1.0,
+    )
+
+    return system
+
+def analyse_trajectory(
+    fname: Union[str, Path],
+    output: Union[str, Path, None] = None,
+    timestep: float = 0.01,
+) -> pd.DataFrame:
+    logger.info('Analysing trajectory...')
+    fname = Path(fname).absolute()
+    trajectory = readdy.Trajectory(str(fname))
+    particle_types = trajectory.particle_types
+    particles = trajectory.read_observable_particles()
+
+    numbers = {
+        't': particles[0] * timestep,
+        'A': [],
+        'B': [],
+        'E': [],
+        'C': [],
+    }
+    for row in particles[1]:
+        numbers['A'].append(len(row[row == particle_types['A']]))
+        numbers['E'].append(len(row[row == particle_types['E']]))
+        numbers['B'].append(len(row[row == particle_types['B']]))
+        numbers['C'].append(len(row[row == particle_types['C']]))
+
+    results = pd.DataFrame(numbers)
+    if output:
+        results.to_csv(output, index=False)
+    return results
 
 def main(**kwargs):
     logger.info('Running diatomic...')
     # insert code here
+    system = create_system()
+    simulation = system.simulation()
+    simulation.add_particles('E', np.random.rand(20, 3) * 12.5)
+
+    # add topologies
+    topologies = create_topologies(20)
+    for topology in topologies:
+        topology.add_to_sim(simulation)
+
+    output = Path('_out.h5')
+    if output.exists():
+        output.unlink()
+    simulation.output_file = str(output.absolute())
+    simulation.observe.particles(1000)
+    simulation.run(100000, 0.01)
+
+    analyse_trajectory(output, output='test.csv')
+
     logger.info('Done!')
     return
 
