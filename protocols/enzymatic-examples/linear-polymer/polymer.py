@@ -1,11 +1,14 @@
 #!/usr/bin/env python
-"""diatomic.py - prototype bond breaking reactions:
+"""polymer.py - prototype bond breaking reactions:
 
 Uses hydrogels to configure the following system
 
 2 reactions:
-    A-A + E -> A-B + E (spatial) r=2.0, k=1.0
-    A-B -> C + C (structural) k=1.0
+    -A-A-A- + E -> -A-B-A- + E (spatial) r=2.0, k=1.0
+    { (structural) k=10000...
+        -A-B-A- -> -A + A-A-
+          A-B   ->  C + C
+    }
 
 2 particle_types:
     E (enzyme)
@@ -107,12 +110,14 @@ def create_topologies(
         x, y, z = np.random.random(3) * 12.5
         positions = np.array([
             [x, y, z],
-            [x+1.0, y, z]
+            [x+1.0, y, z],
+            [x+2.0, y, z],
+            [x+3.0, y, z],
         ])
         molecule = Topology(
             top_type,
-            sequence=[monomer] * 2,
-            edges=[(0, 1)],
+            sequence=[monomer] * 4,
+            edges=[(0, 1), (1, 2), (2, 3)],
             positions=positions,
         )
         result.append(molecule)
@@ -149,16 +154,33 @@ def create_system(
         radius=reaction_radius,
     )
 
-    # register A-B -> C + C reaction
+
     def reaction_function(topology):
         recipe = readdy.StructuralReactionRecipe(topology)
+
+        # register A-B -> C + C reaction
         vertices = topology.get_graph().get_vertices()
-        types = sorted([topology.particle_type_of_vertex(v) for v in vertices])
-        indices = [topology.particle_id_of_vertex(v) for v in vertices]
-        if types[0] == 'A' and types[1] == 'B':
+        if len(vertices) == 1:
             recipe.separate_vertex(0)
             recipe.change_particle_type(vertices[0], 'C')
-            recipe.change_particle_type(vertices[1], 'C')
+
+        elif len(vertices) == 2:
+            types = [topology.particle_type_of_vertex(v) for v in vertices]
+            types = sorted(types)
+            if types[0] == 'A' and types[1] == 'B':
+                recipe.separate_vertex(0)
+                recipe.change_particle_type(vertices[0], 'C')
+                recipe.change_particle_type(vertices[1], 'C')
+
+        # register -A-B-A- -> -A + A-A-
+        else:
+            # insert reaction
+            edges = topology.get_graph().get_edges()
+            for edge in edges:
+                if topology.particle_type_of_vertex(edge[0]) == 'B':
+                    recipe.remove_edge(edge[0], edge[1])
+                elif topology.particle_type_of_vertex(edge[0]) == 'B':
+                    recipe.remove_edge(edge[0], edge[1])
 
         return recipe
 
@@ -166,7 +188,7 @@ def create_system(
         name="BondBreaking",
         topology_type="molecule",
         reaction_function=reaction_function,
-        rate_function=lambda x: 10.0,
+        rate_function=lambda x: 100.0,
 
     )
 
@@ -206,10 +228,10 @@ def main(**kwargs):
     # insert code here
     system = create_system()
     simulation = system.simulation()
-    simulation.add_particles('E', np.random.rand(50, 3) * 12.5)
+    simulation.add_particles('E', np.random.rand(100, 3) * 12.5)
 
     # add topologies
-    topologies = create_topologies(100)
+    topologies = create_topologies(50)
     for topology in topologies:
         topology.add_to_sim(simulation)
 

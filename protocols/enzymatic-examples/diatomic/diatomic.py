@@ -154,7 +154,6 @@ def create_system(
         recipe = readdy.StructuralReactionRecipe(topology)
         vertices = topology.get_graph().get_vertices()
         types = sorted([topology.particle_type_of_vertex(v) for v in vertices])
-        indices = [topology.particle_id_of_vertex(v) for v in vertices]
         if types[0] == 'A' and types[1] == 'B':
             recipe.separate_vertex(0)
             recipe.change_particle_type(vertices[0], 'C')
