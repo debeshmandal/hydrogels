@@ -19,6 +19,7 @@ def test_ParticleTrajectory():
     traj = ParticleTrajectory(H5)
     traj.time
     traj.frames
+    traj.box
     return
 
 if __name__ == '__main__':
