@@ -56,8 +56,8 @@ class ParticleTrajectory(readdy.Trajectory):
     a simulation using ReaDDy"""
     def __init__(self, fname: Union[str, Path]):
         logger.info(f'Reading ReaDDy trajectory from {fname}')
-
-        _traj = readdy.Trajectory(fname)
+        fname = Path(fname)
+        _traj = readdy.Trajectory(str(fname.absolute()))
         _raw = _traj.read()
 
         self.box = _traj.box_size
@@ -68,7 +68,7 @@ class ParticleTrajectory(readdy.Trajectory):
 
     @staticmethod
     def load(
-        trajectory: List[List[TrajectoryParticle]],
+        trajectory: list,
         box: np.ndarray
     ) -> Tuple[np.ndarray, List[ParticleFrame]]:
 

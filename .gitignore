@@ -23,7 +23,4 @@ protocols/enzymatic-examples/**/screen
 protocols/enzymatic-examples/**/*.csv
 protocols/enzymatic-examples/**/yml
 
-
-
-
-
+!test/**/_test.h5

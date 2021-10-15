@@ -16,6 +16,8 @@ def write_LAMMPS_dump(
     data = data.copy()
     types = list(set(data['type']))
     data['type'] = data['type'].apply(lambda x: types.index(x) + 1)
+    data['id'] = data['id'] + 1
+    data = data[['id', 'type', 'x', 'y', 'z']]
     with open(fname, 'w') as f:
         f.write(f'ITEM: TIMESTEP\n{timestep}\n')
         f.write(f'ITEM: NUMBER OF ATOMS\n{len(data)}\n')

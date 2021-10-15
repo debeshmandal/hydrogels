@@ -86,6 +86,7 @@ def run_simulation(
     add_particles(simulation, **kwargs)
     simulation.observe.particles(stride)
     logger.info(f'Running simulation {name}...')
+    simulation.record_trajectory(stride)
     simulation.run(length, timestep)
     logger.info('Done!')
     return output
