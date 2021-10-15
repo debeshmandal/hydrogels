@@ -114,11 +114,13 @@ def create_topologies(
             [x+2.0, y, z],
             [x+3.0, y, z],
             [x+4.0, y, z],
+            [x+5.0, y, z],
+            [x+6.0, y, z],
         ])
         molecule = Topology(
             top_type,
-            sequence=[monomer] * 5,
-            edges=[(0, 1), (1, 2), (2, 3), (3, 4)],
+            sequence=[monomer] * 7,
+            edges=[(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6)],
             positions=positions,
         )
         result.append(molecule)
