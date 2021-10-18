@@ -86,7 +86,7 @@ class ParticleFrame():
             comment=comment
         )
 
-class ParticleTrajectory(readdy.Trajectory):
+class ParticleTrajectory():
     """Class for storing positions of particles outputted from
     a simulation using ReaDDy"""
     def __init__(self, fname: Union[str, Path]):
@@ -119,6 +119,39 @@ class ParticleTrajectory(readdy.Trajectory):
     @property
     def frames(self) -> List[ParticleFrame]:
         return self._frames
+
+    def to_LAMMPS_dump(self, fname: Union[str, Path]):
+        """Writes the whole trajectory to LAMMPS dump
+        format files"""
+        for frame in self.frames:
+            write_LAMMPS_dump(
+                frame.dataframe,
+                str(Path(fname).absolute()) + f'.{frame.time}',
+                frame.time,
+                frame.box,
+            )
+
+    def to_LAMMPS_configuration(
+        self,
+        fname: Union[str, Path],
+        topology: "TopologyTrajectory",
+        masses: Iterable = None,
+        comment: str = None,
+    ):
+        """Writes the whole trajectory to LAMMPS configuration
+        format files"""
+        frames = self.frames
+        for i, topology_frame in enumerate(topology.frames):
+            frame = frames[i]
+            frame.assign_molecule(topology_frame)
+            write_LAMMPS_configuration(
+                frame.dataframe,
+                topology_frame.dataframe,
+                str(Path(fname).absolute()) + f'.{frame.time}',
+                self.box,
+                masses=masses,
+                comment=comment
+            )
 
 class TopologyFrame():
     def __init__(self, frame: List[TopologyRecord]):
@@ -195,6 +228,26 @@ class TopologyTrajectory():
     @property
     def frames(self) -> List[TopologyFrame]:
         return self._frames
+
+    def to_LAMMPS_configuration(
+        self,
+        fname: Union[str, Path],
+        particles: ParticleTrajectory,
+        masses: Iterable = None,
+        comment: str = None,
+    ):
+        frames = self.frames
+        for i, particles_frame in enumerate(particles.frames):
+            frame = frames[i]
+            particles_frame.assign_molecule(frame)
+            write_LAMMPS_configuration(
+                particles_frame.dataframe,
+                frame.dataframe,
+                str(Path(fname).absolute()) + f'.{particles_frame.time}',
+                particles_frame.box,
+                masses=masses,
+                comment=comment
+            )
 
 if __name__ == '__main__':
     import doctest

@@ -23,6 +23,7 @@ def create_system(
     reaction_rate: float = 1.0,
     spring_constant: float = 5.0,
     spring_length: float = 1.0,
+    reaction: bool = True,
     **kwargs,
 ) -> readdy.ReactionDiffusionSystem:
     system = readdy.ReactionDiffusionSystem(
@@ -36,10 +37,11 @@ def create_system(
         system.add_species(name, diffusion_constant)
 
     ## add reaction:
-    system.reactions.add(
-        f'reaction: A + ({reaction_radius:.2f})E -> B + E',
-        rate=reaction_rate
-    )
+    if reaction:
+        system.reactions.add(
+            f'reaction: A + ({reaction_radius:.2f})E -> B + E',
+            rate=reaction_rate
+        )
 
     ## add potentials:
     for pair in [
@@ -78,12 +80,40 @@ def run_simulation(
     length: int = 10000,
     **kwargs
 ) -> Path:
-    system = create_system(**kwargs)
+    # run equilibration
+    logger.info('Running equilibration...')
+    system = create_system(**kwargs, reaction=False)
     output = Path(f'{name}.h5')
     if output.exists():
         output.unlink()
     simulation = system.simulation(output_file=str(output.absolute()))
     add_particles(simulation, **kwargs)
+    simulation.make_checkpoints(
+        stride=stride,
+        output_directory="checkpoints/",
+        max_n_saves=1
+    )
+    simulation.evaluate_topology_reactions = False
+    simulation.run(100, timestep)
+    logger.info('Done!')
+
+    # run proper simulaton
+    logger.info('Configuring simulation...')
+    system = create_system(**kwargs, reactions=False)
+    output = Path(f'{name}.h5')
+    if output.exists():
+        output.unlink()
+    simulation = system.simulation(output_file=str(output.absolute()))
+
+    # skip adding particles since these will be loaded
+    # add_particles(simulation, **kwargs)
+
+    simulation.load_particles_from_latest_checkpoint(
+        'checkpoints/'
+    )
+
+    logger.info('Loaded particles successfully from checkpoint')
+    # include observables
     simulation.observe.particles(stride)
     logger.info(f'Running simulation {name}...')
     simulation.record_trajectory(stride)

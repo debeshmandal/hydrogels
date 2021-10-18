@@ -4,4 +4,4 @@ mv *.*.h5 raw
 mv *.yml yml
 mv yml/settings.yml .
 mv *.screen screen
-mv *.png img
+mv *[0-9].png img
