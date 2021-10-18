@@ -83,7 +83,7 @@ class ParticleFrame():
             fname,
             self.box,
             masses=masses,
-            comment=comment
+            comment=comment,
         )
 
 class ParticleTrajectory():
@@ -96,6 +96,7 @@ class ParticleTrajectory():
         _raw = _traj.read()
 
         self.box = _traj.box_size
+        self.particle_types = _traj.particle_types
         self._time, self._frames = self.load(_raw, self.box)
 
         del _traj
@@ -129,6 +130,12 @@ class ParticleTrajectory():
                 str(Path(fname).absolute()) + f'.{frame.time}',
                 frame.time,
                 frame.box,
+                types=list(
+                    sorted(
+                        self.particle_types,
+                        key=lambda x: self.particle_types[x]
+                    )
+                )
             )
 
     def to_LAMMPS_configuration(
@@ -150,7 +157,13 @@ class ParticleTrajectory():
                 str(Path(fname).absolute()) + f'.{frame.time}',
                 self.box,
                 masses=masses,
-                comment=comment
+                comment=comment,
+                types=list(
+                    sorted(
+                        self.particle_types,
+                        key=lambda x: self.particle_types[x]
+                    )
+                )
             )
 
 class TopologyFrame():
@@ -200,7 +213,7 @@ class TopologyFrame():
             fname,
             particles.box,
             masses=masses,
-            comment=comment
+            comment=comment,
         )
 
 class TopologyTrajectory():
@@ -246,7 +259,13 @@ class TopologyTrajectory():
                 str(Path(fname).absolute()) + f'.{particles_frame.time}',
                 particles_frame.box,
                 masses=masses,
-                comment=comment
+                comment=comment,
+                types=list(
+                    sorted(
+                        particles.particle_types,
+                        key=lambda x: particles.particle_types[x]
+                    )
+                )
             )
 
 if __name__ == '__main__':

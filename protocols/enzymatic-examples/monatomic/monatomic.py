@@ -69,7 +69,7 @@ def add_particles(
 ):
     """Add 100 A particles and 20 E particles"""
     for name, N in [('A', particles), ('E', enzymes)]:
-        positions = np.random.rand(N, 3) * (box / 2)
+        positions = np.random.rand(N, 3) * box - (box / 2)
         simulation.add_particles(name, positions)
     return
 

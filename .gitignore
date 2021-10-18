@@ -22,5 +22,8 @@ protocols/enzymatic-examples/**/raw
 protocols/enzymatic-examples/**/screen
 protocols/enzymatic-examples/**/*.csv
 protocols/enzymatic-examples/**/yml
+protocols/enzymatic-examples/**/checkpoints
+protocols/enzymatic-examples/visualisation/**/lammps.*
+
 
 !test/**/_test.h5

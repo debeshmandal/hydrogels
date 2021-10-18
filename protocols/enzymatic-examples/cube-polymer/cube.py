@@ -107,20 +107,34 @@ def create_topologies(
 ) -> List[Topology]:
     result = []
     for i in range(N):
-        x, y, z = np.random.random(3) * 25.0 - 12.5
+        x, y, z = np.random.random(3) * 12.5
         positions = np.array([
             [x, y, z],
             [x+1.0, y, z],
-            [x+2.0, y, z],
-            [x+3.0, y, z],
-            [x+4.0, y, z],
-            [x+5.0, y, z],
-            [x+6.0, y, z],
+            [x+1.0, y+1.0, z],
+            [x, y+1.0, z],
+            [x, y, z+1.0],
+            [x+1.0, y, z+1.0],
+            [x+1.0, y+1.0, z+1.0],
+            [x, y+1.0, z+1.0],
         ])
         molecule = Topology(
             top_type,
-            sequence=[monomer] * 7,
-            edges=[(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6)],
+            sequence=[monomer] * 8,
+            edges=[
+                (0, 1),
+                (1, 2),
+                (2, 3),
+                (3, 0),
+                (4, 5),
+                (5, 6),
+                (6, 7),
+                (7, 4),
+                (0, 4),
+                (1, 5),
+                (2, 6),
+                (3, 7),
+            ],
             positions=positions,
         )
         result.append(molecule)
@@ -129,7 +143,7 @@ def create_topologies(
 def create_system(
     box: float = 25.0,
     diffusion_dictionary: dict = DEFAULT_DICTIONARY,
-    reaction_radius: float = 1.0,
+    reaction_radius: float = 2.0,
     reaction_rate: float = 1.0
 ):
     system = System([box, box, box], units=None)
@@ -189,13 +203,10 @@ def create_system(
                     recipe.remove_edge(edge[0], edge[1])
                     recipe.change_particle_type(edge[0], 'A')
                     logger.debug('Structural 3A')
-                    return recipe
-
                 elif topology.particle_type_of_vertex(edge[1]) == 'B':
                     recipe.remove_edge(edge[0], edge[1])
                     recipe.change_particle_type(edge[1], 'A')
                     logger.debug('Structural 3B')
-                    return recipe
 
         return recipe
 
@@ -203,7 +214,7 @@ def create_system(
         name="BondBreaking",
         topology_type="molecule",
         reaction_function=reaction_function,
-        rate_function=lambda x: 10000.,
+        rate_function=lambda x: 1000000.,
 
     )
 
@@ -217,6 +228,12 @@ def analyse_trajectory(
     logger.info('Analysing trajectory...')
     fname = Path(fname).absolute()
     trajectory = readdy.Trajectory(str(fname))
+    trajectory.convert_to_xyz(particle_radii={
+        'A': 0.25,
+        'B': 0.25,
+        'C': 0.25,
+        'E': 0.25,
+    })
     particle_types = trajectory.particle_types
     particles = trajectory.read_observable_particles()
 
@@ -243,10 +260,10 @@ def main(**kwargs):
     # insert code here
     system = create_system()
     simulation = system.simulation()
-    simulation.add_particles('E', np.random.rand(500, 3) * 25.0 - 12.5)
+    simulation.add_particles('E', np.random.rand(200, 3) * 12.5)
 
     # add topologies
-    topologies = create_topologies(50)
+    topologies = create_topologies(44)
     for topology in topologies:
         topology.add_to_sim(simulation)
 
@@ -254,14 +271,12 @@ def main(**kwargs):
     if output.exists():
         output.unlink()
     simulation.output_file = str(output.absolute())
-    stride = 10
-    simulation.observe.particles(stride)
-    simulation.observe.reaction_counts(stride)
-    simulation.observe.topologies(stride)
-    simulation.record_trajectory(stride)
-    simulation.progress_output_stride = stride
-    simulation.reaction_handler = 'Gillespie'
-    simulation.run(1000, 0.0001)
+    simulation.observe.particles(1000)
+    simulation.observe.reaction_counts(1000)
+    simulation.observe.topologies(1000)
+    simulation.record_trajectory(stride=1000)
+    simulation.progress_output_stride = 1000
+    simulation.run(100000, 0.001)
 
     results = analyse_trajectory(output, output='test.csv', timestep = 0.001)
     fig, ax = plt.subplots()

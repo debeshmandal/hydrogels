@@ -14,9 +14,11 @@ def write_LAMMPS_dump(
     fname: Union[str, Path],
     timestep: int,
     box: Iterable[float],
+    types: list = None,
 ):
     data = data.copy()
-    types = list(set(data['type']))
+    if not types:
+        types = list(set(data['type']))
     data['type'] = data['type'].apply(lambda x: types.index(x) + 1)
     data['id'] = data['id'] + 1
     data = data[['id', 'type', 'x', 'y', 'z']]
@@ -45,7 +47,8 @@ def write_LAMMPS_configuration(
     fname: Union[str, Path],
     box: Iterable[float],
     masses: Iterable[float] = None,
-    comment: str = None
+    comment: str = None,
+    types: list = None,
 ):
     # manage comment
     if not comment:
@@ -59,7 +62,8 @@ def write_LAMMPS_configuration(
     topology = topology.copy()
 
     # format particles
-    types = list(set(particles['type']))
+    if not types:
+        types = list(set(particles['type']))
     particles['type'] = particles['type'].apply(lambda x: types.index(x) + 1)
     particles['id'] = particles['id'] + 1
 
@@ -73,10 +77,10 @@ def write_LAMMPS_configuration(
 
     # if masses aren't specified, assume 1
     if not masses:
-        masses = {i: 1.0 for i in set(particles['type'])}
+        masses = {i+1: 1.0 for i, _ in enumerate(types)}
 
     if not isinstance(masses, Iterable):
-        masses = {i: masses for i in set(particles['type'])}
+        masses = {i+1: masses for i, _ in enumerate(types)}
 
     with open(fname, 'w') as f:
         # comment
