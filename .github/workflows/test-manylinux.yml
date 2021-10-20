@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHON_BINARY_DIR: /opt/python/${{matrix.cp}}/bin
-    container: ghcr.io/h5py/${{matrix.image}}
+    container: quay.io/pypa/${{matrix.image}}
     strategy:
       matrix:
         cp:
@@ -21,7 +21,7 @@ jobs:
           - "cp38-cp38"
           - "cp39-cp39"
         image:
-          - manylinux2010_x86_64-hdf5
+          - manylinux2014_x86_64
 
     steps:
     - name: show binary directory
@@ -30,11 +30,13 @@ jobs:
         echo "PYTHON_BINARY_DIR:"
         ls ${PYTHON_BINARY_DIR}
     - uses: actions/checkout@v2
+    - name: Set up HDF5
+      run: |
+        yum install -y hdf5-devel
     - name: Install dependencies
       run: |
         ${PYTHON_BINARY_DIR}/pip install --upgrade pip setuptools wheel
         ${PYTHON_BINARY_DIR}/pip install numpy scipy pandas matplotlib pytest tqdm h5py pybind11 cmake starpolymers pytest auditwheel softnanotools networkx
-        ${PYTHON_BINARY_DIR}/python -c "import h5py; h5py.run_tests()"
     - name: Install readdy
       run: |
         pushd /tmp
