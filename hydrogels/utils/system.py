@@ -102,8 +102,8 @@ class System(ReactionDiffusionSystem):
     """
     Wrapper for a ReaDDy system
     """
-    def __init__(self, box, units=None, **kwargs):
-        super().__init__(box, unit_system=units, **kwargs)
+    def __init__(self, box, unit_system=None, **kwargs):
+        super().__init__(box, unit_system=unit_system, **kwargs)
         self._topologies = []
         self.manager = PotentialManager(self)
         self._species = {}
@@ -185,7 +185,7 @@ class System(ReactionDiffusionSystem):
             for bond in topology.bonds:
                 bond.register(self)
         else:
-            
+
             logger.debug('Cannot find any registered bonds when adding topology!')
 
         # store in system - be aware that storing this information

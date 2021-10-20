@@ -38,10 +38,25 @@ class TopologyBond:
 class Topology():
     """
     Wrapper for a readdy topology
+
+    Parameters:
+        sequence:
+            String or list containing sequence of particles
+        names:
+            Names of any topology species that aren't contained in sequence
+        positions:
+            Positions of particles, should correspond to sequence
+        edges:
+            Connectivity of sequence in terms of bonding
+        bonds:
+            List of TopologyBond instances containing bonding information
     """
     def __init__(self, top_type : str, **kwargs):
         self.top_type = top_type
-        self._sequence = kwargs.get('sequence', [])
+        _sequence = kwargs.get('sequence', [])
+        if isinstance(_sequence, str):
+            _sequence = list(_sequence)
+        self._sequence = _sequence
         self._names = list(set(self._sequence + kwargs.get('names', [])))
         self._positions = kwargs.get('positions', np.array([]))
         self._edges = kwargs.get('edges', [])
@@ -140,13 +155,13 @@ class Topology():
             g.add_node(i)
 
         return g
-    
+
     @property
     def connected(self) -> bool:
         return nx.is_connected(self.graph)
 
     def species(
-            self, 
+            self,
             diffusion_dictionary : dict = None,
             diffusion_constant : float = None
         ) -> dict:
@@ -156,7 +171,7 @@ class Topology():
 
         if diffusion_dictionary != None and diffusion_constant != None:
             raise ValueError('Please provide only one form for the diffusion constants!')
-            
+
 
         if diffusion_dictionary:
             try:
@@ -183,7 +198,7 @@ class Topology():
 
     def import_dataframe(self, dataframe : pd.DataFrame):
         """
-        Parse a dataframe containing information on 
+        Parse a dataframe containing information on
         the sequences and positions of a topology
         and pass this information to the Topology object
         """
@@ -228,4 +243,3 @@ class Topology():
         # add the bonds connecting the network
         for atoms in self.edges:
             topology.get_graph().add_edge(atoms[0] + shift, atoms[1] + shift)
-            

@@ -23,7 +23,7 @@ def test_write_LAMMPS_configuration():
 
     output = FOLDER / 'lammps.test.conf'
     particles.to_LAMMPS_configuration(output, topology)
-    #output.unlink()
+    output.unlink()
     return
 
 if __name__ == '__main__':
