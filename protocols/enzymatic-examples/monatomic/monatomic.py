@@ -90,7 +90,7 @@ def run_simulation(
     add_particles(simulation, **kwargs)
     simulation.make_checkpoints(
         stride=stride,
-        output_directory="checkpoints/",
+        output_directory=f"checkpoints-{name}/",
         max_n_saves=1
     )
     simulation.evaluate_topology_reactions = False
@@ -109,7 +109,7 @@ def run_simulation(
     # add_particles(simulation, **kwargs)
 
     simulation.load_particles_from_latest_checkpoint(
-        'checkpoints/'
+        f"checkpoints-{name}/"
     )
 
     logger.info('Loaded particles successfully from checkpoint')
@@ -164,7 +164,7 @@ def gather_results(targets: List[Path]) -> pd.DataFrame:
         for kind in dfs:
             dfs[kind][i] = data[kind]
 
-    for kind in ['A', 'B', 'E']:
+    for kind in dfs.keys():
         results[f'{kind}_mean'] = dfs[kind].mean(axis=1)
         results[f'{kind}_std'] = dfs[kind].std(axis=1)
 

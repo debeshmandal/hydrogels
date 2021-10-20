@@ -32,7 +32,7 @@ def calculate_rate(time: np.ndarray, n: np.ndarray) -> float:
 def plot_ID(ID: str):
     fig, ax = plt.subplots()
     parameter, values = SCHEMA[ID]
-    rates = []
+    #rates = []
     for i, value in enumerate(values):
         data = pd.read_csv(f'{ID}{i+1}.csv')
         params = dict(
@@ -42,49 +42,49 @@ def plot_ID(ID: str):
         )
         ax.errorbar(
             data['t'],
-            data['B_mean'],
-            yerr=data['B_std'],
+            data['C_mean'],
+            yerr=data['C_std'],
             fmt=f"{markers[i]}{colours[i]}",
             label=f'{value:.2f}',
             **params
         )
         temp = data[data['t'] < 10]
         temp = temp[temp['t'] > 1]
-        rate = calculate_rate(
-            temp['t'].to_numpy(),
-            temp['B_mean'].to_numpy()
-        )
-        t_max = data['t'].max()
-        ax.plot(
-            [0.1, t_max],
-            [np.exp(rate[1]) * 0.1 ** rate[0], np.exp(rate[1]) * t_max ** rate[0]],
-            f'{colours[i]}:'
-        )
-        rates.append(rate[0])
-        logger.info(f'{ID}{i+1}: {rate}')
+        #rate = calculate_rate(
+        #    temp['t'].to_numpy(),
+        #    temp['B_mean'].to_numpy()
+        #)
+        #t_max = data['t'].max()
+        #ax.plot(
+        #    [0.1, t_max],
+        #    [np.exp(rate[1]) * 0.1 ** rate[0], np.exp(rate[1]) * t_max ** rate[0]],
+        #    f'{colours[i]}:'
+        #)
+        #rates.append(rate[0])
+        #logger.info(f'{ID}{i+1}: {rate}')
 
     ax.set_title(titles[parameter], fontsize='xx-large')
     ax.set_xlabel('Timestep', fontsize='xx-large')
     ax.set_ylabel('N', fontsize='xx-large')
     ax.legend(frameon=False, fontsize='x-large')
-    ax.set_yscale('log')
-    ax.set_xscale('log')
+    #ax.set_yscale('log')
+    #ax.set_xscale('log')
 
-    fig2, ax2 = plt.subplots()
-    ax2.plot(values, rates, 'k-x')
-    ax2.set_xlabel(titles[parameter], fontsize='xx-large')
-    ax2.set_ylabel('Exponent', fontsize='xx-large')
-    ax2.tick_params(axis='both', which='major', labelsize='xx-large')
+    #fig2, ax2 = plt.subplots()
+    #ax2.plot(values, rates, 'k-x')
+    #ax2.set_xlabel(titles[parameter], fontsize='xx-large')
+    #ax2.set_ylabel('Exponent', fontsize='xx-large')
+    #ax2.tick_params(axis='both', which='major', labelsize='xx-large')
 
-    if ID in ['C', 'D']:
-        ax2.set_xscale('log')
+    #if ID in ['C', 'D']:
+    #    ax2.set_xscale('log')
 
 
     fig.tight_layout()
     fig.savefig(f'{ID}.png')
 
-    fig2.tight_layout()
-    fig2.savefig(f'{ID}-exponent.png')
+    #fig2.tight_layout()
+    #fig2.savefig(f'{ID}-exponent.png')
 
     return
 

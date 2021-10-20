@@ -31,9 +31,10 @@ import numpy as np
 import readdy
 import pandas as pd
 import matplotlib.pyplot as plt
+import yaml
 
 from softnanotools.logger import Logger
-logger = Logger('DIATOMIC')
+logger = Logger('POLYMER')
 
 from hydrogels.utils.system import System
 from hydrogels.utils.topology import Topology, TopologyBond
@@ -103,7 +104,8 @@ def register_potentials(system: System, spring_constant=2.5, spring_length=1.0):
 def create_topologies(
     N: int,
     top_type: str = 'molecule',
-    monomer: str = 'A'
+    monomer: str = 'A',
+    **kwargs
 ) -> List[Topology]:
     result = []
     for i in range(N):
@@ -143,18 +145,19 @@ def create_topologies(
 def create_system(
     box: float = 25.0,
     diffusion_dictionary: dict = DEFAULT_DICTIONARY,
-    reaction_radius: float = 2.0,
-    reaction_rate: float = 1.0
+    reaction_radius: float = 1.0,
+    reaction_rate: float = 1.0,
+    **kwargs,
 ):
     system = System([box, box, box], units=None)
 
     # register species
-    system.add_species('C', DEFAULT_DICTIONARY['C'])
-    system.add_species('E', DEFAULT_DICTIONARY['E'])
+    system.add_species('C', diffusion_dictionary['C'])
+    system.add_species('E', diffusion_dictionary['E'])
 
     # register topology species
-    system.add_topology_species('B', DEFAULT_DICTIONARY['B'])
-    system.add_topology_species('A', DEFAULT_DICTIONARY['A'])
+    system.add_topology_species('B', diffusion_dictionary['B'])
+    system.add_topology_species('A', diffusion_dictionary['A'])
 
     system.topologies.add_type('molecule')
 
@@ -187,8 +190,7 @@ def create_system(
         # register A-B -> C + C reaction
         elif len(vertices) == 2:
             types = [topology.particle_type_of_vertex(v) for v in vertices]
-            types = sorted(types)
-            if types[0] == 'A' and types[1] == 'B':
+            if 'B' in types:
                 recipe.separate_vertex(0)
                 recipe.change_particle_type(vertices[0], 'C')
                 recipe.change_particle_type(vertices[1], 'C')
@@ -203,10 +205,13 @@ def create_system(
                     recipe.remove_edge(edge[0], edge[1])
                     recipe.change_particle_type(edge[0], 'A')
                     logger.debug('Structural 3A')
+                    return recipe
+
                 elif topology.particle_type_of_vertex(edge[1]) == 'B':
                     recipe.remove_edge(edge[0], edge[1])
                     recipe.change_particle_type(edge[1], 'A')
                     logger.debug('Structural 3B')
+                    return recipe
 
         return recipe
 
@@ -214,11 +219,88 @@ def create_system(
         name="BondBreaking",
         topology_type="molecule",
         reaction_function=reaction_function,
-        rate_function=lambda x: 1000000.,
+        rate_function=lambda x: 10000.,
 
     )
 
     return system
+
+def run_simulation(
+    name: str,
+    stride: int = 100,
+    timestep: float = 0.01,
+    length: int = 10000,
+    **kwargs
+) -> Path:
+    # run equilibration
+    logger.info('Running equilibration...')
+    # insert code here
+    system = create_system(**kwargs)#, reaction=False)
+    simulation = system.simulation()
+
+    box = kwargs['box']
+    simulation.add_particles(
+        'E',
+        np.random.rand(kwargs['enzymes'], 3) * box - (box / 2)
+    )
+
+    # add topologies
+    topologies = create_topologies(kwargs['molecules'], box=box)
+    for topology in topologies:
+        topology.add_to_sim(simulation)
+
+    #output = Path(f'{name}.h5')
+    #if output.exists():
+    #    output.unlink()
+    #simulation.output_file = str(output.absolute())
+
+    #simulation.make_checkpoints(
+    #    stride=stride,
+    #    output_directory="checkpoints/",
+    #    max_n_saves=1
+    #)
+    #simulation.evaluate_topology_reactions = False
+    #simulation.observe.particles(stride)
+    #simulation.observe.topologies(stride)
+    #simulation.record_trajectory(stride)
+    #simulation.run(5 * stride, timestep)
+    #logger.info('Done!')
+
+    # run proper simulaton
+    logger.info('Configuring simulation...')
+    #system = create_system(**kwargs)
+    output = Path(f'{name}.h5')
+    if output.exists():
+        output.unlink()
+
+    simulation.output_file = str(output.absolute())
+
+    #simulation = system.simulation(output_file=str(output.absolute()))
+
+    # skip adding particles since these will be loaded
+    # add_particles(simulation, **kwargs)
+
+    #simulation.load_particles_from_latest_checkpoint(
+    #    'checkpoints/'
+    #)
+
+    #logger.info('Loaded particles successfully from checkpoint')#
+
+    #output = Path(f'{name}.h5')
+    #if output.exists():
+    #    output.unlink()
+    #simulation = system.simulation(output_file=str(output.absolute()))
+
+    # include observables
+    simulation.observe.particles(stride)
+    simulation.observe.topologies(stride)
+    simulation.record_trajectory(stride)
+    simulation.reaction_handler = 'Gillespie'
+
+    logger.info(f'Running simulation {name}...')
+    simulation.run(length, timestep)
+    logger.info('Done!')
+    return output
 
 def analyse_trajectory(
     fname: Union[str, Path],
@@ -228,12 +310,6 @@ def analyse_trajectory(
     logger.info('Analysing trajectory...')
     fname = Path(fname).absolute()
     trajectory = readdy.Trajectory(str(fname))
-    trajectory.convert_to_xyz(particle_radii={
-        'A': 0.25,
-        'B': 0.25,
-        'C': 0.25,
-        'E': 0.25,
-    })
     particle_types = trajectory.particle_types
     particles = trajectory.read_observable_particles()
 
@@ -255,36 +331,102 @@ def analyse_trajectory(
         results.to_csv(output, index=False)
     return results
 
-def main(**kwargs):
-    logger.info('Running diatomic...')
-    # insert code here
-    system = create_system()
-    simulation = system.simulation()
-    simulation.add_particles('E', np.random.rand(200, 3) * 12.5)
+def gather_results(targets: List[Path]) -> pd.DataFrame:
+    results = pd.DataFrame()
+    dfs = {
+        'A': pd.DataFrame(),
+        'E': pd.DataFrame(),
+        'B': pd.DataFrame(),
+        'C': pd.DataFrame()
+    }
 
-    # add topologies
-    topologies = create_topologies(44)
-    for topology in topologies:
-        topology.add_to_sim(simulation)
+    for i, target in enumerate(targets):
+        data = pd.read_csv(target)
+        if i == 0:
+            results['t'] = data['t']
 
-    output = Path('_out.h5')
-    if output.exists():
-        output.unlink()
-    simulation.output_file = str(output.absolute())
-    simulation.observe.particles(1000)
-    simulation.observe.reaction_counts(1000)
-    simulation.observe.topologies(1000)
-    simulation.record_trajectory(stride=1000)
-    simulation.progress_output_stride = 1000
-    simulation.run(100000, 0.001)
+        for kind in dfs:
+            dfs[kind][i] = data[kind]
 
-    results = analyse_trajectory(output, output='test.csv', timestep = 0.001)
+    for kind in dfs.keys():
+        results[f'{kind}_mean'] = dfs[kind].mean(axis=1)
+        results[f'{kind}_std'] = dfs[kind].std(axis=1)
+
+    return results
+
+def plot_final(data: pd.DataFrame, name: str = 'polymer'):
     fig, ax = plt.subplots()
-    ax.plot(results['t'], results['A'], 'bx-', label='A')
-    ax.plot(results['t'], results['B'], 'rs-', label='B')
-    ax.plot(results['t'], results['C'], 'go-', label='C')
-    ax.plot(results['t'], results['E'], 'k:')
-    fig.savefig('test.png')
+    params = dict(
+        markevery=len(data) // 30 if len(data) > 50 else 5,
+        errorevery=len(data) // 30 if len(data) > 50 else 5,
+        capsize=2
+    )
+    ax.errorbar(
+        data['t'],
+        data['A_mean'],
+        yerr=data['A_std'],
+        fmt='bx-',
+        label='A',
+        **params
+    )
+    ax.errorbar(
+        data['t'],
+        data['B_mean'],
+        yerr=data['B_std'],
+        fmt='ro-',
+        label='B',
+        **params
+    )
+
+    ax.errorbar(
+        data['t'],
+        data['C_mean'],
+        yerr=data['C_std'],
+        fmt='go-',
+        label='C',
+        **params
+    )
+
+    ax.plot(data['t'], data['E_mean'], 'k:', label='E')
+
+
+    ax.set_xlabel('Timestep', fontsize='xx-large')
+    ax.set_ylabel('N', fontsize='xx-large')
+    ax.legend(frameon=False, fontsize='x-large')
+    fig.tight_layout()
+    fig.savefig(f'{name}.png')
+    data.to_csv(f'{name}.csv', index=False)
+    return
+
+def main(
+    settings: str,
+    run: bool = False,
+    seeds: int = 5,
+    name: str = 'cube',
+    **kwargs
+):
+    logger.info('Running cube...')
+
+    with open(settings, 'r') as f:
+        parameters = yaml.safe_load(f)
+    # insert code here
+    for seed in range(1, seeds + 1, 1):
+        prefix = f'{name}.{seed}'
+        if run:
+            traj = run_simulation(prefix, **parameters)
+            analyse_trajectory(
+                traj,
+                output=f'{prefix}.csv',
+                timestep=parameters['timestep']
+            )
+        else:
+            logger.info('Skipping simulation because --run was not passed!')
+            break
+
+    results = gather_results(Path().glob(f'{name}.*.csv'))
+    logger.info(results)
+    plot_final(results, name=name)
+    logger.info('All Done!')
 
     logger.info('Done!')
     return
@@ -292,6 +434,10 @@ def main(**kwargs):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(
-        description='polymer.py - auto-generated by softnanotools'
+        description='Enzymatic reaction -A-A-A- + E -> xC + E using ReaDDy'
     )
+    parser.add_argument('settings', default='settings.yml')
+    parser.add_argument('--run', action='store_true')
+    parser.add_argument('-s', '--seeds', default=5, type=int)
+    parser.add_argument('-n', '--name', default='cube')
     main(**vars(parser.parse_args()))

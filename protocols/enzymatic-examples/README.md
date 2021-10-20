@@ -95,6 +95,10 @@ system.topologies.add_structural_reaction(
     reaction_function=reaction_function,
     rate_function=lambda x: 10000.0,
 )
+
+...
+
+simulation.reaction_handler = 'Gillespie'
 ```
 The previously described spatial reaction is registered identically since this determines when a bond should be broken.
 
@@ -116,8 +120,7 @@ def polymer_reaction_function(topology):
     # register A-B -> C + C reaction
     elif len(vertices) == 2:
         types = [topology.particle_type_of_vertex(v) for v in vertices]
-        types = sorted(types)
-        if types[0] == 'A' and types[1] == 'B':
+        if 'B' in types:
             recipe.separate_vertex(0)
             recipe.change_particle_type(vertices[0], 'C')
             recipe.change_particle_type(vertices[1], 'C')
@@ -150,5 +153,10 @@ def polymer_reaction_function(topology):
 <img src="./monatomic/D.png" alt="monatomic-D" width="500"/>
 
 ### Diatomic
+
+<img src="./diatomic/A.png" alt="diatomic-A" width="500"/>
+<img src="./diatomic/B.png" alt="diatomic-B" width="500"/>
+<img src="./diatomic/C.png" alt="diatomic-C" width="500"/>
+<img src="./diatomic/D.png" alt="diatomic-D" width="500"/>
 
 ### Polymer
