@@ -1,4 +1,5 @@
 from pathlib import Path
+import h5py
 
 from hydrogels.trajectory.core import ParticleTrajectory, TopologyTrajectory
 
@@ -6,6 +7,11 @@ FOLDER = Path(__file__).parent
 H5 = FOLDER / '_test.h5'
 
 def test_write_LAMMPS_dump():
+    try:
+        if h5py.h5.HDF5_VERSION_COMPILED_AGAINST[1] < 10:
+            return
+    except:
+        return
     traj = ParticleTrajectory(H5)
     frame = traj.frames[0]
     frame.array
@@ -16,6 +22,11 @@ def test_write_LAMMPS_dump():
     return
 
 def test_write_LAMMPS_configuration():
+    try:
+        if h5py.h5.HDF5_VERSION_COMPILED_AGAINST[1] < 10:
+            return
+    except:
+        return
     traj = ParticleTrajectory(H5)
     particles = traj.frames[0]
     traj = TopologyTrajectory(H5)
