@@ -16,8 +16,7 @@ FOLDER = Path(__file__).parent
 H5 = FOLDER / '_test.h5'
 
 def test_ParticleFrame():
-    MINOR_VERSION = h5py.version.hdf5_version_tuple[1]
-    if MINOR_VERSION > 9:
+    try:
         traj = ParticleTrajectory(H5)
         frame = traj.frames[0]
         frame.array
@@ -25,42 +24,51 @@ def test_ParticleFrame():
         output = FOLDER / 'lammps.test.conf'
         frame.to_LAMMPS_dump(output)
         output.unlink()
-    else:
-        logger.warning(f'HDF5 Version is {h5py.version.hdf5_version}')
+    except RuntimeError:
+        logger.warning(
+            f'HDF5 Version is {h5py.version.hdf5_version} and'
+            ' it failed to open a properly tested file'
+        )
     return
 
 def test_ParticleTrajectory():
-    MINOR_VERSION = h5py.version.hdf5_version_tuple[1]
-    if MINOR_VERSION > 9:
+    try:
         traj = ParticleTrajectory(H5)
         traj.time
         traj.frames
         traj.box
-    else:
-        logger.warning(f'HDF5 Version is {h5py.version.hdf5_version}')
+    except RuntimeError:
+        logger.warning(
+            f'HDF5 Version is {h5py.version.hdf5_version} and'
+            ' it failed to open a properly tested file'
+        )
     return
 
 def test_TopologyFrame():
-    MINOR_VERSION = h5py.version.hdf5_version_tuple[1]
-    if MINOR_VERSION > 9:
+    try:
         traj = TopologyTrajectory(H5)
         frame = traj.frames[0]
         frame.dataframe
-    else:
-        logger.warning(f'HDF5 Version is {h5py.version.hdf5_version}')
+    except RuntimeError:
+        logger.warning(
+            f'HDF5 Version is {h5py.version.hdf5_version} and'
+            ' it failed to open a properly tested file'
+        )
 
 def test_TopologyTrajectory():
-    MINOR_VERSION = h5py.version.hdf5_version_tuple[1]
-    if MINOR_VERSION > 9:
+    try:
         traj = TopologyTrajectory(H5)
         traj.time
         traj.frames
-    else:
-        logger.warning(f'HDF5 Version is {h5py.version.hdf5_version}')
+    except RuntimeError:
+        logger.warning(
+            f'HDF5 Version is {h5py.version.hdf5_version} and'
+            ' it failed to open a properly tested file'
+        )
 
 def test_LAMMPS_output():
-    MINOR_VERSION = h5py.version.hdf5_version_tuple[1]
-    if MINOR_VERSION > 9:
+
+    try:
         topology = TopologyTrajectory(H5)
         particles = ParticleTrajectory(H5)
 
@@ -78,8 +86,11 @@ def test_LAMMPS_output():
         for target in FOLDER.glob('conf.*'):
             target.unlink()
 
-    else:
-        logger.warning(f'HDF5 Version is {h5py.version.hdf5_version}')
+    except RuntimeError:
+        logger.warning(
+            f'HDF5 Version is {h5py.version.hdf5_version} and'
+            ' it failed to open a properly tested file'
+        )
     return
 
 if __name__ == '__main__':
