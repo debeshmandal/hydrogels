@@ -54,7 +54,7 @@ def write_LAMMPS_configuration(
     if not comment:
         comment = (
             f"Hydrogels generated LAMMPS configuration - Generated on "
-            f"{pd.Timestamp(time.time_ns()).ctime()}"
+            f"{pd.Timestamp(time.time()).ctime()}"
         )
 
     # make copies
