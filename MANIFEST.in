@@ -1,0 +1,2 @@
+include versioneer.py
+include hydrogels/_version.py
