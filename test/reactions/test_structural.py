@@ -2,7 +2,6 @@
 """
 pytest script for testing utils folder
 """
-from math import comb
 from pathlib import Path
 import numpy as np
 
