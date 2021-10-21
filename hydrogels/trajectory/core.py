@@ -61,6 +61,12 @@ class ParticleFrame():
         )
         return
 
+    def count_atoms(self) -> dict:
+        """Returns a dictionary containing the number of each atom type
+        """
+        types = self.dataframe['type']
+        return {i: len(types[types == i]) for i in set(types)}
+
     def to_LAMMPS_dump(self, fname: Union[str, Path]):
         write_LAMMPS_dump(
             self.dataframe,
@@ -120,6 +126,19 @@ class ParticleTrajectory():
     @property
     def frames(self) -> List[ParticleFrame]:
         return self._frames
+
+    def count_atoms(self) -> pd.DataFrame:
+        """Returns a dataframe containing the number of
+        each atom type at each timestep
+        """
+        result = pd.DataFrame()
+        result['t'] = self.time
+
+        particles = [frame.count_atoms() for frame in self.frames]
+        for particle_type in self.particle_types:
+            result[particle_type] = [i.get(particle_type, 0) for i in particles]
+
+        return result
 
     def to_LAMMPS_dump(self, fname: Union[str, Path]):
         """Writes the whole trajectory to LAMMPS dump
@@ -199,6 +218,11 @@ class TopologyFrame():
 
         del data
 
+    def count_bonds(self) -> dict:
+        """Returns the number of bonds in the frame
+        """
+        return len(self.dataframe)
+
     def to_LAMMPS_configuration(
         self,
         fname: Union[str, Path],
@@ -241,6 +265,15 @@ class TopologyTrajectory():
     @property
     def frames(self) -> List[TopologyFrame]:
         return self._frames
+
+    def count_bonds(self) -> pd.DataFrame:
+        """Returns a dataframe containing the number of
+        each bonds at each timestep
+        """
+        return pd.DataFrame({
+            't': self.time,
+            'bonds': [frame.count_bonds() for frame in self.frames]
+        })
 
     def to_LAMMPS_configuration(
         self,

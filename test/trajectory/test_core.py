@@ -21,6 +21,9 @@ def test_ParticleFrame():
         frame = traj.frames[0]
         frame.array
         frame.dataframe
+        atoms = frame.count_atoms()
+        assert atoms['A'] == 352
+        assert atoms['E'] == 200
         output = FOLDER / 'lammps.test.conf'
         frame.to_LAMMPS_dump(output)
         output.unlink()
@@ -37,6 +40,9 @@ def test_ParticleTrajectory():
         traj.time
         traj.frames
         traj.box
+        atoms = traj.count_atoms()
+        assert atoms['A'][0] == 352
+        assert atoms['E'][0] == 200
     except RuntimeError:
         logger.warning(
             f'HDF5 Version is {h5py.version.hdf5_version} and'
@@ -49,6 +55,7 @@ def test_TopologyFrame():
         traj = TopologyTrajectory(H5)
         frame = traj.frames[0]
         frame.dataframe
+        assert frame.count_bonds() == 528
     except RuntimeError:
         logger.warning(
             f'HDF5 Version is {h5py.version.hdf5_version} and'
@@ -60,6 +67,8 @@ def test_TopologyTrajectory():
         traj = TopologyTrajectory(H5)
         traj.time
         traj.frames
+        bonds = traj.count_bonds()
+        assert bonds['bonds'][0] == 528
     except RuntimeError:
         logger.warning(
             f'HDF5 Version is {h5py.version.hdf5_version} and'
