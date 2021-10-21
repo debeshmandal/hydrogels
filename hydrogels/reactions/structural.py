@@ -12,6 +12,32 @@ import readdy
 from softnanotools.logger import Logger
 logger = Logger(__name__)
 
+class StructuralReaction:
+    def __init__(
+        self,
+        reaction_function,
+        name: str = 'reaction',
+        topology_type: str = 'molecule',
+        rate_function: Callable = lambda x: 10000.0,
+    ):
+        self.name = name
+        self.topology_type = topology_type
+        self.reaction_function = reaction_function
+        self.rate_function = rate_function
+
+    def __call__(self, topology):
+        return self.reaction_function(topology)
+
+    def register(self, system: readdy.ReactionDiffusionSystem):
+        """Registers the structural reaction to a given system"""
+        system.topologies.add_structural_reaction(
+            self.name,
+            topology_type=self.topology_type,
+            reaction_function=self,
+            rate_function=self.rate_function,
+        )
+        return
+
 class BondBreaking:
     """Class to store different Bond Breaking structural reactions
     for use in ReaDDy.
@@ -33,12 +59,12 @@ class BondBreaking:
     Example:
 
     ```python
-    reaction = BondBreaking('R', 'I', 'P')
+    reaction = BondBreaking('R', 'I', 'P').polymer
     ...
     system.topologies.add_structural_reaction(
         name=reaction.name
         topology_type=reaction.topology_type
-        reaction_function=reaction.polymer
+        reaction_function=reaction
         rate_function=reaction.rate_function
     )
     ```
@@ -112,7 +138,12 @@ class BondBreaking:
 
             # return the configured recipe
             return recipe
-        return fn
+        return StructuralReaction(
+            fn,
+            name=self.name,
+            topology_type=self.topology_type,
+            rate_function=self.rate_function
+        )
 
     @property
     def polymer(self) -> Callable:
@@ -155,7 +186,12 @@ class BondBreaking:
                         recipe.remove_edge(edge[0], edge[1])
                         recipe.change_particle_type(edge[1], self.reactant)
             return recipe
-        return fn
+        return StructuralReaction(
+            fn,
+            name=self.name,
+            topology_type=self.topology_type,
+            rate_function=self.rate_function
+        )
 
 if __name__ == '__main__':
     import doctest

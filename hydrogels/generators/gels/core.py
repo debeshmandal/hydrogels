@@ -10,12 +10,12 @@ import pandas as pd
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 
-from typing import List
+from typing import Callable, List, Union
 
 import readdy
 
 from ...utils.topology import Topology
-from ..polymers import LinearPolymer, CrosslinkingPolymer
+from ...reactions import BondBreaking, StructuralReaction
 
 class Gel(Topology):
     """
@@ -66,13 +66,29 @@ class Gel(Topology):
 
     def register_decay(
         self,
-        system,
-        released: str = 'released',
-        reaction_type: str = 'new',
-        rate: float = 1e-3
+        system: readdy.ReactionDiffusionSystem,
+        released: str = None,
+        reaction_type: Union[str, StructuralReaction] = 'polymer',
+        rate: Union[float, Callable] = None,
     ):
         """Registers the decay of unbonded topology particles
-        to released particles"""
+        to released particles to a system
+
+        Parameters:
+            system: A ReaDDy system instance
+            released: name of the released particle aka the product
+            reaction_type: the name or a custom scheme of a reaction type
+            rate: constant rate or pre-defined rate function
+
+        """
+
+        if isinstance(reaction_type, StructuralReaction):
+            reaction_type.register(system)
+
+        if not released:
+            released = 'released'
+
+        name = 'decay'
 
         def function(topology):
             recipe = readdy.StructuralReactionRecipe(topology)
@@ -82,52 +98,39 @@ class Gel(Topology):
                 recipe.change_particle_type(index, released)
             return recipe
 
-        def function_2(topology):
-            recipe = readdy.StructuralReactionRecipe(topology)
-            graph = topology.get_graph()
-            for edge in graph.edges:
-                v1, v2 = edge[0], edge[1]
-                types = [topology.particles[v1.particle_index].type]
-                types.append(topology.particles[v2.particle_index].type)
-                if types[0] == self.unbonded or types[1] == self.unbonded:
-                    for i, v in enumerate([v1, v2]):
-                        index = v.particle_index
-                        if types[i] == self.unbonded:
-                            n = 0
-                            for neighbour in v:
-                                n += 1
-                            if n == 0:
-                                # if no neighbours, release particle from
-                                # topology and change to released
-                                recipe.change_particle_type(
-                                    topology.particles[index],
-                                    released
-                                )
-                                recipe.separate_vertex(index)
-                                break
-                            else:
-                                # if there are neighbours,
-                                recipe.change_particle_type(
-                                    topology.particles[index],
-                                    self.monomer
-                                )
-                                recipe.remove_edge(edge)
-                                break
+        # parse rate options
+        if isinstance(rate, Callable):
+            rate_function = rate
 
+        if isinstance(rate, (float, int)):
+            rate_function = lambda x: rate
 
-            return recipe
+        if not rate:
+            rate_function = lambda x: 10000.0
+
+        default = StructuralReaction(
+            function,
+            name=name,
+            topology_type=self.top_type,
+            rate_function=rate_function
+        )
+
+        bond_breaking_instance = BondBreaking(
+            self.monomer,
+            self.unbonded,
+            released,
+            name=name,
+            topology_type=self.top_type,
+            rate_function=rate_function
+        )
 
         reaction_types = {
-            'old': function,
-            'new': function_2
+            'legacy': default,
+            'polymer': bond_breaking_instance.polymer,
+            'diatomic': bond_breaking_instance.diatomic
         }
 
-        system.topologies.add_structural_reaction(
-            'decay',
-            topology_type=self.top_type,
-            reaction_function=reaction_types[reaction_type],
-            rate_function=lambda x: rate,
-        )
+        reaction_types[reaction_type].register(system)
 
         return
 
