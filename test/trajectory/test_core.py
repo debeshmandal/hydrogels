@@ -21,6 +21,7 @@ def test_ParticleFrame():
         frame = traj.frames[0]
         frame.array
         frame.dataframe
+        frame.translate([0, 0, 0])
         atoms = frame.count_atoms()
         assert atoms['A'] == 352
         assert atoms['E'] == 200

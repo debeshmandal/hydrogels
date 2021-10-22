@@ -92,6 +92,21 @@ class ParticleFrame():
             comment=comment,
         )
 
+    def translate(self, new: Iterable):
+        """Translates entire frame TO new centre of mass
+
+        Arguments:
+            new: New position for centre of mass
+        """
+        x = new[0]
+        y = new[1]
+        z = new[2]
+        averages = self.dataframe.mean()
+        self.dataframe['x'] += x - averages['x']
+        self.dataframe['y'] += y - averages['y']
+        self.dataframe['z'] += z - averages['z']
+        return
+
 class ParticleTrajectory():
     """Class for storing positions of particles outputted from
     a simulation using ReaDDy"""
