@@ -17,6 +17,9 @@ import readdy
 from ...utils.topology import Topology
 from ...reactions import BondBreaking, StructuralReaction
 
+from softnanotools.logger import Logger
+logger = Logger(__name__)
+
 class Gel(Topology):
     """
     A Gel is a ReaDDy Topology that can be used
@@ -130,6 +133,7 @@ class Gel(Topology):
             'diatomic': bond_breaking_instance.diatomic
         }
 
+        logger.info(f'Registering reaction type: {reaction_type}')
         reaction_types[reaction_type].register(system)
 
         return

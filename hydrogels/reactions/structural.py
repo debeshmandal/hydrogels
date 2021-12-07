@@ -30,6 +30,10 @@ class StructuralReaction:
 
     def register(self, system: readdy.ReactionDiffusionSystem):
         """Registers the structural reaction to a given system"""
+        logger.info(
+            f'Registering structural reaction {self.name}:\n'
+            f'\tTopology Type: {self.topology_type}\n'
+        )
         system.topologies.add_structural_reaction(
             self.name,
             topology_type=self.topology_type,
