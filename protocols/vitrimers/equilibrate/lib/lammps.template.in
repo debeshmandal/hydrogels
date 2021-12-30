@@ -8,9 +8,9 @@ variable lj_eps equal 1.0
 variable lj_sig equal 1.0
 variable lj_cut equal 1.12
 variable T equal 1.0
-variable steps equal 1000000
-variable thermo equal 10000
-variable dump equal 100000
+variable steps equal 100000
+variable thermo equal 1000
+variable dump equal 10000
 variable dt equal 0.000012
 variable seed equal 1
 

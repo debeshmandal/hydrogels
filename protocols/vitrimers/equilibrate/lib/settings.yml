@@ -1,4 +1,4 @@
-lammps: lmp_serial
+lammps: /home/debesh/programs/lammps/build/lmp
 input_file: lammps.template.in
 config: lammps.test.conf
 output: lammps.main.conf
@@ -13,5 +13,5 @@ potential:
     eps: 1.0
     cutoff: 1.12
     shifted: True
-enzymes: 250
+enzymes: 100
 seeds: 8

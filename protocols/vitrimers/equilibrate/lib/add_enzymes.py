@@ -3,7 +3,7 @@
 random positions within the box"""
 
 import json
-import re 
+import re
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -36,8 +36,8 @@ def read_conf(fname: str) -> dict:
 
 
     atoms = pd.read_csv(
-        fname, 
-        delim_whitespace=True, 
+        fname,
+        delim_whitespace=True,
         skiprows=settings['atoms_line']+1,
         nrows=settings['atoms'],
         header=None
@@ -54,17 +54,17 @@ def read_conf(fname: str) -> dict:
     logger.debug(f'Radius is {radius}')
 
     settings['radius'] = radius
-    
+
     # calculate radius
 
     logger.debug(json.dumps(settings, indent=2))
-            
+
     return settings
 
 def generate_enzyme_positions(box: float, radius: float, **kwargs) -> np.ndarray:
     # get number
     N = kwargs['N']
-    
+
     # scale box down to avoid enzymes escaping it
     # box = 0.85 * box
     assert box > radius
@@ -128,7 +128,7 @@ def update_file(fname: str, positions: np.ndarray, out: str, **settings):
             if line.endswith('atom types\n'):
                 f.write(f'{settings["atom_types"]} atom types\n')
                 continue
-            if i == 15:
+            if i == 14:
                 f.write(line)
                 f.write(f'{settings["atom_types"]} 1.0\n')
                 continue
@@ -156,12 +156,12 @@ def update_file(fname: str, positions: np.ndarray, out: str, **settings):
                 continue
 
             # this would be for velocities
-            #if i == settings["atoms_line"] + 3 + 2 * (settings["atoms"] - settings['N']):
-            #    f.write(line)
-            #    for j, pos in enumerate(positions):
-            #        f.write(f'{j + settings["atoms"] - settings["N"] + 1} 0.0 0.0 0.0\n')
-            #    continue
-                
+            if i == settings["atoms_line"] + 3 + 2 * (settings["atoms"] - settings['N']):
+                f.write(line)
+                for j, pos in enumerate(positions):
+                    f.write(f'{j + settings["atoms"] - settings["N"] + 1} 0.0 0.0 0.0\n')
+                continue
+
             else:
                 f.write(line)
     return
