@@ -83,7 +83,7 @@ potentials:
     sigma: 1.0
 reaction:
   decay_rate: 1.0
-  degradation_rate: 100000.0
+  degradation_rate: 1000.0
   enzyme: enzyme
   radius: 2.0
   released: released
@@ -104,6 +104,6 @@ reader:
     4: unbonded
     5: released
 simulation:
-  length: 1000
-  stride: 100000
+  length: 100
+  stride: 1000
   timestep: 6.0e-06

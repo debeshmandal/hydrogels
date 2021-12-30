@@ -1,0 +1,109 @@
+bonding:
+  gel:
+  - force_constant: 2.5
+    kind: harmonic
+    length: 1.122
+    species_1: monomer
+    species_2: monomer
+  - force_constant: 2.5
+    kind: harmonic
+    length: 1.122
+    species_1: monomer
+    species_2: unbonded
+  - force_constant: 2.5
+    kind: harmonic
+    length: 1.122
+    species_1: unbonded
+    species_2: unbonded
+diffusion_dictionary:
+  enzyme: 1.0
+  monomer: 1.0
+  released: 1.0
+  unbonded: 1.0
+potentials:
+  - atom_1: monomer
+    atom_2: monomer
+    cutoff: 1.122
+    epsilon: 1.0
+    kind: lj
+    sigma: 1.0
+  - atom_1: monomer
+    atom_2: unbonded
+    cutoff: 1.122
+    epsilon: 1.0
+    kind: lj
+    sigma: 1.0
+  - atom_1: unbonded
+    atom_2: unbonded
+    cutoff: 1.122
+    epsilon: 1.0
+    kind: lj
+    sigma: 1.0
+  - atom_1: enzyme
+    atom_2: enzyme
+    cutoff: 1.122
+    epsilon: 1.0
+    kind: lj
+    sigma: 1.0
+  - atom_1: released
+    atom_2: released
+    cutoff: 1.122
+    epsilon: 1.0
+    kind: lj
+    sigma: 1.0
+  - atom_1: monomer
+    atom_2: released
+    cutoff: 1.122
+    epsilon: 1.0
+    kind: lj
+    sigma: 1.0
+  - atom_1: enzyme
+    atom_2: released
+    cutoff: 1.122
+    epsilon: 1.0
+    kind: lj
+    sigma: 1.0
+  - atom_1: unbonded
+    atom_2: released
+    cutoff: 1.122
+    epsilon: 1.0
+    kind: lj
+    sigma: 1.0
+  - atom_1: enzyme
+    atom_2: unbonded
+    cutoff: 1.122
+    epsilon: 1.0
+    kind: lj
+    sigma: 1.0
+  - atom_1: enzyme
+    atom_2: monomer
+    cutoff: 1.122
+    epsilon: 1.0
+    kind: lj
+    sigma: 1.0
+reaction:
+  decay_rate: 1.0
+  degradation_rate: 1000.0
+  enzyme: enzyme
+  radius: 2.0
+  released: released
+reader:
+  classes:
+  - Gel
+  - null
+  fname: lammps.main.conf
+  kind: lammps-data
+  names:
+  - gel
+  - enzyme
+  - payload
+  species:
+    1: monomer
+    2: monomer
+    3: enzyme
+    4: unbonded
+    5: released
+simulation:
+  length: 100
+  stride: 1000
+  timestep: 6.0e-06
