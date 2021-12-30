@@ -27,8 +27,8 @@ simulation:
   energy: oxdna.init.energy
   input_file: input
   seed: 1
-  interval: 1000000
-  steps: 40000000
+  interval: 100000
+  steps: 4000000
   screen: simu.screen
   forces: oxdna.forces
   T: 0.05
@@ -44,9 +44,9 @@ equilibration:
   input_file: equilibrate/lammps.main.in
 
 programs:
-  oxDNA: /rds/general/user/dm3613/home/software/oxDNA
+  oxDNA: /home/debesh/programs/oxDNA
   micro_csd:
     bin: micro_csd
     cpp: micro_csd.cpp
   compiler: g++
-  lammps: lmp_serial
+  lammps: /home/debesh/programs/lammps/build/lmp
