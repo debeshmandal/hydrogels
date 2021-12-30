@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 from collections import Counter
 
-from hydrogels.utils.logger import Logger
+from softnanotools.logger import Logger
 logger = Logger('CONVERT')
 
 def update_edges(edges: pd.DataFrame, particles: pd.DataFrame) -> pd.DataFrame:
@@ -40,7 +40,7 @@ def find_crosslinkers(particles: pd.DataFrame, edges: pd.DataFrame):
 
 def read_oxDNA_bonds(fname: str):
     logger.info(f'Reading {fname} bonds files')
-    
+
     edges = []
     with open(fname, 'r') as f:
         N, crosslinkers = [int(i) for i in f.readline().split()[2:4]]
@@ -77,7 +77,7 @@ def format_dataframes(
     _particles: pd.DataFrame,
     _edges: pd.DataFrame,
     box: List[float]
-):  
+):
     particles = _particles.rename(columns={
         0: 'x',
         1: 'y',
@@ -88,12 +88,12 @@ def format_dataframes(
 
     for e, i in enumerate(['x', 'y', 'z']):
         break
-        
+
         temp = particles[abs(particles[i]) < (box[e]/2)]
 
         if len(temp) == 0:
             temp = particles[particles[i] > (box[e]/2)]
-            
+
         logger.debug(f'Transforming {i} using box size: {box[e]} and scale {temp[i].mean()}')
         if not np.isnan(temp[i].mean()):
             particles[i] -= temp[i].mean()

@@ -52,7 +52,8 @@ protocol.
 
 A YAML formatted configuration file that is typically the only mandatory argument for
 `lib/main.py`. The use of this file format as opposed to JSON is due to its ability to be edited
-manually or scripted using the `pyyaml` Python package.
+manually or scripted using the `pyyaml` Python package. Edit this file to ensure that the protocol
+works with your system.
 
 ## PBS, SLURM, Docker
 

@@ -1,1 +1,0 @@
-from ._analyse import Model

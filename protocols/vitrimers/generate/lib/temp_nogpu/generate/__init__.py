@@ -1,1 +1,0 @@
-from ._generate import main as run

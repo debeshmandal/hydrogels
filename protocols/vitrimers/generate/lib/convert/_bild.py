@@ -3,11 +3,11 @@ import numpy as np
 
 from typing import List
 
-from hydrogels.utils.logger import Logger
+from softnanotools.logger import Logger
 logger = Logger('BILD')
 
 def write(
-    fname: str, 
+    fname: str,
     particles: pd.DataFrame,
     edges: List[list],
     _box: np.ndarray,
@@ -35,4 +35,3 @@ def write(
         edges[['bild-cmd', 'x1', 'y1', 'z1', 'x2', 'y2', 'z2']].to_csv(
             f, sep=' ', index=False, header=None
         )
-    

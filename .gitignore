@@ -25,5 +25,8 @@ protocols/enzymatic-examples/**/yml
 protocols/enzymatic-examples/**/checkpoints
 protocols/enzymatic-examples/visualisation/**/lammps.*
 
+protocols/**/run
+protocols/**/*.tar.gz
+
 
 !test/**/_test.h5

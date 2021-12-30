@@ -5,7 +5,7 @@ import yaml
 from typing import Tuple
 from pathlib import Path
 
-from hydrogels.utils.logger import Logger
+from softnanotools.logger import Logger
 logger = Logger('GENERATE')
 
 import subprocess
@@ -50,7 +50,7 @@ def parse_yaml(fyaml: str) -> Tuple[dict]:
 
 def generate_initial_topology(fname: str, N: int, X: int):
     """Writes a simple file with N and X as the total number
-    of particles and number of crosslinkers to an oxDNA 
+    of particles and number of crosslinkers to an oxDNA
     readable topology file"""
     with open(fname, 'w') as f:
         f.write(f'{N} {X}\n')
@@ -73,7 +73,7 @@ def parse_micro_csd(data: dict) -> Tuple[str, str]:
         keys = data.keys()
         if 'bin' in keys:
             micro_csd_binary = data['bin']
-        
+
         elif 'cpp' in keys:
             micro_csd_path = data['cpp']
             micro_csd_binary = compile_micro_csd(micro_csd_path)
@@ -129,7 +129,7 @@ def main(setup_yaml: str):
             f'Do not set crosslinker_amount ({crosslinker_amount})'
             f' and crosslinker_ratio ({crosslinker_ratio})'
         )
-    
+
     if crosslinker_ratio:
         crosslinker_amount = int(crosslinker_ratio * N)
 
@@ -173,8 +173,8 @@ def main(setup_yaml: str):
     logger.debug(f'Using small-box size for generation: {small_box}')
     with open(init['screen'], 'w') as f:
         subprocess.check_output([
-            (Path(programs['oxDNA']) / 'build' / 'bin' / 'confGenerator').resolve(), 
-            init['input_file'], 
+            (Path(programs['oxDNA']) / 'build' / 'bin' / 'confGenerator').resolve(),
+            init['input_file'],
             str(small_box),
             f"topology={init['topology']}",
             f"conf_file={init['configuration']}",
@@ -260,4 +260,3 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('setup_yaml')
     main(**vars(parser.parse_args()))
-    
