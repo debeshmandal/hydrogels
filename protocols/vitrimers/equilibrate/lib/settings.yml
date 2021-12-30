@@ -1,0 +1,17 @@
+lammps: lmp_serial
+input_file: lammps.template.in
+config: lammps.test.conf
+output: lammps.main.conf
+bin_width: 0.5
+box: 50.0
+potential:
+  kind: lennard_jones
+  samples_per_shell: 100
+  max_energy: 5.0
+  parameters:
+    sig: 1.0
+    eps: 1.0
+    cutoff: 1.12
+    shifted: True
+enzymes: 250
+seeds: 8
