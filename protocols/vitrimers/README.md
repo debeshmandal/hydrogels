@@ -19,6 +19,7 @@ structure:
 │   ├── main.py
 │   ├── ...
 │   ├── ...
+├── run.sh
 └── settings.yml
 ```
 
@@ -35,6 +36,17 @@ A description of the protocol and a detailed description of the options found in
 ### `lib`
 
 The backend for the protocol access through the entrypoint `lib/main.py`
+
+### `package.sh`
+
+Creates a gzipped tarball `package.tar.gz` containing all important files for the protocol. Users
+should edit this script to include custom files.
+
+### `run.sh`
+
+A quick script that builds a directory called `run` (this is in `.gitignore`), that runs
+`package.sh`, copies `package.tar.gz` to `run`, unzips it and calls `python main.py` to run the
+protocol.
 
 ### `settings.yml`
 
