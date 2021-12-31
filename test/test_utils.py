@@ -60,6 +60,12 @@ def test_system():
     # run
     simulation.run(10, 0.1)
 
+    # load from checkpoint
+    simulation = sys.initialise_simulation(checkpoint=FOLDER / 'checkpoint_10.h5')
+
+    # run
+    simulation.run(10, 0.1)
+
     # delete output file
     OUT.unlink()
     for target in FOLDER.glob('checkpoint_*'):
