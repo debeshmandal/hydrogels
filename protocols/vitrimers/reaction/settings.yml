@@ -107,3 +107,7 @@ simulation:
   length: 100
   stride: 1000
   timestep: 6.0e-06
+  checkpoints:
+    stride: 100
+    output_directory: checkpoints
+    max_n_saves: 1

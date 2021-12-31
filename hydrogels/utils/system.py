@@ -2,6 +2,7 @@
 """
 Objects for handling commonly used high-level readdy systems
 """
+from pathlib import Path
 import typing
 import os
 import json
@@ -185,32 +186,60 @@ class System(ReactionDiffusionSystem):
             for bond in topology.bonds:
                 bond.register(self)
         else:
-
             logger.debug('Cannot find any registered bonds when adding topology!')
 
         # store in system - be aware that storing this information
         # may cause unnecessary memory usage
         self._topologies.append(topology)
 
-    def initialise_simulation(self, fout='_out.h5', checkpoint: bool = None):
+    def initialise_simulation(
+        self,
+        fout: str = '_out.h5',
+        checkpoint: Path = None,
+        checkpoint_directory: Path = None,
+    ):
+        # configure potential manager
         self.manager.configure()
+
+        # initialise simulation object
         simulation = self.simulation()
 
-        if checkpoint:
-            # implement loading particles from checkpoint
-            raise NotImplementedError
-
+        # allocate output file
         simulation.output_file = fout
         if os.path.exists(simulation.output_file):
             os.remove(simulation.output_file)
 
+        if checkpoint and checkpoint_directory:
+            logger.error(
+                'You have provided both a checkpoint file and checkpoint'
+                ' directory, please pick only one!'
+            )
 
-        # add species from dictionary
-        for species, positions in self._species.items():
-            if len(positions) != 0:
-                simulation.add_particles(species, positions)
+        if checkpoint:
 
-        #
-        for top in self.topology_list:
-            top.add_to_sim(simulation)
+            checkpoint = str(Path(checkpoint).absolute())
+            logger.info(f'Loading checkpoint from {checkpoint}')
+            # implement loading particles from checkpoint
+            simulation.load_particles_from_checkpoint(checkpoint)
+
+        elif checkpoint_directory:
+            checkpoint_directory = str(Path(checkpoint_directory).absolute())
+            # implement loading particles from checkpoint
+            logger.info(
+                f'Loading latest checkpoint from {checkpoint_directory}'
+            )
+            simulation.load_particles_from_latest_checkpoint(
+                checkpoint_directory
+            )
+
+        else:
+            # add species from dictionary
+            for species, positions in self._species.items():
+                if len(positions) != 0:
+                    simulation.add_particles(species, positions)
+
+            # add topologies to simulation using their method
+            for top in self.topology_list:
+                top.add_to_sim(simulation)
+
         return simulation
