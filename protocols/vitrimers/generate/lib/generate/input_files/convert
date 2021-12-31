@@ -1,0 +1,99 @@
+##############################
+####  PROGRAM PARAMETERS  ####
+##############################
+backend = CPU
+#backend_precision = mixed
+CUDA_list = verlet
+CUDA_device = 6
+debug = 0
+seed = 104123
+
+##############################
+####    SIM PARAMETERS    ####
+##############################
+sim_type = MD
+ensemble = NVT
+thermostat = brownian
+newtonian_steps = 53
+diff_coeff = 0.1
+box_type = cubic
+
+max_density_multiplier = 10
+
+use_barostat = false
+barostat_probability = 0.1
+P = 0
+delta_L = 0.1
+
+steps = 10000000000
+check_energy_every = 10000
+check_energy_threshold = 1.e-4
+
+T = 0.01
+dt = 0.001
+verlet_skin = 0.2
+
+interaction_type = FSInteraction
+
+FS_N = 4
+FS_N_B = 2
+FS_B_attraction = true
+
+fix_diffusion = false
+
+##############################
+####    INPUT / OUTPUT    ####
+##############################
+topology = largest_topology.dat
+conf_file = init_conf.dat
+trajectory_file = largest_bonds.dat
+refresh_vel = true
+#log_file = log.dat
+no_stdout_energy = 0
+restart_step_counter = true
+energy_file = energy.dat
+conf_output_dir = confs
+print_conf_interval = 10000000
+print_energy_every = 10000
+time_scale = linear
+external_forces = false
+external_forces_file = forces.ext
+
+plugin_search_path = /home/debesh/programs/oxDNA/contrib/rovigatti
+
+data_output_1 = {
+              name = bonds.dat
+	      only_last = true
+	      print_every = 1000000
+              col_1 = {
+                    type = FSConf
+		    print_bonds = true
+              }
+}
+
+data_output_2 = {
+              name = last_backup.dat
+	      only_last = true
+	      print_every = 1000000
+              col_1 = {
+                    type = configuration
+              }
+}
+
+analysis_data_output_1 = {
+	name = with_patches.dat
+	print_every = 1
+	col_1 = {
+		type = FSConf
+		also_patch = true
+	}
+}
+
+analysis_data_output_2 = {
+        name = nico_bonds.dat
+        print_every = 1
+        col_1 = {
+                type = FSConf
+                print_bonds = true
+        }
+}
