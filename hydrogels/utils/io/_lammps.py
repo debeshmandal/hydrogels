@@ -17,9 +17,12 @@ class LAMMPSDataReader(CoreReader):
         names: Union[dict, list, tuple] = None,
         species: dict = None,
         classes: Union[dict, list, tuple] = None,
+        style: str ='bond',
+        configure: bool = True,
         **kwargs
     ):
         super().__init__()
+        self.style = style
         self.fname = fname
         if names == None:
             self.names = None
@@ -33,6 +36,8 @@ class LAMMPSDataReader(CoreReader):
         else:
             self.classes = classes
         self._read()
+        if configure:
+            self.configure()
 
 
     def _read(self):
@@ -67,31 +72,45 @@ class LAMMPSDataReader(CoreReader):
 
         logger.debug(f'Box: {self.metadata["box"]}')
 
-        atoms = pd.read_csv(
-            self.fname,
-            delim_whitespace=True,
-            header=None,
-            nrows=n_atoms,
-            skiprows=skip_atoms,
-        ).rename(columns={
+        # manage styles for columns
+        columns = {
             0: 'id',
             1: 'mol',
             2: 'type',
             3: 'x',
             4: 'y',
             5: 'z',
-        }).sort_values('id').reset_index(drop=True)
+        }
 
-        logger.debug(f'ATOMS:\n{atoms}')
+        if self.style == 'full':
+            columns = {
+                0: 'id',
+                1: 'mol',
+                2: 'type',
+                3: 'q',
+                4: 'x',
+                5: 'y',
+                6: 'z',
+            }
+
+        self.atoms = pd.read_csv(
+            self.fname,
+            delim_whitespace=True,
+            header=None,
+            nrows=n_atoms,
+            skiprows=skip_atoms,
+        ).rename(columns=columns).sort_values('id').reset_index(drop=True)
+
+        logger.debug(f'ATOMS:\n{self.atoms}')
 
         try:
-            assert len(atoms) == n_atoms
-            assert atoms['id'].iloc[0] == 1
-            assert atoms['id'].iloc[-1] == n_atoms
+            assert len(self.atoms) == n_atoms
+            assert self.atoms['id'].iloc[0] == 1
+            assert self.atoms['id'].iloc[-1] == n_atoms
         except:
             logger.error('Assertion Error when importing Atoms')
 
-        bonds = pd.read_csv(
+        self.bonds = pd.read_csv(
             self.fname,
             delim_whitespace=True,
             header=None,
@@ -104,15 +123,17 @@ class LAMMPSDataReader(CoreReader):
             3: 'atom_2',
         }).sort_values('id').reset_index(drop=True)
 
-        logger.debug(f'BONDS:\n{bonds}')
+        logger.debug(f'BONDS:\n{self.bonds}')
         try:
-            assert len(bonds) == n_bonds
-            assert bonds['id'].iloc[0] == 1
-            assert bonds['id'].iloc[-1] == n_bonds
+            assert len(self.bonds) == n_bonds
+            assert self.bonds['id'].iloc[0] == 1
+            assert self.bonds['id'].iloc[-1] == n_bonds
         except:
             logger.error('Assertion Error when importing Bonds')
 
-        mols = set(list(atoms['mol']))
+    def configure(self, simulation):
+        """Adds positions and topologies to a ReaDDy simulation instance"""
+        mols = set(list(self.atoms['mol']))
         for idx, i in enumerate(mols):
             if isinstance(self.names, dict):
                 name = self.names[i]
@@ -123,7 +144,7 @@ class LAMMPSDataReader(CoreReader):
             else:
                 name = i
                 cls = None
-            mol = atoms[atoms['mol']==i]
+            mol = self.atoms[self.atoms['mol']==i]
             logger.debug(f"For molecule[{idx+1}] {name}:\n\nAtoms:\n{mol}")
             sequence = mol['type'].apply(
                 lambda x: self.species[x] if self.species != None else x
@@ -132,7 +153,7 @@ class LAMMPSDataReader(CoreReader):
             edges = []
 
             if cls != None:
-                for j, row in bonds.iterrows():
+                for j, row in self.bonds.iterrows():
                     if row['atom_1'] in mol['id']:
                         edges.append((row['atom_1']-1, row['atom_2']-1))
                     elif row['atom_2'] in mol['id']:
