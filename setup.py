@@ -39,7 +39,11 @@ for package in setuptools.find_packages():
     if package.split('.')[0] == 'hydrogels':
         packages.append(package)
 
-print(packages)
+ENTRY_POINTS = [
+    'hydrogels=hydrogels.cli.main:main',
+    'hydrogels.run=hydrogels.cli.run:main',
+    'hydrogels.generate=hydrogels.cli.generate:main',
+]
 
 setuptools.setup(
     name="hydrogels",
@@ -59,4 +63,7 @@ setuptools.setup(
     ext_modules=[potentials, functions],
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
+    entry_points={
+        'console_scripts': [ENTRY_POINTS]
+    }
 )

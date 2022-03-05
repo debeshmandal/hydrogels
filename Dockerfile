@@ -3,7 +3,7 @@ ENV PATH="/root/miniconda3/bin:${PATH}"
 ARG PATH="/root/miniconda3/bin:${PATH}"
 RUN apt-get update
 
-RUN apt-get install -y wget git && rm -rf /var/lib/apt/lists/*
+RUN apt-get install -y wget git build-essential && rm -rf /var/lib/apt/lists/*
 
 RUN wget \
     https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
@@ -15,9 +15,13 @@ WORKDIR /home
 
 # install python packages
 COPY conda.env conda.env
-RUN conda create --file conda.env --name hydrogels
-RUN /bin/bash -c "source activate hydrogels"
-RUN pip install softnanotools hydrogels
+RUN conda create --file conda.env --name hydrogels && \
+    /bin/bash -c "source activate hydrogels" && \
+    pip install softnanotools pybind11
+
+# install hydrogels
+COPY . hydrogels/
+RUN pip install ./hydrogels
 
 # install cmake
 RUN apt-get update \
@@ -60,3 +64,5 @@ RUN git clone https://github.com/lammps/lammps \
     && mv lmp /usr/local/bin/lmp \
     && cd /home \
     && rm -rf lammps
+
+CMD ["hydrogels"]
