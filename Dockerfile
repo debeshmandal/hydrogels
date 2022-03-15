@@ -19,10 +19,6 @@ RUN conda create --file conda.env --name hydrogels && \
     /bin/bash -c "source activate hydrogels" && \
     pip install softnanotools pybind11
 
-# install hydrogels
-COPY . hydrogels/
-RUN pip install ./hydrogels
-
 # install cmake
 RUN apt-get update \
     && apt-get install -y build-essential libssl-dev \
@@ -65,4 +61,8 @@ RUN git clone https://github.com/lammps/lammps \
     && cd /home \
     && rm -rf lammps
 
-CMD ["hydrogels"]
+# install hydrogels
+COPY . hydrogels/
+RUN pip install ./hydrogels
+
+CMD ["/bin/bash", "-c", "source activate hydrogels", "&&", "hydrogels"]

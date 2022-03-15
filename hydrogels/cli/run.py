@@ -3,8 +3,18 @@
 from softnanotools.logger import Logger
 logger = Logger("hydrogels.run")
 
-def main():
+import argparse
+
+def execute(settings: str, lammps: bool = False, readdy: bool = False):
+    return
+
+def main(**kwargs):
     print('Welcome to the hydrogels simulation runner!')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('settings')
+    parser.add_argument('--lammps', action='store_true')
+    parser.add_argument('--readdy', action='store_true')
+    execute(**vars(parser.parse_args()))
     return
 
 if __name__ == '__main__':
