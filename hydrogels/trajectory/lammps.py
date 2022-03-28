@@ -19,7 +19,8 @@ def write_LAMMPS_dump(
     data = data.copy()
     if not types:
         types = list(set(data['type']))
-    data['type'] = data['type'].apply(lambda x: types.index(x) + 1)
+    # data['type'] = data['type'].apply(lambda x: types.index(x) + 1)
+    data['type'] = data['type'] + 1
     data['id'] = data['id'] + 1
     data = data[['id', 'type', 'x', 'y', 'z']]
     with open(fname, 'w') as f:
@@ -64,7 +65,8 @@ def write_LAMMPS_configuration(
     # format particles
     if not types:
         types = list(set(particles['type']))
-    particles['type'] = particles['type'].apply(lambda x: types.index(x) + 1)
+    # particles['type'] = particles['type'].apply(lambda x: types.index(x) + 1)
+    particles['type'] = particles['type'] + 1
     particles['id'] = particles['id'] + 1
 
     # format topology

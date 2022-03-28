@@ -1,1 +1,1 @@
-from .core import ParticleFrame, ParticleTrajectory
+from .core import ParticleFrame, ParticleTrajectory, TopologyTrajectory, TopologyFrame

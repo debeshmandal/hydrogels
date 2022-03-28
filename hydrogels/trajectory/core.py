@@ -22,35 +22,42 @@ from readdy._internal.readdybinding.api import ( # type: ignore
 from .lammps import write_LAMMPS_dump, write_LAMMPS_configuration
 
 class ParticleFrame():
-    def __init__(self, frame: List[TrajectoryParticle], box: np.ndarray):
-        self.time = frame[0].t
+    def __init__(
+        self,
+        types: np.ndarray,
+        ids: np.ndarray,
+        positions: np.ndarray,
+        box: np.ndarray,
+        time: int
+    ):
+
+        self.time = time
         self.box = box
         data = {
-            'x': [],
-            'y': [],
-            'z': [],
-            'id': [],
-            'type': [],
-            'flavor': [],
-            'mol': [],
+            'x': positions[:, 0],
+            'y': positions[:, 1],
+            'z': positions[:, 2],
+            'id': ids,
+            'type': types,
+            'mol': len(ids) * [1],
         }
-        for particle in frame:
-            data['x'].append(particle.position[0])
-            data['y'].append(particle.position[1])
-            data['z'].append(particle.position[2])
-            data['id'].append(particle.id)
-            data['type'].append(particle.type)
-            data['flavor'].append(particle.flavor)
-            data['mol'].append(1)
 
-        self.dataframe = \
-            pd.DataFrame(data).sort_values('id').reset_index(drop=True)
+        self.dataframe = pd.DataFrame(data)
 
         del data
 
     @property
     def array(self) -> np.ndarray:
         return self.dataframe[['x', 'y', 'z']].to_numpy()
+
+    def assign_names(self, name_mapping: dict):
+        """Types are stored as indexes, here we add a new column called 'name'
+        to ParticleFrame.dataframe which stores the actual name as recorded by
+        ReaDDy
+        """
+        inverted_mapping = {value: key for key, value in name_mapping.items()}
+        self.dataframe['name'] = self.dataframe['type'].apply(lambda x: inverted_mapping[x])
+        return
 
     def assign_molecule(self, topology: "TopologyFrame"):
         self.dataframe['mol'] = \
@@ -114,23 +121,37 @@ class ParticleTrajectory():
         logger.info(f'Reading ReaDDy trajectory from {fname}')
         fname = Path(fname)
         _traj = readdy.Trajectory(str(fname.absolute()))
-        _raw = _traj.read()
+        _raw = _traj.read_observable_particles()
 
         self.box = _traj.box_size
         self.particle_types = _traj.particle_types
         self._time, self._frames = self.load(_raw, self.box)
+
+        for frame in self._frames:
+            frame.assign_names(self.particle_types)
 
         del _traj
         del _raw
 
     @staticmethod
     def load(
-        trajectory: list,
+        trajectory: tuple,
         box: np.ndarray
     ) -> Tuple[np.ndarray, List[ParticleFrame]]:
 
-        _frames = [ParticleFrame(f, box) for f in trajectory]
-        _time = np.array([f.time for f in _frames])
+        _frames = []
+        _time = trajectory[0]
+
+        for i in range(len(_time)):
+            _frames.append(
+                ParticleFrame(
+                    trajectory[1][i], # types
+                    trajectory[2][i], # IDs
+                    trajectory[3][i], # positions
+                    box,
+                    _time[i]
+                )
+            )
 
         return _time, _frames
 
@@ -185,6 +206,7 @@ class ParticleTrajectory():
         for i, topology_frame in enumerate(topology.frames):
             frame = frames[i]
             frame.assign_molecule(topology_frame)
+            topology_frame.remap_edges(frame)
             write_LAMMPS_configuration(
                 frame.dataframe,
                 topology_frame.dataframe,
@@ -209,6 +231,7 @@ class TopologyFrame():
             'atom_2': []
         }
         self.molecules = {}
+        self.remapped = False
         count = 1
         for i, molecule in enumerate(frame):
             particles = molecule.particles
@@ -237,6 +260,20 @@ class TopologyFrame():
         """Returns the number of bonds in the frame
         """
         return len(self.dataframe)
+
+    def remap_edges(self, pf: ParticleFrame):
+        """The atom edges are mapped by order, not by atom ID, this uses
+        the corresponding frame to remap the edges by atom ID"""
+        if self.remapped:
+            logger.info('Tried to remap edges but it has already been done!')
+            return
+        else:
+            index_map = {i: pf.dataframe['id'][i] for i in pf.dataframe.index}
+            mapping_function = lambda x: index_map.get(x, x)
+            self.dataframe['atom_1'] = self.dataframe['atom_1'].apply(mapping_function)
+            self.dataframe['atom_2'] = self.dataframe['atom_2'].apply(mapping_function)
+            self.remapped = True
+        return
 
     def to_LAMMPS_configuration(
         self,
@@ -301,6 +338,7 @@ class TopologyTrajectory():
         for i, particles_frame in enumerate(particles.frames):
             frame = frames[i]
             particles_frame.assign_molecule(frame)
+            frame.remap_edges(particles_frame)
             write_LAMMPS_configuration(
                 particles_frame.dataframe,
                 frame.dataframe,
