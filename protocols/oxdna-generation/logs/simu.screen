@@ -1,0 +1,34 @@
+WARNING: Overwriting key `topology' (`topology.dat' to `data/oxdna.init.top')
+WARNING: Overwriting key `conf_file' (`init_conf.dat' to `data/oxdna.init.conf')
+WARNING: Overwriting key `print_conf_interval' (`1000000' to `500000')
+WARNING: Overwriting key `print_energy_every' (`1000000' to `500000')
+WARNING: Overwriting key `steps' (`100000000' to `50000000')
+WARNING: Overwriting key `trajectory_file' (`trajectory.dat' to `data/oxdna.traj.conf')
+WARNING: Overwriting key `seed' (`104123' to `1')
+WARNING: Overwriting key `external_forces' (`true' to `true')
+WARNING: Overwriting key `external_forces_file' (`forces.ext' to `data/oxdna.forces')
+WARNING: Overwriting key `energy_file' (`energy.dat' to `data/oxdna.init.energy')
+WARNING: Overwriting key `plugin_search_path' (`/home/debesh/programs/oxDNA/contrib/rovigatti' to `/home/debesh/programs/oxDNA/contrib/rovigatti')
+INFO: seeding the RNG with 1
+INFO: Initializing backend 
+
+WARNING: The 'backend_precision' option cannot be set by input file when running on CPU
+
+INFO: Simulation type: MD
+INFO: ascii configuration files will have the particles put back in the box
+INFO: pid: 4576
+INFO: FS parameters: lambda = 1.000000, A_part = 14.778112, B_part = 0.012800
+INFO: FSInteraction: simulating 20 A-particles (of which 0 are defective) and 130 B-particles
+INFO: Parsing Force file data/oxdna.forces
+INFO:    Using temporary file
+INFO: Adding a RepulsiveSphere (stiff=3, r0=10, rate=0, center=10,10,10) on ALL particles
+INFO:    Force file parsed
+INFO: (Cells.cpp) N_cells_side: 10, 10, 10; rcut=2, IS_MC: 0
+INFO: N: 150, N molecules: 150
+INFO: Using randomly distributed velocities
+INFO: Initial kinetic energy: 46.329139
+INFO: RELEASE: v3.0.0-alpha
+INFO: GIT COMMIT: 4ca5a6b
+INFO: COMPILED ON: 05/11/20
+INFO: # Caught SIGNAL 2; setting stop = 1
+

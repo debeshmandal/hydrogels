@@ -1,0 +1,23 @@
+WARNING: Overwriting key `topology' (`oxdna.main.top' to `data/oxdna.init.top')
+WARNING: Overwriting key `conf_file' (`oxdna.init.conf' to `data/oxdna.init.conf')
+WARNING: Overwriting key `plugin_search_path' (`/home/debesh/programs/oxDNA/contrib/rovigatti' to `/home/debesh/programs/oxDNA/contrib/rovigatti')
+INFO: Generating configuration with side 8.66025
+INFO: Setting the random number generator with seed = 104123
+INFO: FS parameters: lambda = 1.000000, A_part = 14.778112, B_part = 0.012800
+INFO: FSInteraction: simulating 20 A-particles (of which 0 are defective) and 130 B-particles
+INFO: Generating configuration with density 0.23094 (150 particles, box sides 8.66025 8.66025 8.66025)
+INFO: RELEASE: v3.0.0-alpha
+INFO: GIT COMMIT: 4ca5a6b
+INFO: COMPILED ON: 05/11/20
+INFO: Starting generation
+INFO: (Cells.cpp) N_cells_side: 5, 5, 5; rcut=1.6, IS_MC: 0
+INFO: Inserted 10% of the particles (15/150)
+INFO: Inserted 20% of the particles (30/150)
+INFO: Inserted 30% of the particles (45/150)
+INFO: Inserted 40% of the particles (60/150)
+INFO: Inserted 50% of the particles (75/150)
+INFO: Inserted 60% of the particles (90/150)
+INFO: Inserted 70% of the particles (105/150)
+INFO: Inserted 80% of the particles (120/150)
+INFO: Inserted 90% of the particles (135/150)
+INFO: END OF THE GENERATION, everything went OK!

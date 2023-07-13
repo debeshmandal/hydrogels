@@ -1,0 +1,169 @@
+LAMMPS (22 Oct 2020)
+# Hydrogels Equilibration Script
+
+variable fname string configs/gel-N150-X20-b20.1.lammps
+variable fout string lammps.data.conf
+variable bond_length equal 1.0
+variable bond_strength equal 2.5
+variable lj_eps equal 1.0
+variable lj_sig equal 1.0
+variable lj_cut equal 2.0
+variable T equal 1.0
+variable steps equal 1000000
+variable thermo equal 100000
+variable dt equal 0.012
+
+units		lj
+atom_style	bond
+special_bonds   fene
+
+read_data	${fname}
+read_data	configs/gel-N150-X20-b20.1.lammps
+Reading data file ...
+  orthogonal box = (-20.000000 -20.000000 -20.000000) to (20.000000 20.000000 20.000000)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  42 atoms
+  scanning bonds ...
+  4 = max bonds/atom
+  reading bonds ...
+  43 bonds
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0.0      1.0      1.0     
+  special bond factors coul:  0.0      1.0      1.0     
+     4 = max # of 1-2 neighbors
+     4 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.002 seconds
+
+neighbor	0.4 bin
+neigh_modify	every 1 delay 1
+
+bond_style  harmonic
+bond_coeff	* ${bond_strength} ${bond_length}
+bond_coeff	* 2.5 ${bond_length}
+bond_coeff	* 2.5 1
+
+pair_style	lj/cut 1.12
+pair_modify	shift yes
+pair_coeff	* * ${lj_eps} ${lj_sig} ${lj_cut}
+pair_coeff	* * 1 ${lj_sig} ${lj_cut}
+pair_coeff	* * 1 1 ${lj_cut}
+pair_coeff	* * 1 1 2
+
+fix		1 all nve
+fix		2 all langevin ${T} ${T} 10.0 904297
+fix		2 all langevin 1 ${T} 10.0 904297
+fix		2 all langevin 1 1 10.0 904297
+fix		3 all recenter 0.0 0.0 0.0
+
+minimize 0.0 1.0e-8 1000 100000
+WARNING: Using 'neigh_modify every 1 delay 0 check yes' setting during minimization (../min.cpp:187)
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.4
+  ghost atom cutoff = 2.4
+  binsize = 1.2, bins = 34 34 34
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d/newton
+      bin: standard
+WARNING: Bond/angle/dihedral extent > half of periodic box length (../domain.cpp:933)
+Per MPI rank memory allocation (min/avg/max) = 5.975 | 5.975 | 5.975 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+       0            0  -0.11301826       19.269    19.155982 -0.0092712761 
+    1000            0   -5.2239181   0.83125664   -4.3926615 5.7523878e-11 
+Loop time of 0.0337942 on 1 procs for 1000 steps with 42 atoms
+
+46.2% CPU use with 1 MPI tasks x no OpenMP threads
+
+Minimization stats:
+  Stopping criterion = max iterations
+  Energy initial, next-to-last, final = 
+      19.1559815452294  -4.39266145776252   -4.3926614577628
+  Force two-norm initial, final = 129.42915 9.7156288e-05
+  Force max component initial, final = 92.000742 3.4071796e-05
+  Final line search alpha, max atom move = 1.0000000 3.4071796e-05
+  Iterations, force evaluations = 1000 1873
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.017015   | 0.017015   | 0.017015   |   0.0 | 50.35
+Bond    | 0.0021076  | 0.0021076  | 0.0021076  |   0.0 |  6.24
+Neigh   | 0.008837   | 0.008837   | 0.008837   |   0.0 | 26.15
+Comm    | 0.001848   | 0.001848   | 0.001848   |   0.0 |  5.47
+Output  | 4.22e-05   | 4.22e-05   | 4.22e-05   |   0.0 |  0.12
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 0.003945   |            |       | 11.67
+
+Nlocal:        42.0000 ave          42 max          42 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:        0.00000 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:        616.000 ave         616 max         616 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 616
+Ave neighs/atom = 14.666667
+Ave special neighs/atom = 2.0476190
+Neighbor list builds = 172
+Dangerous builds = 0
+reset_timestep 0
+
+thermo  ${thermo}
+thermo  100000
+timestep	${dt}
+timestep	0.012
+
+run		${steps}
+run		1000000
+Per MPI rank memory allocation (min/avg/max) = 4.850 | 4.850 | 4.850 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+       0            0   -5.2239181   0.83125664   -4.3926615 5.7523878e-11 
+  100000    1.0972973    -1.667252   0.64358938   0.58309407 -0.00020105593 
+  200000    1.3417631   -1.9151057   0.70343833   0.75305717 0.00010486282 
+  300000    1.0375957   -1.3794097   0.66901476   0.80894156 -0.00012313885 
+  400000   0.97351189   -1.8413325    0.5148496  0.099016698 0.00057835299 
+  500000   0.81733124   -1.9284041   0.80225919  0.070661505 -0.00048737918 
+  600000   0.79780084   -1.5298662   0.66088702   0.29922921 -0.00016091766 
+  700000   0.95848639   -1.9197672   0.61934093   0.10307164 -0.00039148457 
+  800000   0.84207298    -1.400307   0.73760195   0.57033034 -0.00027068815 
+  900000    1.1300535   -1.9386536    0.6032373   0.31930491 0.00036648018 
+ 1000000    1.1943147   -2.4260321   0.49761879   -0.1795953 0.00010454696 
+Loop time of 22.9094 on 1 procs for 1000000 steps with 42 atoms
+
+Performance: 45256558.655 tau/day, 43650.230 timesteps/s
+86.6% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 5.3586     | 5.3586     | 5.3586     |   0.0 | 23.39
+Bond    | 0.99799    | 0.99799    | 0.99799    |   0.0 |  4.36
+Neigh   | 10.057     | 10.057     | 10.057     |   0.0 | 43.90
+Comm    | 1.0895     | 1.0895     | 1.0895     |   0.0 |  4.76
+Output  | 0.0023539  | 0.0023539  | 0.0023539  |   0.0 |  0.01
+Modify  | 3.7695     | 3.7695     | 3.7695     |   0.0 | 16.45
+Other   |            | 1.634      |            |       |  7.13
+
+Nlocal:        42.0000 ave          42 max          42 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:        0.00000 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:        422.000 ave         422 max         422 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 422
+Ave neighs/atom = 10.047619
+Ave special neighs/atom = 2.0476190
+Neighbor list builds = 172241
+Dangerous builds = 1
+
+write_data ${fout} pair ij
+write_data lammps.data.conf pair ij
+System init for write_data ...
+Total wall time: 0:00:22

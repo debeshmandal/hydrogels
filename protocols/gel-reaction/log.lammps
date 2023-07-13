@@ -1,0 +1,207 @@
+LAMMPS (22 Oct 2020)
+# Hydrogels Equilibration Script
+
+variable fname string lammps.main.conf
+variable fout string data.out
+variable bond_length equal 1.122
+variable bond_strength equal 2.5
+variable lj_eps equal 1.0
+variable lj_sig equal 1.0
+variable lj_cut equal 1.122
+variable T equal 0.05
+variable steps equal 1000000
+variable thermo equal 100000
+variable dt equal 0.00012
+variable global_cutoff equal 19
+variable comm_cutoff equal "v_global_cutoff + 0.5"
+
+variable delta equal 0.25
+variable n_bins equal "floor(v_global_cutoff / v_delta)"
+
+units		lj
+special_bonds  lj 1.0 1.0 1.0
+atom_style	bond
+bond_style  harmonic
+pair_style	lj/cut ${lj_cut}
+pair_style	lj/cut 1.122
+pair_modify shift yes
+read_data	${fname}
+read_data	lammps.main.conf
+Reading data file ...
+  orthogonal box = (-25.000000 -25.000000 -25.000000) to (25.000000 25.000000 25.000000)
+  1 by 1 by 2 MPI processor grid
+  reading atoms ...
+  2000 atoms
+  scanning bonds ...
+  4 = max bonds/atom
+  reading bonds ...
+  1297 bonds
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    1.0      1.0      1.0     
+  special bond factors coul:  0.0      0.0      0.0     
+     4 = max # of 1-2 neighbors
+     6 = max # of 1-3 neighbors
+    16 = max # of 1-4 neighbors
+    20 = max # of special neighbors
+  special bonds CPU = 0.001 seconds
+  read_data CPU = 0.014 seconds
+
+bond_coeff	* ${bond_strength} ${bond_length}
+bond_coeff	* 2.5 ${bond_length}
+bond_coeff	* 2.5 1.122
+pair_coeff	* * ${lj_eps} ${lj_sig} ${lj_cut}
+pair_coeff	* * 1 ${lj_sig} ${lj_cut}
+pair_coeff	* * 1 1 ${lj_cut}
+pair_coeff	* * 1 1 1.122
+
+comm_style tiled
+comm_modify cutoff ${comm_cutoff}
+comm_modify cutoff 19.5
+
+group gel type 1 2
+1000 atoms in group gel
+group crosslinkers type 2
+295 atoms in group crosslinkers
+
+neighbor	0.4 bin
+neigh_modify	every 1 delay 1 page 100000000 one 1000000
+
+fix		1 all nve
+fix		2 all langevin ${T} ${T} 10.0 904297
+fix		2 all langevin 0.05 ${T} 10.0 904297
+fix		2 all langevin 0.05 0.05 10.0 904297
+fix		3 gel recenter 0.0 0.0 0.0
+fix   4 all balance ${thermo} 1.1 rcb
+fix   4 all balance 100000 1.1 rcb
+
+# compute gyration radius
+compute gyr gel gyration
+
+# compute rdfs
+# variable rdf_bins equal "v_global_cutoff / 0.5"
+# compute rdf_N all rdf ${n_bins} * * cutoff ${global_cutoff}
+# compute rdf_X crosslinkers rdf ${n_bins} 2 2 cutoff ${global_cutoff}
+
+# compute density profile
+# variable rho_bins equal "ceil(v_global_cutoff)"
+# compute rho_N all chunk/atom bin/sphere 0 0 0 0.0 ${global_cutoff} ${n_bins} discard yes
+# compute rho_X crosslinkers chunk/atom bin/sphere 0 0 0 0.0 ${global_cutoff} ${n_bins} discard yes
+
+minimize 0.0 1.0e-8 1000 100000
+WARNING: Using 'neigh_modify every 1 delay 0 check yes' setting during minimization (../min.cpp:187)
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 1000000, page size: 100000000
+  master list distance cutoff = 1.522
+  ghost atom cutoff = 19.5
+  binsize = 0.761, bins = 66 66 66
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d/newton
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 392.5 | 392.5 | 392.5 Mbytes
+Step Temp E_pair E_mol TotEng Press Volume 
+       0            0 2.5266482e+11   0.03060115 2.5266482e+11 1.6170549e+10       125000 
+     440            0 5.2076699e-07 1.213434e-05 1.2655107e-05 -3.5655795e-06       125000 
+Loop time of 0.2812 on 2 procs for 440 steps with 2000 atoms
+
+88.9% CPU use with 2 MPI tasks x no OpenMP threads
+
+Minimization stats:
+  Stopping criterion = linesearch alpha is zero
+  Energy initial, next-to-last, final = 
+      252664818339.323 1.26551069109313e-05 1.26551069109313e-05
+  Force two-norm initial, final = 1.2694161e+17 0.22674813
+  Force max component initial, final = 7.2012044e+16 0.060203837
+  Final line search alpha, max atom move = 0.001953125 0.00011758562
+  Iterations, force evaluations = 440 2312
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.04862    | 0.052476   | 0.056332   |   1.7 | 18.66
+Bond    | 0.024071   | 0.02504    | 0.02601    |   0.6 |  8.90
+Neigh   | 0.045228   | 0.045251   | 0.045274   |   0.0 | 16.09
+Comm    | 0.09654    | 0.10572    | 0.11491    |   2.8 | 37.60
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 0.05271    |            |       | 18.74
+
+Nlocal:        1000.00 ave        1028 max         972 min
+Histogram: 1 0 0 0 0 0 0 0 0 1
+Nghost:        4248.00 ave        4267 max        4229 min
+Histogram: 1 0 0 0 0 0 0 0 0 1
+Neighs:        1977.50 ave        2188 max        1767 min
+Histogram: 1 0 0 0 0 0 0 0 0 1
+
+Total # of neighbors = 3955
+Ave neighs/atom = 1.9775000
+Ave special neighs/atom = 7.1210000
+Neighbor list builds = 31
+Dangerous builds = 0
+reset_timestep 0
+
+
+thermo_style custom step temp press pe ke etotal c_gyr
+thermo  ${thermo}
+thermo  100000
+timestep	${dt}
+timestep	0.00012
+
+# fix rdf_out all ave/time 10 1000 ${steps} c_rdf_N[*] c_rdf_X[*] file out.rdf mode vector
+# fix gyr_out all ave/time 10 1000 ${steps} c_gyr c_gyr[1] c_gyr[2] c_gyr[3] c_gyr[4] c_gyr[5] c_gyr[6] file out.gyr
+# fix rho_out_N all ave/histo 10 1000 ${steps} 0.0 ${global_cutoff} ${rho_bins} c_rho_N[*] file out.rho.N mode vector kind peratom
+# fix rho_out_X all ave/histo 10 1000 ${steps} 0.0 ${global_cutoff} ${rho_bins} c_rho_X[*] file out.rho.X mode vector kind peratom
+
+dump out all custom ${thermo} dump.out id type mol x y z vx vy vz fx fy fz
+dump out all custom 100000 dump.out id type mol x y z vx vy vz fx fy fz
+write_data ${fout} pair ij
+write_data data.out pair ij
+System init for write_data ...
+
+run		${steps}
+run		1000000
+Per MPI rank memory allocation (min/avg/max) = 392.7 | 392.7 | 392.7 Mbytes
+Step Temp Press PotEng KinEng TotEng c_gyr 
+       0            0 -3.5655795e-06 1.2655107e-05            0 1.2655107e-05    5.9509773 
+  100000  0.042163096 0.00037210225  0.015584254  0.063213022  0.078797276    6.6019211 
+  200000  0.048867085 0.00034317015  0.020083832  0.073263978   0.09334781    6.9946774 
+  300000  0.050528801  0.000317846  0.020633679  0.075755305  0.096388984       6.9357 
+  400000  0.048944837 0.00048172372  0.021198765  0.073380547  0.094579312    6.9655697 
+  500000  0.050660935 0.00045278174   0.02171433  0.075953406  0.097667736    6.9804036 
+  600000  0.050328525 0.00040567476  0.022232885  0.075455041  0.097687926    6.9285193 
+  700000  0.050334011 0.00046155429  0.020415178  0.075463266  0.095878444    7.0017883 
+  800000  0.050709618 0.00047090245  0.021736954  0.076026395  0.097763349    7.0459392 
+  900000  0.050602602 0.00056714241  0.020848696  0.075865951  0.096714647    6.9660035 
+ 1000000  0.050146462 0.00033679781   0.02065922  0.075182084  0.095841304    6.9583433 
+Loop time of 155.44 on 2 procs for 1000000 steps with 2000 atoms
+
+Performance: 66701.155 tau/day, 6433.368 timesteps/s
+92.5% CPU use with 2 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 13.062     | 14.025     | 14.988     |  25.7 |  9.02
+Bond    | 9.6027     | 9.7953     | 9.9879     |   6.2 |  6.30
+Neigh   | 0.93302    | 0.93362    | 0.93422    |   0.1 |  0.60
+Comm    | 46.864     | 49.483     | 52.102     |  37.2 | 31.83
+Output  | 0.038817   | 0.038873   | 0.03893    |   0.0 |  0.03
+Modify  | 69.671     | 71.128     | 72.584     |  17.3 | 45.76
+Other   |            | 10.04      |            |       |  6.46
+
+Nlocal:        1000.00 ave        1010 max         990 min
+Histogram: 1 0 0 0 0 0 0 0 0 1
+Nghost:        4545.00 ave        4559 max        4531 min
+Histogram: 1 0 0 0 0 0 0 0 0 1
+Neighs:        1342.50 ave        1444 max        1241 min
+Histogram: 1 0 0 0 0 0 0 0 0 1
+
+Total # of neighbors = 2685
+Ave neighs/atom = 1.3425000
+Ave special neighs/atom = 7.1210000
+Neighbor list builds = 561
+Dangerous builds = 0
+Total wall time: 0:02:35

@@ -1,0 +1,15 @@
+WARNING: Overwriting key `conf_file' (`init_conf.dat' to `data/oxdna.init.conf')
+WARNING: Overwriting key `plugin_search_path' (`/home/debesh/programs/oxDNA/contrib/rovigatti' to `/home/debesh/programs/oxDNA/contrib/rovigatti')
+INFO: Setting the random number generator with seed = 104123
+INFO: FS parameters: lambda = 1.000000, A_part = 14.778112, B_part = 0.012800
+INFO: FSInteraction: simulating 6 A-particles (of which 0 are defective) and 36 B-particles
+INFO: (Cells.cpp) N_cells_side: 5, 5, 5; rcut=2, IS_MC: 0
+INFO: N: 42, N molecules: 42
+INFO: RELEASE: v3.0.0-alpha
+INFO: GIT COMMIT: 4ca5a6b
+INFO: COMPILED ON: 05/11/20
+INFO: Starting analysis
+INFO: END OF THE ANALYSIS, everything went OK!
+INFO: Aggregated I/O statistics (set debug=1 for file-wise information)
+	 17.166 KB written to files
+	  0.000  B written to stdout/stderr
